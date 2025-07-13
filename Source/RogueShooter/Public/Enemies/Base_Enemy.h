@@ -4,11 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "RogueShooter/FlowControlLIbrary.h"
 #include "Base_Enemy.generated.h"
 
 class UInterface_GameManager;
 class ASoul;
 class USphereComponent;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeath);
 
 UCLASS()
 class ROGUESHOOTER_API ABase_Enemy : public ACharacter
@@ -30,7 +33,30 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	// Combat
+	UFUNCTION(Category = "On Overlap Event")
+	void AttackSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	UFUNCTION(Category = "On Overlap Event")
+	void AttackSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION()
+	void DamagePlayer();
+
+	// TODO : Multicast이다. 어떻게 적용해야할까?
+	UFUNCTION()
+	void MC_EnemyAttack();
+
+	UFUNCTION()
+	void MC_OnHit();
+
+	UFUNCTION()
+	void MC_ShowAura();
+	
+	void SetTimerWithDelay(float Time, bool bLoop);
+
+	void Reset() {DoOnce.Reset();}
+	
 public:
 	// Component
 	
@@ -88,4 +114,28 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup")
 	FTimerHandle DamagePlayerTimerReference;
+	
+	FTimerDelegate DamageSphereOverlapDelegate;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup")
+	FTimerHandle RetriggerHandle;
+
+	FTimerDelegate RetriggerDelegate;
+	
+	FDoOnce DoOnce;
+
+	FAudioDeviceHandle EnemySoundHandle;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy")
+	TObjectPtr<USoundBase> EnemySound;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy")
+	TObjectPtr<USoundBase> ImpactSound;
+	
+	//  FRetriggerableTimer RetriggerTimer;
+	
+	// Delegate
+public:
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Base Enemy|Delegate")
+	FOnDeath OnDeath;
 };

@@ -26,8 +26,22 @@ namespace AssetPath
 		
 	}
 
+	namespace Montage
+	{
+		const FString EnemyMelee = TEXT("AnimMontage'/Game/SurvivorsTemplate/Demo/Animations/AM_EnemyMelee.AM_EnemyMelee'");
+		const FString GruntlingDeath = TEXT("AnimMontage'/Game/SurvivorsTemplate/Demo/InfinityBladeAdversaries/Enemy/Enemy_Gruntling/Enemy_Gruntling_Animation/AM_Gruntling_Death.AM_Gruntling_Death'");
+	}
+	
+	namespace Sound
+	{
+		const FString CueEnemyAttack = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/Creatures/Guardian/Cue_EnemyAttack.Cue_EnemyAttack'");
+		const FString CueImpact = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/Creatures/Guardian/Cue_Impact.Cue_Impact'");
+	}
+	
 	namespace EffectTemplate
 	{
 		const FString BaseSoul = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Ability/Summon/P_Summon_Parent_Startup.P_Summon_Parent_Startup'");
+		const FString BaseEnemy = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Skill_Aura/P_AuraCircle_Default_IronSkin_02.P_AuraCircle_Default_IronSkin_02'");
+		
 	}
 }

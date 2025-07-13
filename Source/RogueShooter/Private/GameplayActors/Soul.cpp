@@ -10,6 +10,7 @@
 #include "Interface/Interface_GameManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "RogueShooter/AssetPath.h"
 #include "RogueShooter/FlowControlLIbrary.h"
 
 
@@ -27,6 +28,9 @@ ASoul::ASoul()
 
 	Sphere->SetLineThickness(0.0f);
 
+	// sphere component에 바인드
+	Sphere->OnComponentBeginOverlap.AddDynamic(this,&ASoul::OuterSphereBeginOverlap);
+
 	// Inner 설정
 	Inner = CreateDefaultSubobject<USphereComponent>("Inner");
 
@@ -34,12 +38,22 @@ ASoul::ASoul()
 
 	Inner->SetLineThickness(0.0f);
 
+	// inner sphere component에 바인드
+	Inner->OnComponentBeginOverlap.AddDynamic(this,&ASoul::InnerSphereBeginOverlap);
+
+
 	// Particle System Component 설정
 	ParticleSystemComponent = CreateDefaultSubobject<UParticleSystemComponent>("ParticleSystem");
 
 	ParticleSystemComponent->bEditableWhenInherited = true;
 
-	
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleFinder(*AssetPath::EffectTemplate::BaseSoul);
+	if(ParticleFinder.Succeeded())
+	{
+		ParticleSystemComponent->SetTemplate(ParticleFinder.Object);
+	}
+
+	ParticleSystemComponent->SetAutoActivate(true);
 	
 	// 구조 설정 
 	SetRootComponent(Sphere);
@@ -59,6 +73,8 @@ void ASoul::BeginPlay()
 	Super::BeginPlay();
 
 	TimelineUpdate.BindUFunction(this,FName("SoulLocationUpdate"));
+
+	
 }
 
 // Called every frame

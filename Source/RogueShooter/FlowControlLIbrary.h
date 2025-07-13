@@ -69,3 +69,35 @@ FORCEINLINE FGate::FGate() : bGateOpen(true)
 FORCEINLINE FGate::FGate(const bool bStartClosed) : bGateOpen(!bStartClosed)
 {
 }
+
+USTRUCT(BlueprintType)
+struct FRetriggerableTimer
+{
+	GENERATED_BODY()
+
+public:
+	FORCEINLINE FRetriggerableTimer() {}
+
+	FORCEINLINE FRetriggerableTimer(UObject* Object,FName FunctionName) {SetDelegate(Object,FunctionName);}
+	
+	FORCEINLINE void SetTimerWithDelegate(const UWorld* World, float Time, bool bLoop)
+	{
+		if(!World)
+		{
+			// 메시지 
+			return;
+		}
+		World->GetTimerManager().ClearTimer(TimerHandle);
+		World->GetTimerManager().SetTimer(TimerHandle, TimeDelegate, Time, bLoop);
+	}
+
+	FORCEINLINE void SetDelegate(UObject* Object,FName FunctionName)
+	{
+		TimeDelegate.BindUFunction(Object,FunctionName);
+	}
+private:
+	UPROPERTY(VisibleAnywhere)
+	FTimerHandle TimerHandle;
+
+	FTimerDelegate TimeDelegate;
+};
