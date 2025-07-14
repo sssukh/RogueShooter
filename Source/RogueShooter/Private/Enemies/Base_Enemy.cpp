@@ -4,13 +4,19 @@
 #include "Enemies/Base_Enemy.h"
 
 #include "AudioDevice.h"
+#include "AI/Base_AIController.h"
 #include "AssetTypeActions/AssetDefinition_SoundBase.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "Engine/DamageEvents.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameplayActors/Base_Chest.h"
+#include "GameplayActors/FloatingTextActor.h"
+#include "GameplayActors/Soul.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "RogueShooter/AssetPath.h"
+
 
 
 // Sets default values
@@ -84,6 +90,7 @@ ABase_Enemy::ABase_Enemy()
 
 	DoOnce = FDoOnce();
 
+	TakeDamageDoOnce = FDoOnce();
 	// RetriggerTimer = FRetriggerableTimer(this,FName("Reset"));
 
 }
@@ -181,10 +188,120 @@ void ABase_Enemy::MC_ShowAura()
 	}
 }
 
+float ABase_Enemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+	class AController* EventInstigator, AActor* DamageCauser)
+{
+	SpawnFloatingText(DamageAmount);
+
+	MC_OnHit();
+
+	// 피격당한 상황을 보이게한다.
+	GetCharacterMovement()->StopMovementKeepPathing();
+
+	Health = Health - DamageAmount;
+
+	if(Health<=0)
+	{
+		if(TakeDamageDoOnce.Execute())
+		{
+			bIsDead =  true;
+
+			// On Death 호출
+
+			SpawnSoul();
+
+			GetCharacterMovement()->StopMovementImmediately();
+
+			BaseControllerReference->StopMovement();
+
+			BaseControllerReference->EndAI();
+
+			MC_Enemy_Death();
+
+			DetachFromControllerPendingDestroy();
+		}
+	}
+	
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}
+
+void ABase_Enemy::MC_Enemy_Death()
+{
+	GetCapsuleComponent()->SetCollisionObjectType(ECC_WorldDynamic);
+
+	GetMesh()->SetCollisionObjectType(ECC_WorldDynamic);
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn,ECR_Ignore);
+
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn,ECR_Ignore);
+
+	// TODO : ECC 채널 추가 필요 Enemy/Projectile 
+	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_ENEMY,ECR_Ignore);
+	
+	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_PROJECTILE,ECR_Ignore);
+	
+	GetMesh()->SetCollisionResponseToChannel(COLLISION_ENEMY,ECR_Ignore);
+	
+	GetMesh()->SetCollisionResponseToChannel(COLLISION_PROJECTILE,ECR_Ignore);
+
+	AttackCollisionSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	PlayAnimMontage(DeathAnimation);
+
+	FTimerHandle DelayHandle;
+
+	// 1.5초 뒤에 authority있으면 destroy
+	GetWorldTimerManager().SetTimer(
+		DelayHandle,
+		FTimerDelegate::CreateLambda([this]()
+		{
+			if(HasAuthority())
+				Destroy();
+		}),
+		1.5f,
+		false);
+
+	
+}
+
 void ABase_Enemy::SetTimerWithDelay(float Time, bool bLoop)
 {
 	GetWorldTimerManager().ClearTimer(RetriggerHandle);
 	GetWorldTimerManager().SetTimer(RetriggerHandle,RetriggerDelegate,Time,bLoop);
+}
+
+void ABase_Enemy::SpawnFloatingText(float InDamage)
+{
+	FVector SpawnLocation = GetActorLocation();
+	SpawnLocation.X+=FMath::RandRange(-10.0f,10.0f);
+	SpawnLocation.Y+=FMath::RandRange(-10.0f,10.0f);
+	SpawnLocation.Z+=FMath::RandRange(-10.0f,10.0f);
+
+	if(AFloatingTextActor* FloatingTextActor = GetWorld()->SpawnActorDeferred<AFloatingTextActor>(AFloatingTextActor::StaticClass(),FTransform(SpawnLocation)))
+	{
+		FloatingTextActor->Damage = InDamage;
+		FloatingTextActor->FinishSpawning(FTransform(SpawnLocation));
+	}
+}
+
+void ABase_Enemy::SpawnSoul()
+{
+	if(ASoul* SoulSpawn = GetWorld()->SpawnActorDeferred<ASoul>(ASoul::StaticClass(),FTransform(GetActorLocation())))
+	{
+		SoulSpawn->GM_Interface = this->GM_Interface;
+		SoulSpawn->FinishSpawning(FTransform(GetActorLocation()));
+	}
+
+	if(bIsElite)
+	{
+		FVector SpawnLocation = GetActorLocation();
+		SpawnLocation.Z -=100.0f;
+		FActorSpawnParameters ActorSpawnParameters;
+		ActorSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+		FRotator Rotator = FRotator();
+		GetWorld()->SpawnActor(ABase_Chest::StaticClass(),&SpawnLocation,&Rotator,ActorSpawnParameters);
+	}
 }
 
 

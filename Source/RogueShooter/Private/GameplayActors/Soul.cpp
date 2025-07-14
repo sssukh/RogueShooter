@@ -28,8 +28,7 @@ ASoul::ASoul()
 
 	Sphere->SetLineThickness(0.0f);
 
-	// sphere component에 바인드
-	Sphere->OnComponentBeginOverlap.AddDynamic(this,&ASoul::OuterSphereBeginOverlap);
+
 
 	// Inner 설정
 	Inner = CreateDefaultSubobject<USphereComponent>("Inner");
@@ -38,8 +37,7 @@ ASoul::ASoul()
 
 	Inner->SetLineThickness(0.0f);
 
-	// inner sphere component에 바인드
-	Inner->OnComponentBeginOverlap.AddDynamic(this,&ASoul::InnerSphereBeginOverlap);
+
 
 
 	// Particle System Component 설정
@@ -74,7 +72,11 @@ void ASoul::BeginPlay()
 
 	TimelineUpdate.BindUFunction(this,FName("SoulLocationUpdate"));
 
-	
+	// sphere component에 바인드
+	Sphere->OnComponentBeginOverlap.AddDynamic(this,&ASoul::OuterSphereBeginOverlap);
+
+	// inner sphere component에 바인드
+	Inner->OnComponentBeginOverlap.AddDynamic(this,&ASoul::InnerSphereBeginOverlap);
 }
 
 // Called every frame

@@ -7,6 +7,11 @@
 #include "RogueShooter/FlowControlLIbrary.h"
 #include "Base_Enemy.generated.h"
 
+#define COLLISION_ENEMY ECollisionChannel::ECC_GameTraceChannel1
+
+#define COLLISION_PROJECTILE ECollisionChannel::ECC_GameTraceChannel2
+
+class ABase_AIController;
 class UInterface_GameManager;
 class ASoul;
 class USphereComponent;
@@ -40,6 +45,7 @@ public:
 	UFUNCTION(Category = "On Overlap Event")
 	void AttackSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	// TODO : DO Once를 사용했는데 실질적으로 반복해서 리셋하고 사용한다. 수정 필요 
 	UFUNCTION()
 	void DamagePlayer();
 
@@ -52,10 +58,27 @@ public:
 
 	UFUNCTION()
 	void MC_ShowAura();
+
+	// Life and Death
+	UFUNCTION()
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	
+	UFUNCTION()
+	void MC_Enemy_Death();
 	
 	void SetTimerWithDelay(float Time, bool bLoop);
 
 	void Reset() {DoOnce.Reset();}
+
+	// Floating Combat Text
+	
+	UFUNCTION()
+	void SpawnFloatingText(float InDamage);
+
+	// Spawn XP bubble
+
+	UFUNCTION()
+	void SpawnSoul();
 	
 public:
 	// Component
@@ -88,10 +111,9 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup")
 	bool bIsDead = false;
-
-	// TODO : Base_AIController 구현 필요 
-	// UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup")
-	// TObjectPtr<ABase_AIController> BaseControllerReference;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup")
+	TObjectPtr<ABase_AIController> BaseControllerReference;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup", meta = (ExposeOnSpawn = "true"))
 	TSubclassOf<ASoul> Soul;
@@ -132,7 +154,7 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy")
 	TObjectPtr<USoundBase> ImpactSound;
 	
-	//  FRetriggerableTimer RetriggerTimer;
+	FDoOnce TakeDamageDoOnce;
 	
 	// Delegate
 public:

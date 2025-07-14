@@ -5,6 +5,8 @@ namespace AssetPath
 	namespace Curve
 	{
 		const FString Curve_Soul = TEXT("CurveFloat'/Game/SurvivorsTemplate/Resource/SoulCurve.SoulCurve'");
+		const FString Curve_Fade = TEXT("CurveFloat'/Game/SurvivorsTemplate/Resource/FadeCurve.FadeCurve'");
+		const FString Curve_Movement = TEXT("CurveFloat'/Game/SurvivorsTemplate/Resource/MovementCurve.MovementCurve'");
 	}
 
 	namespace Texture
@@ -23,9 +25,18 @@ namespace AssetPath
 
 	namespace Material
 	{
-		
+		const FString BaseChestMat = TEXT("MaterialInstanceConstant'/Engine/VREditor/LaserPointer/LaserPointerMaterialInst.LaserPointerMaterialInst'");
 	}
 
+	namespace Mesh
+	{
+		const FString ChamferCube = TEXT("StaticMesh'/Game/SurvivorsTemplate/Demo/LevelPrototyping/Meshes/SM_ChamferCube.SM_ChamferCube'");		
+	}
+	
+	namespace Blueprint
+	{
+		const FString WB_FloatingTextWidget_C = TEXT("WidgetBlueprint'/Game/SurvivorsTemplate/Widgets/WB_FloatingTextWidget.WB_FloatingTextWidget_C'");
+	}
 	namespace Montage
 	{
 		const FString EnemyMelee = TEXT("AnimMontage'/Game/SurvivorsTemplate/Demo/Animations/AM_EnemyMelee.AM_EnemyMelee'");
