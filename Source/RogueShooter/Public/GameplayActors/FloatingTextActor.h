@@ -27,10 +27,13 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION()
 	void FadeWidget(float alpha);
 
+	UFUNCTION()
 	void MoveWidget(float alpha);
 
+	UFUNCTION()
 	void DestroyActor();
 
 public:

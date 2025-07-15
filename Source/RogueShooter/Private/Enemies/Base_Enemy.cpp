@@ -41,6 +41,8 @@ ABase_Enemy::ABase_Enemy()
 	AttackCollisionSphere->SetSphereRadius(32.0f);
 
 	AttackCollisionSphere->SetLineThickness(0.0f);
+
+	AttackCollisionSphere->SetRelativeLocation(FVector(50.0f,0.0f,0.0f));
 	
 	AttackCollisionSphere->OnComponentBeginOverlap.AddDynamic(this,&ABase_Enemy::AttackSphereBeginOverlap);
 
@@ -48,6 +50,26 @@ ABase_Enemy::ABase_Enemy()
 
 	AttackCollisionSphere->SetupAttachment(GetRootComponent());
 
+	// Skeletal Mesh setting
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> EnemyMeshFinder(*AssetPath::Mesh::BaseEnemyMesh);
+
+	if(EnemyMeshFinder.Succeeded())
+	{
+		GetMesh()->SetSkeletalMesh(EnemyMeshFinder.Object);
+	}
+
+	GetMesh()->SetRelativeLocation(FVector(0.0f,0.0f,-90.0f));
+
+	GetMesh()->SetRelativeRotation(FRotator(0.0f,270.0f,0.0f));
+	
+	// AnimInstance Class setting
+	ConstructorHelpers::FClassFinder<UAnimInstance> AnimFinder(*AssetPath::Animation::BaseEnemyAnim);
+
+	if(AnimFinder.Succeeded())
+	{
+		GetMesh()->SetAnimInstanceClass(AnimFinder.Class);
+	}
+	
 	// Particle System
 	EliteAura = CreateDefaultSubobject<UParticleSystemComponent>("EliteAura");
 
@@ -59,6 +81,8 @@ ABase_Enemy::ABase_Enemy()
 	}
 
 	EliteAura->SetHiddenInGame(true);
+
+	EliteAura->SetRelativeLocation(FVector(0.0f,0.0f,-90.0f));
 	
 	EliteAura->SetupAttachment(GetCapsuleComponent());
 
@@ -88,11 +112,21 @@ ABase_Enemy::ABase_Enemy()
 		DeathAnimation = DeathMontageFinder.Object;
 	}
 
-	DoOnce = FDoOnce();
+	DoOnce.Reset();
 
-	TakeDamageDoOnce = FDoOnce();
-	// RetriggerTimer = FRetriggerableTimer(this,FName("Reset"));
+	TakeDamageDoOnce.Reset();
 
+	ConstructorHelpers::FClassFinder<ASoul> SoulClassFinder(*AssetPath::Blueprint::BP_BaseSoul_C);
+	if(SoulClassFinder.Succeeded())
+	{
+		SoulClass = SoulClassFinder.Class;
+	}
+
+	ConstructorHelpers::FClassFinder<AFloatingTextActor> FTActorClassFinder(*AssetPath::Blueprint::BP_FloatingTextActor_C);
+	if(FTActorClassFinder.Succeeded())
+	{
+		FTActorClass = FTActorClassFinder.Class;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -101,7 +135,7 @@ void ABase_Enemy::BeginPlay()
 	Super::BeginPlay();
 
 	DamageSphereOverlapDelegate.BindUFunction(this,FName("DamagePlayer"));
-	RetriggerDelegate.BindUFunction(this,FName("Reset"));
+	RetriggerDelegate.BindUFunction(this,FName("ResetDoOnce"));
 }
 
 // Called every frame
@@ -235,7 +269,7 @@ void ABase_Enemy::MC_Enemy_Death()
 
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn,ECR_Ignore);
 
-	// TODO : ECC 채널 추가 필요 Enemy/Projectile 
+	// 새로 추가한 Enemy, projectile 채널 설정 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_ENEMY,ECR_Ignore);
 	
 	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_PROJECTILE,ECR_Ignore);
@@ -255,7 +289,8 @@ void ABase_Enemy::MC_Enemy_Death()
 		DelayHandle,
 		FTimerDelegate::CreateLambda([this]()
 		{
-			if(HasAuthority())
+			// TODO : 임시로 authority 빼둠 
+			// if(HasAuthority())
 				Destroy();
 		}),
 		1.5f,
@@ -270,6 +305,11 @@ void ABase_Enemy::SetTimerWithDelay(float Time, bool bLoop)
 	GetWorldTimerManager().SetTimer(RetriggerHandle,RetriggerDelegate,Time,bLoop);
 }
 
+void ABase_Enemy::ResetDoOnce()
+{
+	DoOnce.Reset();
+}
+
 void ABase_Enemy::SpawnFloatingText(float InDamage)
 {
 	FVector SpawnLocation = GetActorLocation();
@@ -277,7 +317,7 @@ void ABase_Enemy::SpawnFloatingText(float InDamage)
 	SpawnLocation.Y+=FMath::RandRange(-10.0f,10.0f);
 	SpawnLocation.Z+=FMath::RandRange(-10.0f,10.0f);
 
-	if(AFloatingTextActor* FloatingTextActor = GetWorld()->SpawnActorDeferred<AFloatingTextActor>(AFloatingTextActor::StaticClass(),FTransform(SpawnLocation)))
+	if(AFloatingTextActor* FloatingTextActor = GetWorld()->SpawnActorDeferred<AFloatingTextActor>(FTActorClass,FTransform(SpawnLocation)))
 	{
 		FloatingTextActor->Damage = InDamage;
 		FloatingTextActor->FinishSpawning(FTransform(SpawnLocation));
@@ -286,7 +326,7 @@ void ABase_Enemy::SpawnFloatingText(float InDamage)
 
 void ABase_Enemy::SpawnSoul()
 {
-	if(ASoul* SoulSpawn = GetWorld()->SpawnActorDeferred<ASoul>(ASoul::StaticClass(),FTransform(GetActorLocation())))
+	if(ASoul* SoulSpawn = GetWorld()->SpawnActorDeferred<ASoul>(SoulClass,FTransform(GetActorLocation())))
 	{
 		SoulSpawn->GM_Interface = this->GM_Interface;
 		SoulSpawn->FinishSpawning(FTransform(GetActorLocation()));

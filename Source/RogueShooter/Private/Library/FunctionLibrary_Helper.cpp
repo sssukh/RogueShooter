@@ -5,6 +5,7 @@
 
 #include "Engine/DamageEvents.h"
 #include "Kismet/GameplayStatics.h"
+#include "RogueShooter/AssetPath.h"
 
 void UFunctionLibrary_Helper::DamageEnemiesOnce(const TArray<FHitResult>& EnemyHits, float Damage,
                                                 AController* Instigator, AActor* Causer, const TSubclassOf<UDamageType> DamageTypeClass)
@@ -26,7 +27,6 @@ void UFunctionLibrary_Helper::DamageEnemiesOnce(const TArray<FHitResult>& EnemyH
 	}
 }
 
-// TODO : 텍스처들 코드에 업로드해두자.
 UTexture2D* UFunctionLibrary_Helper::FindActiveIcon(EActiveAbilities AAbility)
 {
 	UTexture2D* result = nullptr;
@@ -34,18 +34,38 @@ UTexture2D* UFunctionLibrary_Helper::FindActiveIcon(EActiveAbilities AAbility)
 	{
 		case (EActiveAbilities::Hammer):
 			{
+				ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::HammerDrop);
+				if(TexFinder.Succeeded())
+				{
+					result = TexFinder.Object;
+				}
 				break;
 			}
 		case(EActiveAbilities::Frost_Bolt):
 			{
+				ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::IceSpear);
+				if(TexFinder.Succeeded())
+				{
+					result = TexFinder.Object;
+				}
 				break;
 			}
 		case(EActiveAbilities::Lightning):
 			{
+				ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::Lightning);
+				if(TexFinder.Succeeded())
+				{
+					result = TexFinder.Object;
+				}
 				break;
 			}
 		case(EActiveAbilities::Fireball):
 			{
+				ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::Fireball);
+				if(TexFinder.Succeeded())
+				{
+					result = TexFinder.Object;
+				}
 				break;
 			}
 		default:
@@ -62,18 +82,38 @@ UTexture2D* UFunctionLibrary_Helper::FindPassiveIcon(EPassiveAbilities PAbility)
 	{
 	case (EPassiveAbilities::Ability_Bonus_Damage):
 		{
+			ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::Upgrade);
+			if(TexFinder.Succeeded())
+			{
+				result = TexFinder.Object;
+			}
 			break;
 		}
 	case(EPassiveAbilities::Health_Bonus):
 		{
+			ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::HealthIncrease);
+			if(TexFinder.Succeeded())
+			{
+				result = TexFinder.Object;
+			}
 			break;
 		}
 	case(EPassiveAbilities::Ability_Cooldown_Reduction):
 		{
+			ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::SpeedoMeter);
+			if(TexFinder.Succeeded())
+			{
+				result = TexFinder.Object;
+			}
 			break;
 		}
 	case(EPassiveAbilities::Speed_Bonus):
 		{
+			ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::Run);
+			if(TexFinder.Succeeded())
+			{
+				result = TexFinder.Object;
+			}
 			break;
 		}
 	default:

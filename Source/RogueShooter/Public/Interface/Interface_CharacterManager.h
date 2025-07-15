@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Character/Base_Character.h"
 #include "Components/SphereComponent.h"
 #include "RogueShooter/RSEnumStruct.h"
 #include "UObject/Interface.h"
@@ -33,9 +34,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
 	USphereComponent* GetAbilitySphere();
 
-	// TODO : ABase_Character 구현 필요 
-	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
-	// ABase_Character* GetCharacter();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
+	ABase_Character* GetCharacter();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
 	void AdjustPassive(EPassiveAbilities Stat, float MultiplicationAmount);

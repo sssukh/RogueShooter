@@ -33,11 +33,11 @@ public:
 	// chest에 겹쳐지면 - chest UI를 모든 살아있는 플레이어들에게 보인다.
 	void ChestAction();
 	
-private:
-	UPROPERTY()
+public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<USphereComponent> Sphere;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<UStaticMeshComponent> StaticMesh;
 
 	

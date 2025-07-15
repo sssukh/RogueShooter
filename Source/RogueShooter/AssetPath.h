@@ -2,6 +2,15 @@
 
 namespace AssetPath
 {
+	namespace AI
+	{
+		const FString BaseEnemyBT = TEXT("BehaviorTree'/Game/RogueShooter/Blueprints/AI/BT_Base_Enemy.BT_Base_Enemy'");	
+	}
+
+	namespace Animation
+	{
+		const FString BaseEnemyAnim = TEXT("AnimBlueprint'/Game/SurvivorsTemplate/Demo/InfinityBladeAdversaries/Enemy/Enemy_Gruntling/Enemy_Gruntling_Animation/ABP_Gruntling.ABP_Gruntling_C'");		
+	}
 	namespace Curve
 	{
 		const FString Curve_Soul = TEXT("CurveFloat'/Game/SurvivorsTemplate/Resource/SoulCurve.SoulCurve'");
@@ -30,12 +39,15 @@ namespace AssetPath
 
 	namespace Mesh
 	{
-		const FString ChamferCube = TEXT("StaticMesh'/Game/SurvivorsTemplate/Demo/LevelPrototyping/Meshes/SM_ChamferCube.SM_ChamferCube'");		
+		const FString ChamferCube = TEXT("StaticMesh'/Game/SurvivorsTemplate/Demo/LevelPrototyping/Meshes/SM_ChamferCube.SM_ChamferCube'");
+		const FString BaseEnemyMesh = TEXT("SkeletalMesh'/Game/SurvivorsTemplate/Demo/InfinityBladeAdversaries/Enemy/Enemy_Gruntling/SK_Exodus_Gruntling.SK_Exodus_Gruntling'");
 	}
 	
 	namespace Blueprint
 	{
-		const FString WB_FloatingTextWidget_C = TEXT("WidgetBlueprint'/Game/SurvivorsTemplate/Widgets/WB_FloatingTextWidget.WB_FloatingTextWidget_C'");
+		const FString WB_FloatingTextWidget_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/WB_FloatingTextWidget.WB_FloatingTextWidget_C'");
+		const FString BP_BaseSoul_C = TEXT("Blueprint'/Game/RogueShooter/Blueprints/GameplayActors/BP_BaseSoul.BP_BaseSoul_C'");
+		const FString BP_FloatingTextActor_C = TEXT("Blueprint'/Game/RogueShooter/Blueprints/GameplayActors/BP_FloatingTextActor.BP_FloatingTextActor_C'");
 	}
 	namespace Montage
 	{

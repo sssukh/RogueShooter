@@ -52,6 +52,12 @@ ASoul::ASoul()
 	}
 
 	ParticleSystemComponent->SetAutoActivate(true);
+
+	ConstructorHelpers::FObjectFinder<UCurveFloat> CurveFinder(*AssetPath::Curve::Curve_Soul);
+	if(CurveFinder.Succeeded())
+	{
+		TimeCurve = CurveFinder.Object;
+	}
 	
 	// 구조 설정 
 	SetRootComponent(Sphere);
@@ -60,9 +66,9 @@ ASoul::ASoul()
 	
 	ParticleSystemComponent->SetupAttachment(Sphere);
 
-	DoOnce = FDoOnce();
+	DoOnce.Reset();
 
-	SphereDoOnce = FDoOnce();
+	SphereDoOnce.Reset();
 }
 
 // Called when the game starts or when spawned
@@ -71,6 +77,8 @@ void ASoul::BeginPlay()
 	Super::BeginPlay();
 
 	TimelineUpdate.BindUFunction(this,FName("SoulLocationUpdate"));
+
+	Timeline.AddInterpFloat(TimeCurve,TimelineUpdate);
 
 	// sphere component에 바인드
 	Sphere->OnComponentBeginOverlap.AddDynamic(this,&ASoul::OuterSphereBeginOverlap);
@@ -110,6 +118,7 @@ void ASoul::InnerSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 void ASoul::OuterSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* pOtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	// TODO : 임시로 authority 빼둠 
 	if(!HasAuthority())
 		return;
 
@@ -120,8 +129,8 @@ void ASoul::OuterSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	this->OtherActor = pOtherActor;
 
 	StartingLocation = GetActorLocation();
-	
-	Timeline.AddInterpFloat(TimeCurve,TimelineUpdate);
+
+	Timeline.PlayFromStart();
 }
 
 void ASoul::SoulLocationUpdate(float Alpha)

@@ -42,6 +42,7 @@ public:
 	UFUNCTION(Category = "On Overlap Event")
 	void OuterSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	UFUNCTION()
 	void SoulLocationUpdate(float Alpha);
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Soul | Component")
@@ -85,4 +86,6 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<UParticleSystem> EmitterTemplate;
+
+	
 };

@@ -11,10 +11,12 @@
 
 #define COLLISION_PROJECTILE ECollisionChannel::ECC_GameTraceChannel2
 
+class AFloatingTextActor;
 class ABase_AIController;
 class UInterface_GameManager;
 class ASoul;
 class USphereComponent;
+class ABase_Character;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeath);
 
@@ -68,7 +70,8 @@ public:
 	
 	void SetTimerWithDelay(float Time, bool bLoop);
 
-	void Reset() {DoOnce.Reset();}
+	UFUNCTION()
+	void ResetDoOnce(); 
 
 	// Floating Combat Text
 	
@@ -91,18 +94,17 @@ public:
 
 	// Enemy Setup
 	
-	// TODO : Base_Character 구현 필요
-	// UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup", meta = (ExposeOnSpawn = "true"))
-	// TArray<ABase_Character*> PlayerArray;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup", meta = (ExposeOnSpawn = "true"))
+	TArray<TObjectPtr<ABase_Character>> PlayerArray;
 
 	// 초기값 설정 필요
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup")
 	TObjectPtr<UAnimMontage> AttackAnimation;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup")
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup", meta = (ExposeOnSpawn = "true"))
 	float Damage = 10.0f;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup")
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup", meta = (ExposeOnSpawn = "true"))
 	float Health = 15.0f;
 
 	// 초기값 설정 필요
@@ -155,6 +157,12 @@ public:
 	TObjectPtr<USoundBase> ImpactSound;
 	
 	FDoOnce TakeDamageDoOnce;
+
+	UPROPERTY()
+	TSubclassOf<ASoul> SoulClass;
+
+	UPROPERTY()
+	TSubclassOf<AFloatingTextActor> FTActorClass;
 	
 	// Delegate
 public:

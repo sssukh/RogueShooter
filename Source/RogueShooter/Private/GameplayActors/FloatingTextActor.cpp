@@ -71,6 +71,7 @@ void AFloatingTextActor::BeginPlay()
 
 	Fade.AddInterpFloat(FadeCurve,FadeFunction);
 
+	Fade.PlayFromStart();
 	// Move Up
 
 	InitialLocation =  GetActorLocation();
@@ -88,6 +89,8 @@ void AFloatingTextActor::BeginPlay()
 	Movement.AddInterpFloat(MovementCurve,MovementFunction);
 
 	Movement.SetTimelineFinishedFunc(FinishedFunction);
+
+	Movement.PlayFromStart();
 }
 
 // Called every frame

@@ -4,6 +4,9 @@
 #include "GameplayTagContainer.h"
 #include "RSEnumStruct.generated.h"
 
+class ABase_Enemy;
+class ASoul;
+
 UENUM(BlueprintType)
 enum class EActiveAbilities : uint8
 {
@@ -115,9 +118,8 @@ struct FEnemySpawnType
 {
 	GENERATED_BODY()
 
-	// TODO : Base_EnemyType 구현 필요 
-	// UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Enemy Spawn Type")
-	// TObjectPtr<ABase_EnemyType> Enemy;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Enemy Spawn Type")
+	TObjectPtr<ABase_Enemy> Enemy;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Enemy Spawn Type")
 	int32 AllowedWave = 0 ;
@@ -128,9 +130,9 @@ struct FEnemySpawnType
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Enemy Spawn Type")
 	float Damage = 10.0f;
 
-	// TODO : Soul 구현 필요 
-	// UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Enemy Spawn Type")
-	// TObjectPtr<ASoul> Soul;
+ 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Enemy Spawn Type")
+	TObjectPtr<ASoul> Soul;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Enemy Spawn Type")
 	bool IsElite = false;
