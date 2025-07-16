@@ -87,5 +87,6 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<UParticleSystem> EmitterTemplate;
 
+	FVector Destination;
 	
 };

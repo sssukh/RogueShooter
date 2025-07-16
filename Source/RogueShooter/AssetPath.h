@@ -13,9 +13,9 @@ namespace AssetPath
 	}
 	namespace Curve
 	{
-		const FString Curve_Soul = TEXT("CurveFloat'/Game/SurvivorsTemplate/Resource/SoulCurve.SoulCurve'");
-		const FString Curve_Fade = TEXT("CurveFloat'/Game/SurvivorsTemplate/Resource/FadeCurve.FadeCurve'");
-		const FString Curve_Movement = TEXT("CurveFloat'/Game/SurvivorsTemplate/Resource/MovementCurve.MovementCurve'");
+		const FString Curve_Soul = TEXT("CurveFloat'/Game/RogueShooter/Resource/SoulCurve.SoulCurve'");
+		const FString Curve_Fade = TEXT("CurveFloat'/Game/RogueShooter/Resource/FadeCurve.FadeCurve'");
+		const FString Curve_Movement = TEXT("CurveFloat'/Game/RogueShooter/Resource/MovementCurve.MovementCurve'");
 	}
 
 	namespace Texture
@@ -53,6 +53,7 @@ namespace AssetPath
 	{
 		const FString EnemyMelee = TEXT("AnimMontage'/Game/SurvivorsTemplate/Demo/Animations/AM_EnemyMelee.AM_EnemyMelee'");
 		const FString GruntlingDeath = TEXT("AnimMontage'/Game/SurvivorsTemplate/Demo/InfinityBladeAdversaries/Enemy/Enemy_Gruntling/Enemy_Gruntling_Animation/AM_Gruntling_Death.AM_Gruntling_Death'");
+		const FString PlayerDeath = TEXT("AnimMontage'/Game/SurvivorsTemplate/Demo/Animations/UE5/AM_PlayerDeath.AM_PlayerDeath'");
 	}
 	
 	namespace Sound

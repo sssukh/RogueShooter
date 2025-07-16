@@ -16,7 +16,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "RogueShooter/AssetPath.h"
-
+#include "Utility/RSCollisionChannel.h"
 
 
 // Sets default values
@@ -270,13 +270,13 @@ void ABase_Enemy::MC_Enemy_Death()
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn,ECR_Ignore);
 
 	// 새로 추가한 Enemy, projectile 채널 설정 
-	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_ENEMY,ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_COLLISION_ENEMY,ECR_Ignore);
 	
-	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_PROJECTILE,ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_COLLISION_PROJECTILE,ECR_Ignore);
 	
-	GetMesh()->SetCollisionResponseToChannel(COLLISION_ENEMY,ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_COLLISION_ENEMY,ECR_Ignore);
 	
-	GetMesh()->SetCollisionResponseToChannel(COLLISION_PROJECTILE,ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_COLLISION_PROJECTILE,ECR_Ignore);
 
 	AttackCollisionSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 

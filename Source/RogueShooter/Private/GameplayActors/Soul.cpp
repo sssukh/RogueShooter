@@ -93,6 +93,11 @@ void ASoul::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	Timeline.TickTimeline(DeltaTime);
+
+	if(OtherActor)
+	{
+		Destination = OtherActor->GetActorLocation();
+	}
 }
 
 void ASoul::AddXP()
@@ -102,8 +107,10 @@ void ASoul::AddXP()
 	{
 		IInterface_GameManager::Execute_TransferXP(GM_Interface,XPAmount);
 
+		// TODO : 임시로 외부로 옮기자
 		Destroy();
 	}
+	Destroy();
 }
 
 void ASoul::InnerSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* pOtherActor,
@@ -135,8 +142,6 @@ void ASoul::OuterSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 
 void ASoul::SoulLocationUpdate(float Alpha)
 {
-	FVector Destination = OtherActor->GetActorLocation();
-	
 	this->SetActorLocation(FVector::SlerpVectorToDirection(StartingLocation,Destination,Alpha));
 }
 

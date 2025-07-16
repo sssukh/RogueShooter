@@ -7,9 +7,7 @@
 #include "RogueShooter/FlowControlLIbrary.h"
 #include "Base_Enemy.generated.h"
 
-#define COLLISION_ENEMY ECollisionChannel::ECC_GameTraceChannel1
 
-#define COLLISION_PROJECTILE ECollisionChannel::ECC_GameTraceChannel2
 
 class AFloatingTextActor;
 class ABase_AIController;
