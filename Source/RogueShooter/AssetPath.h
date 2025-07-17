@@ -9,7 +9,8 @@ namespace AssetPath
 
 	namespace Animation
 	{
-		const FString BaseEnemyAnim = TEXT("AnimBlueprint'/Game/SurvivorsTemplate/Demo/InfinityBladeAdversaries/Enemy/Enemy_Gruntling/Enemy_Gruntling_Animation/ABP_Gruntling.ABP_Gruntling_C'");		
+		const FString BaseEnemyAnim = TEXT("AnimBlueprint'/Game/SurvivorsTemplate/Demo/InfinityBladeAdversaries/Enemy/Enemy_Gruntling/Enemy_Gruntling_Animation/ABP_Gruntling.ABP_Gruntling_C'");
+		const FString BaseCharAnim = TEXT("AnimBlueprint'/Game/SurvivorsTemplate/Demo/Characters/Mannequins/Animations/ABP_Quinn.ABP_Quinn_C'");
 	}
 	namespace Curve
 	{

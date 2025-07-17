@@ -46,6 +46,7 @@ public:
 	void S_SetCharacterData(FAvailableCharacter CharacterData);
 
 	void SetupReference();
+	 
 	//*****************************************
 	// Health/Damage
 	//*****************************************
@@ -183,4 +184,8 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<UAnimMontage> DeathAnimMontage;
+
+	UPROPERTY()
+	TObjectPtr<UAnimInstance> CharacterAnimInstance;
+
 };

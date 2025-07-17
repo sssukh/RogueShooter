@@ -127,6 +127,8 @@ ABase_Enemy::ABase_Enemy()
 	{
 		FTActorClass = FTActorClassFinder.Class;
 	}
+
+	ScaleHP();
 }
 
 // Called when the game starts or when spawned
@@ -199,7 +201,7 @@ void ABase_Enemy::DamagePlayer()
 	SetTimerWithDelay(0.9f,false);
 }
 
-void ABase_Enemy::MC_EnemyAttack()
+void ABase_Enemy::MC_EnemyAttack_Implementation()
 {
 	PlayAnimMontage(AttackAnimation);
 
@@ -208,13 +210,16 @@ void ABase_Enemy::MC_EnemyAttack()
 	//EnemySoundHandle->PlaySoundAtLocation(EnemySound,GetWorld(),1.0f,1.0f,0.0f,GetActorLocation(),FRotator());
 }
 
-void ABase_Enemy::MC_OnHit()
+
+
+
+void ABase_Enemy::MC_OnHit_Implementation()
 {
 	if(GetWorld())
 		UGameplayStatics::SpawnSoundAtLocation(GetWorld(),ImpactSound,GetActorLocation());
 }
 
-void ABase_Enemy::MC_ShowAura()
+void ABase_Enemy::MC_ShowAura_Implementation()
 {
 	if(bIsElite)
 	{
@@ -223,7 +228,7 @@ void ABase_Enemy::MC_ShowAura()
 }
 
 float ABase_Enemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
-	class AController* EventInstigator, AActor* DamageCauser)
+                              class AController* EventInstigator, AActor* DamageCauser)
 {
 	SpawnFloatingText(DamageAmount);
 
@@ -259,7 +264,7 @@ float ABase_Enemy::TakeDamage(float DamageAmount, struct FDamageEvent const& Dam
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
-void ABase_Enemy::MC_Enemy_Death()
+void ABase_Enemy::MC_Enemy_Death_Implementation()
 {
 	GetCapsuleComponent()->SetCollisionObjectType(ECC_WorldDynamic);
 
@@ -298,6 +303,8 @@ void ABase_Enemy::MC_Enemy_Death()
 
 	
 }
+
+
 
 void ABase_Enemy::SetTimerWithDelay(float Time, bool bLoop)
 {
@@ -342,6 +349,28 @@ void ABase_Enemy::SpawnSoul()
 		FRotator Rotator = FRotator();
 		GetWorld()->SpawnActor(ABase_Chest::StaticClass(),&SpawnLocation,&Rotator,ActorSpawnParameters);
 	}
+}
+
+void ABase_Enemy::ShowEliteAura()
+{
+	if(bIsElite)
+	{
+		EliteAura->SetHiddenInGame(false,false);
+	}
+}
+
+void ABase_Enemy::ScaleHP()
+{
+	if(ScaleHPToLevel)
+	{
+		Health = Health * CharLevel;
+	}
+}
+
+bool ABase_Enemy::IsAlive_Implementation()
+{
+	// return IInterface_CharacterManager::IsAlive_Implementation();
+	return !bIsDead;
 }
 
 

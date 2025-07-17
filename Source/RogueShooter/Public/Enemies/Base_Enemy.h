@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interface/Interface_CharacterManager.h"
 #include "RogueShooter/FlowControlLIbrary.h"
 #include "Base_Enemy.generated.h"
 
@@ -19,7 +20,7 @@ class ABase_Character;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeath);
 
 UCLASS()
-class ROGUESHOOTER_API ABase_Enemy : public ACharacter
+class ROGUESHOOTER_API ABase_Enemy : public ACharacter, public IInterface_CharacterManager
 {
 	GENERATED_BODY()
 
@@ -50,20 +51,20 @@ public:
 	void DamagePlayer();
 
 	// TODO : Multicast이다. 어떻게 적용해야할까?
-	UFUNCTION()
+	UFUNCTION(NetMulticast,Unreliable)
 	void MC_EnemyAttack();
 
-	UFUNCTION()
+	UFUNCTION(NetMulticast,Unreliable)
 	void MC_OnHit();
 
-	UFUNCTION()
+	UFUNCTION(NetMulticast,Unreliable)
 	void MC_ShowAura();
 
 	// Life and Death
 	UFUNCTION()
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	
-	UFUNCTION()
+	UFUNCTION(NetMulticast,Unreliable)
 	void MC_Enemy_Death();
 	
 	void SetTimerWithDelay(float Time, bool bLoop);
@@ -80,7 +81,14 @@ public:
 
 	UFUNCTION()
 	void SpawnSoul();
-	
+
+	void ShowEliteAura();
+
+	void ScaleHP();
+
+
+	// Interface
+	virtual bool IsAlive_Implementation() override;
 public:
 	// Component
 	

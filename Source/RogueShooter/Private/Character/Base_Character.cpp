@@ -3,8 +3,11 @@
 
 #include "Character/Base_Character.h"
 
+#include "Camera/CameraComponent.h"
+#include "Chaos/SoftsSpring.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Interface/Interface_GameManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -28,6 +31,36 @@ ABase_Character::ABase_Character()
 	{
 		DeathAnimMontage = DeathAMFinder.Object;
 	}
+
+	SetRootComponent(GetCapsuleComponent());
+	GetCapsuleComponent()->SetCapsuleHalfHeight(88.0f);
+	GetCapsuleComponent()->SetLineThickness(0.0f);
+	GetCapsuleComponent()->SetCapsuleRadius(34.0f);
+
+	AbilitySphere = CreateDefaultSubobject<USphereComponent>("AbilitySphere");
+	AbilitySphere->SetSphereRadius(960.0f);
+	AbilitySphere->SetLineThickness(0.0f);
+	AbilitySphere->SetupAttachment(GetCapsuleComponent());
+
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
+	SpringArm->TargetArmLength = 2500.0f;
+	SpringArm->SetRelativeRotation(FRotator(0.0f,-35.0f,0.0f));
+	SpringArm->SetupAttachment(GetCapsuleComponent());
+
+	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
+	Camera->SetFieldOfView(45.0f);
+	Camera->SetProjectionMode(ECameraProjectionMode::Perspective);
+	Camera->SetupAttachment(SpringArm);
+
+	ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceFinder(*AssetPath::Animation::BaseCharAnim);
+	if(AnimInstanceFinder.Succeeded())
+	{
+		GetMesh()->SetAnimInstanceClass(AnimInstanceFinder.Class);
+	}
+	
+	GetMesh()->SetRelativeLocation(FVector(0.0f,0.0f,-90.0f));
+	GetMesh()->SetRelativeRotation(FRotator(0.0f,270.0f,0.0f));
+	
 }
 
 // Called when the game starts or when spawned
