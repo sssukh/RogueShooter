@@ -15,23 +15,23 @@ class ROGUESHOOTER_API UFunctionLibrary_Helper : public UBlueprintFunctionLibrar
 {
 	GENERATED_BODY()
 public:
-	UFUNCTION(BlueprintCallable,Category = "Function Library Helper")
-	void DamageEnemiesOnce(const TArray<FHitResult>& EnemyHits, float Damage, AController* Instigator, AActor* Causer, const TSubclassOf<UDamageType> DamageTypeClass);
+	UFUNCTION(BlueprintCallable,Category = "Function Library Helper",meta = (WorldContext = "WorldContextObject"))
+	static void DamageEnemiesOnce(const UObject* WorldContextObject, const TArray<FHitResult>& EnemyHits, float Damage, AController* Instigator, AActor* Causer);
 
-	UFUNCTION(BlueprintCallable,Category = "Function Library Helper", BlueprintPure)
-	UTexture2D* FindActiveIcon(EActiveAbilities AAbility=EActiveAbilities::Hammer);
+	UFUNCTION(BlueprintCallable,Category = "Function Library Helper", BlueprintPure,meta = (WorldContext = "WorldContextObject"))
+	static UTexture2D* FindActiveIcon(const UObject* WorldContextObject,EActiveAbilities AAbility=EActiveAbilities::Hammer);
 
-	UFUNCTION(BlueprintCallable,Category = "Function Library Helper", BlueprintPure)
-	UTexture2D* FindPassiveIcon(EPassiveAbilities PAbility = EPassiveAbilities::Ability_Bonus_Damage);
+	UFUNCTION(BlueprintCallable,Category = "Function Library Helper", BlueprintPure,meta = (WorldContext = "WorldContextObject"))
+	static UTexture2D* FindPassiveIcon(const UObject* WorldContextObject,EPassiveAbilities PAbility = EPassiveAbilities::Ability_Bonus_Damage);
 
-	UFUNCTION(BlueprintCallable,Category = "Function Library Helper")
-	void CreateLoadingScreen(FText LoadingInfo);
+	UFUNCTION(BlueprintCallable,Category = "Function Library Helper",meta = (WorldContext = "WorldContextObject"))
+	static void CreateLoadingScreen(const UObject* WorldContextObject,FText LoadingInfo);
 
 	// TODO : SG_Player 구현 필요 
-	// UFUNCTION(BlueprintCallable,Category = "Function Library Helper")
-	// SG_Player* LoadPlayerData();
+	// UFUNCTION(BlueprintCallable,Category = "Function Library Helper",meta = (WorldContext = "WorldContextObject"))
+	// static SG_Player* LoadPlayerData(const UObject* WorldContextObject);
 	
 	// TODO : SG_Player 구현 필요 
-	// UFUNCTION(BlueprintCallable,Category = "Function Library Helper")
-	// void SavePlayerData(SG_Player* SaveData);
+	// UFUNCTION(BlueprintCallable,Category = "Function Library Helper",meta = (WorldContext = "WorldContextObject"))
+	// static void SavePlayerData(const UObject* WorldContextObject,SG_Player* SaveData);
 };

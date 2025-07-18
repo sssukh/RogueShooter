@@ -61,12 +61,22 @@ namespace AssetPath
 	{
 		const FString CueEnemyAttack = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/Creatures/Guardian/Cue_EnemyAttack.Cue_EnemyAttack'");
 		const FString CueImpact = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/Creatures/Guardian/Cue_Impact.Cue_Impact'");
+		
+		const FString HammerSound = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/Weapons/Hammer/Cue_Hammer.Cue_Hammer'");
+		const FString FrostBoltSound = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/Weapons/A_Axe_Swing_Cue.A_Axe_Swing_Cue'");
+		const FString LightningSound = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/Abilities/Cue_lightning.Cue_lightning'");
+		const FString FireballSound = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/Weapons/A_Axe_Swing_Cue.A_Axe_Swing_Cue'");
 	}
 	
 	namespace EffectTemplate
 	{
 		const FString BaseSoul = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Ability/Summon/P_Summon_Parent_Startup.P_Summon_Parent_Startup'");
 		const FString BaseEnemy = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Skill_Aura/P_AuraCircle_Default_IronSkin_02.P_AuraCircle_Default_IronSkin_02'");
+		
+		const FString HammerEffect = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Skill_WeaponThrow/P_Skill_Throw_Fire_Proj_Hammer1.P_Skill_Throw_Fire_Proj_Hammer1'");
+		const FString FrostBoltEffect = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Combat_Ice/Impact/P_Impact_Ice.P_Impact_Ice'");
+		const FString LightningEffect = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Combat_Ice/Impact/P_Impact_Ice.P_Impact_Ice'");
+		const FString FireballEffect = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Monsters/FX_Monster_Gruntling/Bomber/P_FireBombExplosion.P_FireBombExplosion'");
 		
 	}
 }

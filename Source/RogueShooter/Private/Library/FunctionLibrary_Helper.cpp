@@ -7,8 +7,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "RogueShooter/AssetPath.h"
 
-void UFunctionLibrary_Helper::DamageEnemiesOnce(const TArray<FHitResult>& EnemyHits, float Damage,
-                                                AController* Instigator, AActor* Causer, const TSubclassOf<UDamageType> DamageTypeClass)
+void UFunctionLibrary_Helper::DamageEnemiesOnce(const UObject* WorldContextObject, const TArray<FHitResult>& EnemyHits,
+	float Damage, AController* Instigator, AActor* Causer)
 {
 	TArray<AActor*> HitActors;
 	for(const FHitResult& hitResult : EnemyHits)
@@ -19,7 +19,7 @@ void UFunctionLibrary_Helper::DamageEnemiesOnce(const TArray<FHitResult>& EnemyH
 			HitActors.Add(LhitActor);
 
 			// 따로 damageType이 지정되지 않음
-			TSubclassOf<UDamageType> const ValidDamageTypeClass = DamageTypeClass ? DamageTypeClass : TSubclassOf<UDamageType>(UDamageType::StaticClass());
+			TSubclassOf<UDamageType> const ValidDamageTypeClass =  TSubclassOf<UDamageType>(UDamageType::StaticClass());
 			FDamageEvent DamageEvent(ValidDamageTypeClass);
 		
 			LhitActor->TakeDamage(Damage,DamageEvent,Instigator,Causer);
@@ -27,55 +27,55 @@ void UFunctionLibrary_Helper::DamageEnemiesOnce(const TArray<FHitResult>& EnemyH
 	}
 }
 
-UTexture2D* UFunctionLibrary_Helper::FindActiveIcon(EActiveAbilities AAbility)
+UTexture2D* UFunctionLibrary_Helper::FindActiveIcon(const UObject* WorldContextObject, EActiveAbilities AAbility)
 {
 	UTexture2D* result = nullptr;
 	switch (AAbility)
 	{
-		case (EActiveAbilities::Hammer):
+	case (EActiveAbilities::Hammer):
+		{
+			ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::HammerDrop);
+			if(TexFinder.Succeeded())
 			{
-				ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::HammerDrop);
-				if(TexFinder.Succeeded())
-				{
-					result = TexFinder.Object;
-				}
-				break;
+				result = TexFinder.Object;
 			}
-		case(EActiveAbilities::Frost_Bolt):
-			{
-				ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::IceSpear);
-				if(TexFinder.Succeeded())
-				{
-					result = TexFinder.Object;
-				}
-				break;
-			}
-		case(EActiveAbilities::Lightning):
-			{
-				ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::Lightning);
-				if(TexFinder.Succeeded())
-				{
-					result = TexFinder.Object;
-				}
-				break;
-			}
-		case(EActiveAbilities::Fireball):
-			{
-				ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::Fireball);
-				if(TexFinder.Succeeded())
-				{
-					result = TexFinder.Object;
-				}
-				break;
-			}
-		default:
 			break;
+		}
+	case(EActiveAbilities::Frost_Bolt):
+		{
+			ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::IceSpear);
+			if(TexFinder.Succeeded())
+			{
+				result = TexFinder.Object;
+			}
+			break;
+		}
+	case(EActiveAbilities::Lightning):
+		{
+			ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::Lightning);
+			if(TexFinder.Succeeded())
+			{
+				result = TexFinder.Object;
+			}
+			break;
+		}
+	case(EActiveAbilities::Fireball):
+		{
+			ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::Fireball);
+			if(TexFinder.Succeeded())
+			{
+				result = TexFinder.Object;
+			}
+			break;
+		}
+	default:
+		break;
 	}
 
 	return result;
 }
 
-UTexture2D* UFunctionLibrary_Helper::FindPassiveIcon(EPassiveAbilities PAbility)
+UTexture2D* UFunctionLibrary_Helper::FindPassiveIcon(const UObject* WorldContextObject, EPassiveAbilities PAbility)
 {
 	UTexture2D* result = nullptr;
 	switch (PAbility)
@@ -124,7 +124,9 @@ UTexture2D* UFunctionLibrary_Helper::FindPassiveIcon(EPassiveAbilities PAbility)
 }
 
 // TODO : WBLoadingScreenWidget 구현 필요 
-void UFunctionLibrary_Helper::CreateLoadingScreen(FText LoadingInfo)
+
+void UFunctionLibrary_Helper::CreateLoadingScreen(const UObject* WorldContextObject, FText LoadingInfo)
 {
 	// GetWorld()->GetFirstLocalPlayerFromController()
+
 }
