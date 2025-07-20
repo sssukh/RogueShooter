@@ -8,6 +8,8 @@
 #include "AbilitiesComponent.generated.h"
 
 
+class ABase_Projectile;
+class ABase_Character;
 enum class EPassiveAbilities : uint8;
 enum class EActiveAbilities : uint8;
 
@@ -55,6 +57,23 @@ public:
 	UFUNCTION(NetMulticast,Reliable)
 	void MC_Hammer(float Radius);
 
+	// FrostBolt
+	void LevelUpFrostBolt();
+
+	void GrantFrostBolt(bool Cast);
+
+	
+	void Prepare_FrostBolt();
+
+	
+	UFUNCTION(Server,Reliable)
+	void S_ExecuteFrostBolt(AActor* Target, ABase_Character* Character, float Damage);
+
+	UFUNCTION(NetMulticast,Reliable)
+	void MC_Frostbolt();
+
+	int32 LevelUpAbility(EActiveAbilities Active);
+	
 	UFUNCTION()
 	float CalcAbilityDamageWithCrit(float weight, EActiveAbilities ActiveAbility,float BaseDamage);
 	
@@ -169,4 +188,6 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<USoundBase> LightningSound;
+
+	TSubclassOf<ABase_Projectile> BaseProjectileClass;
 };

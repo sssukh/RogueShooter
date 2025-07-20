@@ -36,12 +36,14 @@ namespace AssetPath
 	namespace Material
 	{
 		const FString BaseChestMat = TEXT("MaterialInstanceConstant'/Engine/VREditor/LaserPointer/LaserPointerMaterialInst.LaserPointerMaterialInst'");
+		const FString Blue = TEXT("MaterialInstanceConstant'/Engine/ArtTools/RenderToTexture/Materials/Debug/M_Emissive_Color_0-0-127.M_Emissive_Color_0-0-127'");
 	}
 
 	namespace Mesh
 	{
 		const FString ChamferCube = TEXT("StaticMesh'/Game/SurvivorsTemplate/Demo/LevelPrototyping/Meshes/SM_ChamferCube.SM_ChamferCube'");
 		const FString BaseEnemyMesh = TEXT("SkeletalMesh'/Game/SurvivorsTemplate/Demo/InfinityBladeAdversaries/Enemy/Enemy_Gruntling/SK_Exodus_Gruntling.SK_Exodus_Gruntling'");
+		const FString Cube = TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'");
 	}
 	
 	namespace Blueprint
@@ -77,6 +79,7 @@ namespace AssetPath
 		const FString FrostBoltEffect = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Combat_Ice/Impact/P_Impact_Ice.P_Impact_Ice'");
 		const FString LightningEffect = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Combat_Ice/Impact/P_Impact_Ice.P_Impact_Ice'");
 		const FString FireballEffect = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Monsters/FX_Monster_Gruntling/Bomber/P_FireBombExplosion.P_FireBombExplosion'");
-		
+
+		const FString ImpactImce = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Combat_Ice/Impact/P_Impact_Ice.P_Impact_Ice'");
 	}
 }
