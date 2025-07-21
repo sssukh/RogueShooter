@@ -101,3 +101,16 @@ private:
 
 	FTimerDelegate TimeDelegate;
 };
+
+// 첫 flip호출에 true가 출력된다.
+USTRUCT(BlueprintType)
+struct FFlipflop
+{
+	GENERATED_BODY()
+public:
+	FORCEINLINE FFlipflop() {}
+
+	FORCEINLINE bool Flip() { bCondition = !bCondition; return bCondition;}
+private:
+	bool bCondition = false;
+};

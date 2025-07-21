@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Character/Base_Character.h"
+// #include "Character/Base_Character.h"
 #include "Components/SphereComponent.h"
 #include "RogueShooter/RSEnumStruct.h"
 #include "UObject/Interface.h"

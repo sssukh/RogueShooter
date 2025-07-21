@@ -10,6 +10,7 @@
 #include "Interface/Interface_GameManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Particles/ParticleSystem.h"
 #include "RogueShooter/AssetPath.h"
 #include "RogueShooter/FlowControlLIbrary.h"
 

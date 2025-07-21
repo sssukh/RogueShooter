@@ -85,11 +85,11 @@ void ABase_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	
 }
 
-void ABase_Character::UpdateCharacterClass_Implementation(FAvailableCharacter Character)
+void ABase_Character::UpdateCharacterClass_Implementation(FAvailableCharacter AvailableCharacter)
 {
 	// IInterface_CharacterManager::UpdateCharacterClass_Implementation(Character);
 
-	S_SetCharacterData_Implementation(Character);
+	S_SetCharacterData_Implementation(AvailableCharacter);
 }
 
 void ABase_Character::S_SetCharacterMesh_Implementation(USkeletalMesh* SK)
@@ -260,6 +260,14 @@ void ABase_Character::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 	DOREPLIFETIME(ABase_Character,Character)
 
 	DOREPLIFETIME(ABase_Character,CharSK);
+}
+
+void ABase_Character::OnRep_Character()
+{
+}
+
+void ABase_Character::OnRep_CharSK()
+{
 }
 
 void ABase_Character::S_UpdatePassiveStat_Implementation(EPassiveAbilities Stat, float Value)

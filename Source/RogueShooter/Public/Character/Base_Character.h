@@ -13,6 +13,7 @@ struct FAvailableCharacter;
 class USpringArmComponent;
 class UCameraComponent;
 class USphereComponent;
+class IInterface_CharacterManager;
 
 DECLARE_MULTICAST_DELEGATE(FOnLoad);
 

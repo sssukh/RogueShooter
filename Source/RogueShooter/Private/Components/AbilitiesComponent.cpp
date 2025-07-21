@@ -7,6 +7,9 @@
 #include "RogueShooter/RSEnumStruct.h"
 #include "DrawDebugHelpers.h"
 #include "Abilities/Base_Projectile.h"
+#include "Abilities/Fireball_Projectile.h"
+#include "Abilities/LightningExplosion.h"
+#include "Character/Base_Character.h"
 #include "Engine/OverlapResult.h"
 #include "Interface/Interface_CharacterManager.h"
 #include "Kismet/GameplayStatics.h"
@@ -14,6 +17,7 @@
 #include "Library/FunctionLibrary_Helper.h"
 #include "RogueShooter/AssetPath.h"
 #include "Utility/RSLog.h"
+#include "Particles/ParticleSystem.h"
 
 
 // Sets default values for this component's properties
@@ -23,11 +27,12 @@ UAbilitiesComponent::UAbilitiesComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	SetIsReplicated(true);
+	// TODO : component 생성할 때 set해야한다고 한다.
+	// SetIsReplicated(true);
 	
 	// ...
 
-	ConstructorHelpers::FObjectFinder<UParticleSystem> HammerEmitterFinder(*AssetPath::EffectTemplate::HammerEffect);
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> HammerEmitterFinder(*AssetPath::EffectTemplate::HammerEffect);
 	if(HammerEmitterFinder.Succeeded())
 	{
 		HammerEffect = HammerEmitterFinder.Object;	
@@ -71,6 +76,25 @@ UAbilitiesComponent::UAbilitiesComponent()
 	{
 		LightningSound = LightningSoundFinder.Object;
 	}
+
+	
+	ConstructorHelpers::FClassFinder<ABase_Projectile> ProjectileClassFinder(*AssetPath::Blueprint::BP_BaseProjectile_C);
+	if(ProjectileClassFinder.Succeeded())
+	{
+		BaseProjectileClass = ProjectileClassFinder.Class;
+	}
+	
+	ConstructorHelpers::FClassFinder<ALightningExplosion> LightningClassFinder(*AssetPath::Blueprint::BP_LightningExplosion_C);
+	if(LightningClassFinder.Succeeded())
+	{
+		LightningClass = LightningClassFinder.Class;
+	}
+	
+	ConstructorHelpers::FClassFinder<AFireball_Projectile> FireballClassFinder(*AssetPath::Blueprint::BP_FireballProjectile_C);
+	if(FireballClassFinder.Succeeded())
+	{
+		FireballClass = FireballClassFinder.Class;
+	}
 }
 
 
@@ -81,6 +105,12 @@ void UAbilitiesComponent::BeginPlay()
 
 	// ...
 	HammerDelegate.BindUFunction(this,FName("PrepareHammer"));
+
+	FrostBoltDelegate.BindUFunction(this,FName("PrepareFrostbolt"));
+
+	LightningDelegate.BindUFunction(this,FName("PrepareLightning"));
+
+	FireBallDelegate.BindUFunction(this,FName("PrepareFireball"));
 }
 
 
@@ -119,7 +149,7 @@ bool UAbilitiesComponent::CheckEvoActive(EActiveAbilities InEnumActive)
 
 void UAbilitiesComponent::LevelUpHammer()
 {
-	int32 HammerLevel = LevelUpAbility(EActiveAbilities::Hammer);
+	int32 HammerLevel = LevelUpActive(EActiveAbilities::Hammer);
 
 	switch(HammerLevel)
 	{
@@ -176,9 +206,17 @@ void UAbilitiesComponent::PrepareHammer()
 	S_ExecuteHammer_Implementation(OutHits,damage,HammerRadius,UGameplayStatics::GetPlayerController(GetWorld(),0));
 }
 
+void UAbilitiesComponent::S_ExecuteHammer_Implementation(const TArray<FHitResult>& Hits, float Damage, float Radius,
+	APlayerController* Controller)
+{
+	MC_Hammer_Implementation(Radius);
+
+	UFunctionLibrary_Helper::DamageEnemiesOnce(this,Hits,Damage,Controller,GetOwner());
+}
+
 void UAbilitiesComponent::LevelUpFrostBolt()
 {
-	switch(LevelUpAbility(EActiveAbilities::Frost_Bolt))
+	switch(LevelUpActive(EActiveAbilities::Frost_Bolt))
 	{
 	case 1:
 		GrantFrostBolt(true);
@@ -211,17 +249,18 @@ void UAbilitiesComponent::GrantFrostBolt(bool Cast)
 
 	if(Cast)
 	{
-		Prepare_FrostBolt();
+		PrepareFrostBolt();
 	}
 }
 
-void UAbilitiesComponent::Prepare_FrostBolt()
+void UAbilitiesComponent::PrepareFrostBolt()
 {
 	FBFireIndex = 0;
 
 	// IInterface 상속 검증 
 	if(!GetOwner()->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
 	{
+		RS_LOG_ERROR(TEXT("User Character가 IInterface_CharacterManager를 상속받지 않았습니다."))
 		return;
 	}
 
@@ -243,9 +282,192 @@ void UAbilitiesComponent::Prepare_FrostBolt()
 		return;
 	}
 
+	TArray<AActor*> Actors;
+
+	float distance;
+	
+	for(FOverlapResult overlap : OverlapResults)
+	{
+		Actors.AddUnique(overlap.GetActor());
+	}
+	
+	ABase_Character* Char = IInterface_CharacterManager::Execute_GetCharacter(GetOwner());
+
+	AActor* LocNearestActor = UGameplayStatics::FindNearestActor(GetOwner()->GetActorLocation(),Actors,distance);
+
+	S_ExecuteFrostBolt_Implementation(LocNearestActor,Char,CalculateBonusDamage(FBDamage));
+
+	// ExecuteFrostBolt 호출 후 0.05초 delay
+	FTimerHandle DelayTimer;
+	GetWorld()->GetTimerManager().SetTimer(DelayTimer,FTimerDelegate::CreateLambda([&]()
+	{
+		if(FBFireIndex<=FBFireCount)
+		{
+			++FBFireIndex;
+			S_ExecuteFrostBolt_Implementation(LocNearestActor,Char,CalculateBonusDamage(FBDamage));
+		}
+	}),
+	0.05f,
+	true
+	);
+}
+
+void UAbilitiesComponent::LevelUpLightning()
+{
+	switch (LevelUpActive(EActiveAbilities::Lightning))
+	{
+	case 1 :
+		GrantLightning(true);
+		break;
+	case 2:
+	case 4:
+		LightningDamage+=5.0f;
+		break;
+	case 3:
+		LightningRadius*=1.1f;
+		break;
+	case 5:
+		LightningRadius*=1.1f;
+		EvolutionMap.Add(EActiveAbilities::Lightning,EPassiveAbilities::Ability_Cooldown_Reduction);
+		break;
+	default:
+		break;
+	}
+}
+
+void UAbilitiesComponent::GrantLightning(bool Cast)
+{
+	FTimerHandle LightningTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(LightningTimerHandle,LightningDelegate,CalculateTimerMode(LightningTimer),true);
+	ActiveTimers.AddUnique(LightningTimerHandle);
+
+	if(Cast)
+	{
+		PrepareLightning();
+	}
+}
+
+void UAbilitiesComponent::PrepareLightning()
+{
+	// IInterface 상속 검증 
 	if(!GetOwner()->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
 	{
-		// Character Manager 상속 안받았으면 함수 종료(에러)
+		RS_LOG_ERROR(TEXT("User Character가 IInterface_CharacterManager를 상속받지 않았습니다."))
+		return;
+	}
+
+	USphereComponent* AbilitySphere = IInterface_CharacterManager::Execute_GetAbilitySphere(GetOwner());
+
+	TArray<FOverlapResult> OverlapResults;
+
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_COLLISION_ENEMY);
+	
+	bool bAnyHit = GetWorld()->OverlapMultiByObjectType(OverlapResults,GetOwner()->GetActorLocation(),
+		FQuat::Identity,ObjectQueryParams,FCollisionShape::MakeSphere(AbilitySphere->GetScaledSphereRadius()));
+	
+
+	if(!bAnyHit)
+	{
+		// 없으면 함수 종료
+		return;
+	}
+
+	TArray<AActor*> Actors;
+	
+	for(FOverlapResult overlap : OverlapResults)
+	{
+		Actors.AddUnique(overlap.GetActor());
+	}
+	
+	ABase_Character* Char = IInterface_CharacterManager::Execute_GetCharacter(GetOwner());
+
+	int32 RandIdx = FMath::RandRange(0,Actors.Num()-1);
+
+	LastLightningLoc = Actors[RandIdx]->GetActorLocation();
+
+	S_ExecuteLightning(LastLightningLoc,Char,CalculateBonusDamage(LightningDamage),LightningRadius);
+
+	// Evolution
+
+	if(!CheckEvoActive(EActiveAbilities::Lightning))
+	{
+		// 아직 진화 안함
+		return;
+	}
+
+	// 0.5초 이후에 마지막 위치에 lightning 발사  
+	FTimerHandle delayTimer;
+	GetWorld()->GetTimerManager().SetTimer(delayTimer,FTimerDelegate::CreateLambda([&]()
+	{
+		ABase_Character* Character = IInterface_CharacterManager::Execute_GetCharacter(GetOwner());
+
+		S_ExecuteLightning(LastLightningLoc,Character,CalculateBonusDamage(LightningDamage),LightningRadius);
+	}),
+	0.5f,
+	false);	 
+}
+
+void UAbilitiesComponent::LevelUpFireball()
+{
+	switch (LevelUpActive(EActiveAbilities::Fireball))
+	{
+	case 1:
+		GrantFireball(true);
+		break;
+	case 2:
+	case 4:
+		FireballDamage +=5.0f;
+		break;
+	case 3:
+		FireballRadius *= 1.1f;
+		break;
+	case 5:
+		FireballRadius *=1.1f;
+		EvolutionMap.Add(EActiveAbilities::Fireball,EPassiveAbilities::Speed_Bonus);
+		break;
+	default:
+		break;
+	}
+}
+
+void UAbilitiesComponent::GrantFireball(bool Cast)
+{
+	FTimerHandle FireballTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(FireballTimerHandle,FireBallDelegate,CalculateTimerMode(FireballTimer),true);
+
+	ActiveTimers.AddUnique(FireballTimerHandle);
+
+	if(Cast)
+	{
+		PrepareFireball();
+	}
+}
+
+void UAbilitiesComponent::PrepareFireball()
+{
+	// IInterface 상속 검증 
+	if(!GetOwner()->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
+	{
+		RS_LOG_ERROR(TEXT("User Character가 IInterface_CharacterManager를 상속받지 않았습니다."))
+		return;
+	}
+
+	USphereComponent* AbilitySphere = IInterface_CharacterManager::Execute_GetAbilitySphere(GetOwner());
+
+	TArray<FOverlapResult> OverlapResults;
+
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_COLLISION_ENEMY);
+	
+	bool bAnyHit = GetWorld()->OverlapMultiByObjectType(OverlapResults,GetOwner()->GetActorLocation(),
+		FQuat::Identity,ObjectQueryParams,FCollisionShape::MakeSphere(AbilitySphere->GetScaledSphereRadius()));
+
+	// 여기부터
+
+	if(!bAnyHit)
+	{
+		// 없으면 함수 종료
 		return;
 	}
 
@@ -260,23 +482,65 @@ void UAbilitiesComponent::Prepare_FrostBolt()
 	
 	ABase_Character* Char = IInterface_CharacterManager::Execute_GetCharacter(GetOwner());
 
-	AActor* NearestActor = UGameplayStatics::FindNearestActor(GetOwner()->GetActorLocation(),Actors,distance);
+	AActor* LocNearestActor = UGameplayStatics::FindNearestActor(GetOwner()->GetActorLocation(),Actors,distance);
 
-	S_ExecuteFrostBolt_Implementation(NearestActor,Char,CalculateBonusDamage(FBDamage));
+	S_ExecuteFireball_Implementation(LocNearestActor,Char,CalculateBonusDamage(FireballDamage),FireballRadius);
 
-	// ExecuteFrostBolt 호출 후 0.05초 delay
+	if(!FireballFlipflop.Flip())
+		return;
+	
+	//  0.5초 delay 후 PrepareFireball 호출 
 	FTimerHandle DelayTimer;
-	GetWorld()->GetTimerManager().SetTimer(DelayTimer,FTimerDelegate::CreateLambda([this,&]()
+	GetWorld()->GetTimerManager().SetTimer(DelayTimer,FTimerDelegate::CreateLambda([&]()
 	{
-		if(FBFireIndex<=FBFireCount)
-		{
-			++FBFireIndex;
-			S_ExecuteFrostBolt_Implementation(NearestActor,Char,CalculateBonusDamage(FBDamage));
-		}
+		PrepareFireball();
 	}),
-	0.05f,
-	true
+	0.5f,
+	false
 	);
+}
+
+void UAbilitiesComponent::S_ExecuteFireball_Implementation(AActor* Target, ABase_Character* Character, float Damage,
+	float Radius)
+{
+	if(!IsValid(Target))
+	{
+		RS_LOG_ERROR(TEXT("Fireball의 Target이 유효하지 않습니다."))
+		return;
+	}
+
+	FTransform FireballTransform;
+	FireballTransform.SetIdentity();
+	FireballTransform.SetLocation(Character->GetActorLocation());
+	FireballTransform.SetRotation((Target->GetActorLocation() - Character->GetActorLocation()).Rotation().Quaternion());
+	
+	if(AFireball_Projectile* Fireball = GetWorld()->SpawnActorDeferred<AFireball_Projectile>(FireballClass,FireballTransform
+		,nullptr,nullptr,ESpawnActorCollisionHandlingMethod::AlwaysSpawn))
+	{
+		Fireball->Radius = Radius;
+		Fireball->Damage = Damage;
+		Fireball->SetInstigator(Character);
+		Fireball->Hit_VFX = FireballEffect;
+		Fireball->FinishSpawning(FireballTransform);
+	}
+
+	MC_Fireball_Implementation();
+}
+
+void UAbilitiesComponent::S_ExecuteLightning_Implementation(const FVector& TargetLocation, ABase_Character* Instigator,
+                                                            float Damage, float Radius)
+{
+	FTransform LightningTransform;
+	LightningTransform.SetIdentity();
+	LightningTransform.SetTranslation(TargetLocation - FVector(0.0f,0.0f,100.0f));
+	
+	if(ALightningExplosion* Lightning = GetWorld()->SpawnActorDeferred<ALightningExplosion>(LightningClass,LightningTransform))
+	{
+		Lightning->Radius = Radius;
+		// Lightning->DrawDebugType = EDrawDebugTrace::Type::None;
+		Lightning->SetInstigator(Instigator);
+		Lightning->FinishSpawning(LightningTransform);
+	}
 }
 
 void UAbilitiesComponent::S_ExecuteFrostBolt_Implementation(AActor* Target, ABase_Character* Character, float Damage)
@@ -288,7 +552,7 @@ void UAbilitiesComponent::S_ExecuteFrostBolt_Implementation(AActor* Target, ABas
 	}
 
 	FTransform transform;
-	transform.SetIdentityZeroScale();
+	transform.SetIdentity();
 	transform.SetLocation(Character->GetActorLocation());
 	FVector direction = Target->GetActorLocation() - Character->GetActorLocation();
 	FRotator rot =direction.Rotation();
@@ -304,20 +568,185 @@ void UAbilitiesComponent::S_ExecuteFrostBolt_Implementation(AActor* Target, ABas
 	MC_Frostbolt_Implementation();
 }
 
-void UAbilitiesComponent::S_ExecuteHammer_Implementation(TArray<FHitResult> Hits, float Damage, float Radius,
-                                                         APlayerController* Controller)
-{
-	MC_Hammer_Implementation(Radius);
-
-	UFunctionLibrary_Helper::DamageEnemiesOnce(this,Hits,Damage,Controller,GetOwner());
-}
 
 void UAbilitiesComponent::MC_Frostbolt_Implementation()
 {
 	UGameplayStatics::PlaySoundAtLocation(GetWorld(),FrostBoltSound,GetOwner()->GetActorLocation());
 }
 
-int32 UAbilitiesComponent::LevelUpAbility(EActiveAbilities Active)
+void UAbilitiesComponent::MC_Fireball_Implementation()
+{
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(),FireballSound,GetOwner()->GetActorLocation());
+}
+
+void UAbilitiesComponent::LevelUpMaxHealth(bool PowerUp)
+{
+	if(!GetOwner()->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
+	{
+		RS_LOG_ERROR(TEXT("Owner가 IInterface_CharacterManager를 상속받지 않았습니다."))
+		return;
+	}
+	
+	if(!PowerUp)
+	{
+		switch (LevelUpPassive(EPassiveAbilities::Health_Bonus))
+		{
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+			IInterface_CharacterManager::Execute_AdjustPassive(GetOwner(),EPassiveAbilities::Health_Bonus,1.1f);
+			break;
+		case 5:
+			IInterface_CharacterManager::Execute_AdjustPassive(GetOwner(),EPassiveAbilities::Health_Bonus,1.1f);
+			EvolutionPassiveArray.AddUnique(EPassiveAbilities::Health_Bonus);
+			break;
+		default:
+			break;
+		}
+	}
+	else
+	{
+		IInterface_CharacterManager::Execute_AdjustPassive(GetOwner(),EPassiveAbilities::Health_Bonus,1.1f);
+	}
+}
+
+void UAbilitiesComponent::LevelUpTimerReduction(bool PowerUp)
+{
+	if(!GetOwner()->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
+	{
+		RS_LOG_ERROR(TEXT("Owner가 IInterface_CharacterManager를 상속받지 않았습니다."))
+		return;
+	}
+	if(!PowerUp)
+	{
+		switch (LevelUpPassive(EPassiveAbilities::Ability_Cooldown_Reduction))
+		{
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+			AbilityTimerMultiplier *= 0.95f;
+			break;
+		case 5:
+			AbilityTimerMultiplier *= 0.95f;
+			EvolutionPassiveArray.AddUnique(EPassiveAbilities::Ability_Cooldown_Reduction);
+			break;
+		default:
+			break;
+		}
+	}
+	else
+	{
+			AbilityTimerMultiplier *= 0.95f;
+	}
+}
+
+void UAbilitiesComponent::LevelUpAbilityDamageBonus(bool PowerUp)
+{
+	if(!GetOwner()->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
+	{
+		RS_LOG_ERROR(TEXT("Owner가 IInterface_CharacterManager를 상속받지 않았습니다."))
+		return;
+	}
+	if(!PowerUp)
+	{
+		switch (LevelUpPassive(EPassiveAbilities::Ability_Bonus_Damage))
+		{
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+			AbilityDamageMultiplier *= 1.1f;
+			break;
+		case 5:
+			AbilityDamageMultiplier *= 1.1f;
+			EvolutionPassiveArray.AddUnique(EPassiveAbilities::Ability_Bonus_Damage);
+			break;
+		default:
+			break;
+		}
+	}
+	else
+	{
+		AbilityDamageMultiplier *= 1.1f;
+	}
+}
+
+void UAbilitiesComponent::LevelUpSpeedBonus(bool PowerUp)
+{
+	if(!GetOwner()->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
+	{
+		RS_LOG_ERROR(TEXT("Owner가 IInterface_CharacterManager를 상속받지 않았습니다."))
+		return;
+	}
+	if(!PowerUp)
+	{
+		switch (LevelUpPassive(EPassiveAbilities::Speed_Bonus))
+		{
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+			IInterface_CharacterManager::Execute_AdjustPassive(GetOwner(),EPassiveAbilities::Speed_Bonus,1.1f);
+			break;
+		case 5:
+			IInterface_CharacterManager::Execute_AdjustPassive(GetOwner(),EPassiveAbilities::Speed_Bonus,1.1f);
+			EvolutionPassiveArray.AddUnique(EPassiveAbilities::Speed_Bonus);
+			break;
+		default:
+			break;
+		}
+	}
+	else
+	{
+		IInterface_CharacterManager::Execute_AdjustPassive(GetOwner(),EPassiveAbilities::Speed_Bonus,1.1f);
+	}
+}
+
+void UAbilitiesComponent::RefreshAbilities()
+{
+	ActiveTimers.Empty();
+
+	TArray<EActiveAbilities> ActiveAbilities;
+	ActiveAbilitiesMap.GetKeys(ActiveAbilities);
+
+	for(EActiveAbilities active : ActiveAbilities)
+	{
+		switch (active)
+		{
+		case EActiveAbilities::Hammer:
+			GrantHammer(false);
+			break;
+		case EActiveAbilities::Frost_Bolt:
+			GrantFrostBolt(false);
+			break;
+		case EActiveAbilities::Lightning:
+			GrantLightning(false);
+			break;
+		case EActiveAbilities::Fireball:
+			GrantFireball(false);
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+void UAbilitiesComponent::InvalidateTimers()
+{
+	for(FTimerHandle& TimerHandle : ActiveTimers)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+	}
+}
+
+void UAbilitiesComponent::SetStartingAbility()
+{
+	// UFunctionLibrary_Helper::
+}
+
+int32 UAbilitiesComponent::LevelUpActive(EActiveAbilities Active)
 {
 	int32 ActiveAbilityLevel = 1;
 	if(ActiveAbilitiesMap.Contains(Active))
@@ -328,6 +757,19 @@ int32 UAbilitiesComponent::LevelUpAbility(EActiveAbilities Active)
 	ActiveAbilitiesMap.Add(Active,ActiveAbilityLevel);
 
 	return ActiveAbilityLevel;
+}
+
+int32 UAbilitiesComponent::LevelUpPassive(EPassiveAbilities Passive)
+{
+	int32 PassiveAbilityLevel = 1;
+	if(PassiveAbilitiesMap.Contains(Passive))
+	{
+		PassiveAbilityLevel = *PassiveAbilitiesMap.Find(Passive) + 1;
+	}
+	
+	PassiveAbilitiesMap.Add(Passive,PassiveAbilityLevel);
+
+	return PassiveAbilityLevel;
 }
 
 float UAbilitiesComponent::CalcAbilityDamageWithCrit(float weight, EActiveAbilities ActiveAbility, float BaseDamage)

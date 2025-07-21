@@ -3,20 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
-#include "Base_Projectile.generated.h"
+#include "Base_Projectile.h"
+#include "Fireball_Projectile.generated.h"
 
-class UProjectileMovementComponent;
-class USphereComponent;
+class ABase_Explosion;
 
 UCLASS()
-class ROGUESHOOTER_API ABase_Projectile : public AActor
+class ROGUESHOOTER_API AFireball_Projectile : public ABase_Projectile
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this actor's properties
-	ABase_Projectile();
+	AFireball_Projectile();
 
 protected:
 	// Called when the game starts or when spawned
@@ -26,23 +25,13 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	FORCEINLINE UStaticMeshComponent* GetCube() {return Cube;}
-	
 	virtual void NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
-private:
-	UPROPERTY()
-	TObjectPtr<USphereComponent> Sphere;
-
-	UPROPERTY()
-	TObjectPtr<UStaticMeshComponent> Cube;
-
-	UPROPERTY()
-	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
+	
 public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta = (ExposeOnSpawn = "true"))
+	float Radius;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta = (ExposeOnSpawn = "true"))
-	TObjectPtr<UParticleSystem> Hit_VFX;
-
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta = (ExposeOnSpawn = "true"))
-	float Damage;
+	TSubclassOf<ABase_Explosion> ExplosionClass;
+	
 };

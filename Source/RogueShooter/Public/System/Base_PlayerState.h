@@ -21,8 +21,7 @@ public:
 
 	void OnRep_GoldCount();
 
-	// TODO : 
-	// 아래 이벤트들은 Owning Client로 replicate된 것들이다.
+	// TODO :  아래 이벤트들은 Owning Client로 replicate된 것들이다.
 	// 뭔지 일단 알아야겠다.
 	// OC_Save
 	// OC_GoldPickup

@@ -37,6 +37,7 @@ namespace AssetPath
 	{
 		const FString BaseChestMat = TEXT("MaterialInstanceConstant'/Engine/VREditor/LaserPointer/LaserPointerMaterialInst.LaserPointerMaterialInst'");
 		const FString Blue = TEXT("MaterialInstanceConstant'/Engine/ArtTools/RenderToTexture/Materials/Debug/M_Emissive_Color_0-0-127.M_Emissive_Color_0-0-127'");
+		const FString FireBall = TEXT("Material'/Engine/VREditor/LaserPointer/M_LaserPointer-Core.M_LaserPointer-Core'");
 	}
 
 	namespace Mesh
@@ -51,6 +52,10 @@ namespace AssetPath
 		const FString WB_FloatingTextWidget_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/WB_FloatingTextWidget.WB_FloatingTextWidget_C'");
 		const FString BP_BaseSoul_C = TEXT("Blueprint'/Game/RogueShooter/Blueprints/GameplayActors/BP_BaseSoul.BP_BaseSoul_C'");
 		const FString BP_FloatingTextActor_C = TEXT("Blueprint'/Game/RogueShooter/Blueprints/GameplayActors/BP_FloatingTextActor.BP_FloatingTextActor_C'");
+		const FString BP_BaseExplosion_C = TEXT("Blueprint'/Game/RogueShooter/Blueprints/Abilities/BP_BaseExplosion.BP_BaseExplosion_C'");
+		const FString BP_BaseProjectile_C = TEXT("Blueprint'/Game/RogueShooter/Blueprints/Abilities/BP_BaseProjectile.BP_BaseProjectile_C'");
+		const FString BP_LightningExplosion_C = TEXT("Blueprint'/Game/RogueShooter/Blueprints/Abilities/BP_LightningExplosion.BP_LightningExplosion_C'");
+		const FString BP_FireballProjectile_C = TEXT("Blueprint'/Game/RogueShooter/Blueprints/Abilities/BP_FireballProjectile.BP_FireballProjectile_C'");
 	}
 	namespace Montage
 	{
@@ -68,6 +73,8 @@ namespace AssetPath
 		const FString FrostBoltSound = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/Weapons/A_Axe_Swing_Cue.A_Axe_Swing_Cue'");
 		const FString LightningSound = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/Abilities/Cue_lightning.Cue_lightning'");
 		const FString FireballSound = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/Weapons/A_Axe_Swing_Cue.A_Axe_Swing_Cue'");
+
+		const FString ExplosionSound = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/Abilities/Cue_Explosion.Cue_Explosion'");
 	}
 	
 	namespace EffectTemplate
@@ -77,9 +84,10 @@ namespace AssetPath
 		
 		const FString HammerEffect = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Skill_WeaponThrow/P_Skill_Throw_Fire_Proj_Hammer1.P_Skill_Throw_Fire_Proj_Hammer1'");
 		const FString FrostBoltEffect = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Combat_Ice/Impact/P_Impact_Ice.P_Impact_Ice'");
-		const FString LightningEffect = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Combat_Ice/Impact/P_Impact_Ice.P_Impact_Ice'");
+		const FString LightningEffect = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Mobile/Lightning/P_LineToPoint_Blast_Lightning_00.P_LineToPoint_Blast_Lightning_00'");
 		const FString FireballEffect = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Monsters/FX_Monster_Gruntling/Bomber/P_FireBombExplosion.P_FireBombExplosion'");
 
-		const FString ImpactImce = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Combat_Ice/Impact/P_Impact_Ice.P_Impact_Ice'");
+		const FString ImpactIce = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Combat_Ice/Impact/P_Impact_Ice.P_Impact_Ice'");
+		const FString Explosion = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Monsters/FX_Monster_Gruntling/Bomber/P_FireBombExplosion.P_FireBombExplosion'");
 	}
 }

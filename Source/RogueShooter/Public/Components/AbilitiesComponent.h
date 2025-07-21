@@ -5,9 +5,12 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "RogueShooter/FlowControlLIbrary.h"
 #include "AbilitiesComponent.generated.h"
 
 
+class AFireball_Projectile;
+class ALightningExplosion;
 class ABase_Projectile;
 class ABase_Character;
 enum class EPassiveAbilities : uint8;
@@ -52,7 +55,7 @@ public:
 	void PrepareHammer();
 
 	UFUNCTION(Server,Reliable)
-	void S_ExecuteHammer(TArray<FHitResult> Hits,float Damage, float Radius, APlayerController* Controller);
+	void S_ExecuteHammer(const TArray<FHitResult>& Hits,float Damage, float Radius, APlayerController* Controller);
 
 	UFUNCTION(NetMulticast,Reliable)
 	void MC_Hammer(float Radius);
@@ -62,9 +65,8 @@ public:
 
 	void GrantFrostBolt(bool Cast);
 
-	
-	void Prepare_FrostBolt();
-
+	UFUNCTION()
+	void PrepareFrostBolt();
 	
 	UFUNCTION(Server,Reliable)
 	void S_ExecuteFrostBolt(AActor* Target, ABase_Character* Character, float Damage);
@@ -72,12 +74,60 @@ public:
 	UFUNCTION(NetMulticast,Reliable)
 	void MC_Frostbolt();
 
-	int32 LevelUpAbility(EActiveAbilities Active);
+	// Lightning
+	void LevelUpLightning();
+
+	void GrantLightning(bool Cast);
+
+	UFUNCTION()
+	void PrepareLightning();
+	
+	UFUNCTION(Server,Reliable)
+	void S_ExecuteLightning(const FVector& TargetLocation, ABase_Character* Instigator, float Damage, float Radius);
+
+	// Fireball
+	void LevelUpFireball();
+
+	void GrantFireball(bool Cast);
+
+	UFUNCTION()
+	void PrepareFireball();
+	
+	UFUNCTION(Server,Reliable)
+	void S_ExecuteFireball(AActor* Target, ABase_Character* Character, float Damage, float Radius);
+
+	UFUNCTION(NetMulticast,Reliable)
+	void MC_Fireball();
+
+	// Passive Ability
+public:
+	void LevelUpMaxHealth(bool PowerUp);
+
+	void LevelUpTimerReduction(bool PowerUp);
+
+	void LevelUpAbilityDamageBonus(bool PowerUp);
+
+	void LevelUpSpeedBonus(bool PowerUp);
+
+	
+	// Check if this character already has this ability - if not - add it into the ability map
+	// 캐릭터가 이 능력을 이미 소유했는지 확인하고 그렇지 않으면 ability map에 추가합니다.
+	int32 LevelUpActive(EActiveAbilities Active);
+
+	int32 LevelUpPassive(EPassiveAbilities Passive);
+
+	
+	void RefreshAbilities();
+
+	void InvalidateTimers();
+
+	// SG_Player 구현 필요 
+	void SetStartingAbility();
 	
 	UFUNCTION()
 	float CalcAbilityDamageWithCrit(float weight, EActiveAbilities ActiveAbility,float BaseDamage);
 	
-private:
+public:
 	// Ability
 	UPROPERTY(Replicated,VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Passive")
 	float AbilityTimerMultiplier = 1.0f;
@@ -149,8 +199,8 @@ private:
 
 	// Setup
 	// Kismet 사용. 어떻게 할까..
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Setup")
-	EDrawDebugTrace::Type Debug;
+	// UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Setup")
+	// EDrawDebugTrace::Type Debug;
 	
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Gameplay")
 	TObjectPtr<AActor> NearestActor;
@@ -190,4 +240,12 @@ private:
 	TObjectPtr<USoundBase> LightningSound;
 
 	TSubclassOf<ABase_Projectile> BaseProjectileClass;
+
+	TSubclassOf<ALightningExplosion> LightningClass;
+
+	TSubclassOf<AFireball_Projectile> FireballClass;
+
+	FFlipflop FireballFlipflop;
+
+	
 };

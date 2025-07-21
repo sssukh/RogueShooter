@@ -7,6 +7,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "RogueShooter/AssetPath.h"
+#include "Particles/ParticleSystem.h"
 
 
 // Sets default values
@@ -54,9 +55,9 @@ ABase_Projectile::ABase_Projectile()
 
 	ProjectileMovement->Friction = 0.2;
 
-	ProjectileMovement->BounceVelocityStopSimulatingThreshold - 5.0f;
+	ProjectileMovement->BounceVelocityStopSimulatingThreshold = 5.0f;
 
-	ConstructorHelpers::FObjectFinder<UParticleSystem> EffectFinder(*AssetPath::EffectTemplate::ImpactImce);
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> EffectFinder(*AssetPath::EffectTemplate::ImpactIce);
 
 	if(EffectFinder.Succeeded())
 	{
