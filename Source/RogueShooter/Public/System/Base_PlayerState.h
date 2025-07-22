@@ -8,6 +8,7 @@
 #include "Base_PlayerState.generated.h"
 
 
+class USG_Player;
 // Event_ 는 interface로 구현하면 된다.
 /**
  * 
@@ -20,25 +21,26 @@ public:
 	ABase_PlayerState();
 
 	void OnRep_GoldCount();
-
-	// TODO :  아래 이벤트들은 Owning Client로 replicate된 것들이다.
-	// 뭔지 일단 알아야겠다.
-	// OC_Save
-	// OC_GoldPickup
 	
+	UFUNCTION(Client,Unreliable)
+	void OC_GoldPickUp(int32 Amount);
+	
+	UFUNCTION(Client,Unreliable)
+	void OC_Save();
+
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 public:
 	// Interface
 
-	// virtual void CallGameSave_Implementation() override;
+	virtual void CallGameSave_Implementation() override;
 
-	// virtual void OnGoldPickUp_Implementation(int32 Amount) override;
+	virtual void OnGoldPickUp_Implementation(int32 Amount) override;
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category="PlayerState")
+	UPROPERTY(ReplicatedUsing=OnRep_GoldCount,EditAnywhere, BlueprintReadWrite,Category="PlayerState")
 	int32 GoldCount = 0 ;
 
-	// TODO : SG_Player 구현 필요 
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite,Category="PlayerState")
-	// TObjectPtr<SG_Player> GameSave;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category="PlayerState")
+	TObjectPtr<USG_Player> GameSave;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category="PlayerState")
 	int32 TempGold = 0 ;

@@ -9,6 +9,7 @@
 #include "UObject/Interface.h"
 #include "Interface_CharacterManager.generated.h"
 
+class UAbilitiesComponent;
 // This class does not need to be modified.
 UINTERFACE()
 class UInterface_CharacterManager : public UInterface
@@ -44,9 +45,8 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
 	void Pause(bool Pause, bool Override);
 
-	// TODO : AbilityComponent 구현 필요 
-	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
-	// UAbilityComponent* GetAbilityComponent();
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
+	UAbilitiesComponent* GetAbilityComponent();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
 	void UpdateClassName();

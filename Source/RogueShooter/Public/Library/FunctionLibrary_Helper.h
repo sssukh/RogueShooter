@@ -7,6 +7,7 @@
 #include "RogueShooter/RSEnumStruct.h"
 #include "FunctionLibrary_Helper.generated.h"
 
+class USG_Player;
 /**
  * 
  */
@@ -27,11 +28,11 @@ public:
 	UFUNCTION(BlueprintCallable,Category = "Function Library Helper",meta = (WorldContext = "WorldContextObject"))
 	static void CreateLoadingScreen(const UObject* WorldContextObject,FText LoadingInfo);
 
-	// TODO : SG_Player 구현 필요 
-	// UFUNCTION(BlueprintCallable,Category = "Function Library Helper",meta = (WorldContext = "WorldContextObject"))
-	// static SG_Player* LoadPlayerData(const UObject* WorldContextObject);
 	
-	// TODO : SG_Player 구현 필요 
-	// UFUNCTION(BlueprintCallable,Category = "Function Library Helper",meta = (WorldContext = "WorldContextObject"))
-	// static void SavePlayerData(const UObject* WorldContextObject,SG_Player* SaveData);
+	UFUNCTION(BlueprintCallable,Category = "Function Library Helper",meta = (WorldContext = "WorldContextObject"))
+	static USG_Player* LoadPlayerData(const UObject* WorldContextObject);
+	
+	
+	UFUNCTION(BlueprintCallable,Category = "Function Library Helper",meta = (WorldContext = "WorldContextObject"))
+	static void SavePlayerData(const UObject* WorldContextObject,USG_Player* SaveData);
 };

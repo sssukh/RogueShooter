@@ -18,6 +18,7 @@
 #include "RogueShooter/AssetPath.h"
 #include "Utility/RSLog.h"
 #include "Particles/ParticleSystem.h"
+#include "Saves/SG_Player.h"
 
 
 // Sets default values for this component's properties
@@ -743,7 +744,23 @@ void UAbilitiesComponent::InvalidateTimers()
 
 void UAbilitiesComponent::SetStartingAbility()
 {
-	// UFunctionLibrary_Helper::
+	USG_Player* SGPlayer = UFunctionLibrary_Helper::LoadPlayerData(GetWorld());
+
+	switch (SGPlayer->Character.StartingAbilities)
+	{
+	case EActiveAbilities::Hammer:
+		LevelUpHammer();
+		break;
+	case EActiveAbilities::Frost_Bolt:
+		LevelUpFrostBolt();
+		break;
+	case EActiveAbilities::Lightning:
+		LevelUpLightning();
+		break;
+	case EActiveAbilities::Fireball:
+		LevelUpFireball();
+		break;
+	}
 }
 
 int32 UAbilitiesComponent::LevelUpActive(EActiveAbilities Active)

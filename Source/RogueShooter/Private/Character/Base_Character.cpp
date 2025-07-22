@@ -3,17 +3,25 @@
 
 #include "Character/Base_Character.h"
 
+#include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
-#include "Chaos/SoftsSpring.h"
+#include "Components/AbilitiesComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/ProgressBar.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PlayerState.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Interface/Interface_GameManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "Library/FunctionLibrary_Helper.h"
 #include "Net/UnrealNetwork.h"
 #include "RogueShooter/AssetPath.h"
+#include "Saves/SG_Player.h"
 #include "System/Base_GameMode.h"
 #include "Utility/RSCollisionChannel.h"
+#include "Utility/RSLog.h"
+#include "UI/UW_HealthBar.h"
 
 
 // Sets default values
@@ -60,7 +68,32 @@ ABase_Character::ABase_Character()
 	
 	GetMesh()->SetRelativeLocation(FVector(0.0f,0.0f,-90.0f));
 	GetMesh()->SetRelativeRotation(FRotator(0.0f,270.0f,0.0f));
+
+	// TODO : healthbar 경로 추가 
+	static ConstructorHelpers::FClassFinder<UUW_HealthBar> HealthbarClassFinder(*AssetPath::Blueprint::WBP_HealthBar_C);
+	if(HealthbarClassFinder.Succeeded())
+	{
+		HealthBarClass = HealthbarClassFinder.Class;
+	}
+	else
+	{
+		RS_LOG_ERROR(TEXT("HealthBarClass를 찾을 수 없습니다."))
+	}
+
+	// HealthWidget  초기화 
+	{
+		HealthWidget = CreateDefaultSubobject<UWidgetComponent>("HealthWidget");
+
+		HealthWidget->SetWidgetSpace(EWidgetSpace::Screen);
+
+		HealthWidget->SetDrawSize(FVector2D(125.0f,18.0f));
+
+		HealthWidget->SetPivot(FVector2D(0.5f,0.5f));
 	
+		HealthWidget->SetRelativeLocation(FVector(0.0f,0.0f,125.0f));
+
+		HealthWidget->SetupAttachment(RootComponent);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -68,7 +101,18 @@ void ABase_Character::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+	SetupReference();
+
+	LoadLastCharacterClass();
+
+	FTimerHandle BeginTimer;
+	GetWorld()->GetTimerManager().SetTimer(BeginTimer,FTimerDelegate::CreateLambda([this]()
+	{
+		// TODO : OC_SetupWidget() 호출 
+	}),
+	1.0f,
+	false
+	);
 }
 
 // Called every frame
@@ -89,7 +133,7 @@ void ABase_Character::UpdateCharacterClass_Implementation(FAvailableCharacter Av
 {
 	// IInterface_CharacterManager::UpdateCharacterClass_Implementation(Character);
 
-	S_SetCharacterData_Implementation(AvailableCharacter);
+	S_SetCharacterData(AvailableCharacter);
 }
 
 void ABase_Character::S_SetCharacterMesh_Implementation(USkeletalMesh* SK)
@@ -103,10 +147,34 @@ void ABase_Character::S_SetCharacterData_Implementation(FAvailableCharacter Char
 	Character = CharacterData;
 }
 
+void ABase_Character::CreateHealthWidget()
+{
+	UUW_HealthBar* HealthBar = Cast<UUW_HealthBar>(CreateWidget(GetPlayerState()->GetPlayerController(),HealthBarClass));
+
+	HealthBarWidgetReference = HealthBar;
+
+	HealthWidget->SetWidget(HealthBarWidgetReference);
+
+	MC_UpdateHealthBar(CurrentHealth/MaxHealth);
+}
+
 void ABase_Character::SetupReference()
 {
 	// TODO : GameplayPlayerController 구현 필요 
 	//	GetController()
+}
+
+void ABase_Character::LoadLastCharacterClass()
+{
+	USG_Player* SavedPlayer = UFunctionLibrary_Helper::LoadPlayerData(GetWorld());
+
+	GameSave = SavedPlayer;
+
+	S_SetCharacterData(GameSave->Character);
+}
+
+void ABase_Character::SetupDispatchers()
+{
 }
 
 float ABase_Character::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
@@ -126,11 +194,15 @@ float ABase_Character::TakeDamage(float DamageAmount, struct FDamageEvent const&
 
 			MC_Death();
 
-			if(GM_Interface.GetClass()->ImplementsInterface(UInterface_GameManager::StaticClass()))
+			if(!GM_Interface.GetClass()->ImplementsInterface(UInterface_GameManager::StaticClass()))
+			{
+				RS_LOG_ERROR(TEXT("GM_Interface 변수가 IInterface_GameManager를 상속받지 않았습니다."))
+			}
+			else
 			{
 				IInterface_GameManager::Execute_OnPlayerDeath(GM_Interface);
-
-				// TODO : AbilityComponent 변수 필요 
+				
+				AbilityComponent->InvalidateTimers();
 			}
 		}
 	}
@@ -140,7 +212,9 @@ float ABase_Character::TakeDamage(float DamageAmount, struct FDamageEvent const&
 
 void ABase_Character::Death()
 {
-	// TODO : AbilityComponent 구현 필요
+	AbilityComponent->InvalidateTimers();
+
+	// TODO : Gameplay Controller 구현 필요 
 }
 
 void ABase_Character::MC_Death_Implementation()
@@ -169,6 +243,17 @@ void ABase_Character::RestoreHealth_Implementation(float amount)
 	S_RestoreHealth(amount);
 }
 
+void ABase_Character::SetupHealthWidget_Implementation()
+{
+	// IInterface_CharacterManager::SetupHealthWidget_Implementation();
+	OC_SetupWidgets();
+}
+
+void ABase_Character::OC_SetupWidgets_Implementation()
+{
+	CreateHealthWidget();
+}
+
 void ABase_Character::S_RestoreHealth_Implementation(float amount)
 {
 	CurrentHealth = FMath::Clamp(CurrentHealth+amount,0.0f,MaxHealth);
@@ -178,6 +263,10 @@ void ABase_Character::S_RestoreHealth_Implementation(float amount)
 
 void ABase_Character::MC_UpdateHealthBar_Implementation(float percent)
 {
+	if(IsValid(HealthBarWidgetReference))
+	{
+		HealthBarWidgetReference->ProgressBar->SetPercent(percent);
+	}
 }
 
 void ABase_Character::S_Pause_Implementation(bool Pause, bool Override)
@@ -262,12 +351,25 @@ void ABase_Character::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 	DOREPLIFETIME(ABase_Character,CharSK);
 }
 
+void ABase_Character::OROnRepCharacterClass()
+{
+}
+
 void ABase_Character::OnRep_Character()
 {
+	OROnRepCharacterClass();
+	
+	StartingAbility = Character.StartingAbilities;
+
+	S_SetCharacterMesh(Character.CharacterSK);
 }
 
 void ABase_Character::OnRep_CharSK()
 {
+	if(IsValid(CharSK))
+	{
+		GetMesh()->SetSkinnedAssetAndUpdate(CharSK,false);
+	}
 }
 
 void ABase_Character::S_UpdatePassiveStat_Implementation(EPassiveAbilities Stat, float Value)
@@ -276,7 +378,7 @@ void ABase_Character::S_UpdatePassiveStat_Implementation(EPassiveAbilities Stat,
 	{
 	case EPassiveAbilities::Health_Bonus:
 		MaxHealth = MaxHealth*Value;
-		RestoreHealth_Implementation(MaxHealth*0.1f);
+		IInterface_CharacterManager::Execute_RestoreHealth(this,MaxHealth*0.1f);
 		break;
 	case EPassiveAbilities::Speed_Bonus:
 		GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed * Value;

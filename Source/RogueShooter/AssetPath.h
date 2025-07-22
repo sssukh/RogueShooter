@@ -12,6 +12,11 @@ namespace AssetPath
 		const FString BaseEnemyAnim = TEXT("AnimBlueprint'/Game/SurvivorsTemplate/Demo/InfinityBladeAdversaries/Enemy/Enemy_Gruntling/Enemy_Gruntling_Animation/ABP_Gruntling.ABP_Gruntling_C'");
 		const FString BaseCharAnim = TEXT("AnimBlueprint'/Game/SurvivorsTemplate/Demo/Characters/Mannequins/Animations/ABP_Quinn.ABP_Quinn_C'");
 	}
+
+	namespace DataTable
+	{
+		const FString DT_AvailableCharacter = TEXT("");
+	}
 	namespace Curve
 	{
 		const FString Curve_Soul = TEXT("CurveFloat'/Game/RogueShooter/Resource/SoulCurve.SoulCurve'");
@@ -56,6 +61,10 @@ namespace AssetPath
 		const FString BP_BaseProjectile_C = TEXT("Blueprint'/Game/RogueShooter/Blueprints/Abilities/BP_BaseProjectile.BP_BaseProjectile_C'");
 		const FString BP_LightningExplosion_C = TEXT("Blueprint'/Game/RogueShooter/Blueprints/Abilities/BP_LightningExplosion.BP_LightningExplosion_C'");
 		const FString BP_FireballProjectile_C = TEXT("Blueprint'/Game/RogueShooter/Blueprints/Abilities/BP_FireballProjectile.BP_FireballProjectile_C'");
+
+		const FString BP_SG_Player_C = TEXT("");
+
+		const FString WBP_HealthBar_C = TEXT("");
 	}
 	namespace Montage
 	{

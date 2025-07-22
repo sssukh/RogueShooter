@@ -6,9 +6,11 @@
 #include "Engine/DamageEvents.h"
 #include "Kismet/GameplayStatics.h"
 #include "RogueShooter/AssetPath.h"
+#include "Saves/SG_Player.h"
+#include "Utility/RSLog.h"
 
 void UFunctionLibrary_Helper::DamageEnemiesOnce(const UObject* WorldContextObject, const TArray<FHitResult>& EnemyHits,
-	float Damage, AController* Instigator, AActor* Causer)
+                                                float Damage, AController* Instigator, AActor* Causer)
 {
 	TArray<AActor*> HitActors;
 	for(const FHitResult& hitResult : EnemyHits)
@@ -129,4 +131,46 @@ void UFunctionLibrary_Helper::CreateLoadingScreen(const UObject* WorldContextObj
 {
 	// GetWorld()->GetFirstLocalPlayerFromController()
 
+}
+
+USG_Player* UFunctionLibrary_Helper::LoadPlayerData(const UObject* WorldContextObject)
+{
+	if(UGameplayStatics::DoesSaveGameExist(FString(TEXT("PlayerData1")),0))
+	{
+		USaveGame* SG = UGameplayStatics::LoadGameFromSlot(FString(TEXT("PlayerData1")),0);
+
+		if(USG_Player* SGPlayer = Cast<USG_Player>(SG))
+		{
+			return SGPlayer;
+		}
+
+		RS_LOG_ERROR(TEXT("SGPlayer가 USaveGame을 상속받지 않았습니다."))
+		return nullptr;
+	}
+	else
+	{
+		// TODO : AssetPath에 경로 추가하기
+		USG_Player* SG = Cast<USG_Player>(UGameplayStatics::CreateSaveGameObject(StaticLoadClass(USG_Player::StaticClass(),nullptr,*AssetPath::Blueprint::BP_SG_Player_C)));
+		
+		UDataTable* DT_AvailableCharacter = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(),nullptr,*AssetPath::DataTable::DT_AvailableCharacter));
+
+		if(DT_AvailableCharacter)
+		{
+			const FAvailableCharacter* RowData = DT_AvailableCharacter->FindRow<FAvailableCharacter>(TEXT("Char1"),TEXT("DT_AvailableCharacter"));
+			if(RowData)
+			{
+				SG->Character = *RowData;
+			}
+			else
+			{
+				RS_LOG_ERROR(TEXT("DT_AvailalbeCharacter에서 Char1의 row를 찾지 못했습니다."))
+			}
+		}
+		return SG;
+	}
+}
+
+void UFunctionLibrary_Helper::SavePlayerData(const UObject* WorldContextObject, USG_Player* SaveData)
+{
+	UGameplayStatics::SaveGameToSlot(SaveData,TEXT("PlayerData1"),0);
 }

@@ -9,6 +9,10 @@
 #include "RogueShooter/RSEnumStruct.h"
 #include "Base_Character.generated.h"
 
+class UWidgetComponent;
+class UUW_HealthBar;
+class UAbilitiesComponent;
+class USG_Player;
 struct FAvailableCharacter;
 class USpringArmComponent;
 class UCameraComponent;
@@ -46,7 +50,30 @@ public:
 	UFUNCTION(Server,Unreliable)
 	void S_SetCharacterData(FAvailableCharacter CharacterData);
 
+	//*****************************************
+	// Character Setup
+	//*****************************************
+	
+	void CreateHealthWidget();
+
+	// TODO : GameplayPlayerController 구현 필요
+	/**
+	 * set ref to PC \n
+	 */
 	void SetupReference();
+
+	
+	/**
+	 * attempt to load the last used character\n
+	 * 마지막으로 사용한 캐릭터를 로드한다.
+	 */
+	void LoadLastCharacterClass();
+	
+	/**
+	* if you need to setup dispatchers do so here.\n
+	* dispatcher를 셋업해야한다면 여기서 하면 된다.
+	*/
+	void SetupDispatchers();
 	 
 	//*****************************************
 	// Health/Damage
@@ -72,10 +99,13 @@ public:
 	// Widgets
 	//*****************************************
 
+	UFUNCTION(Client,Unreliable)
+	void OC_SetupWidgets();
+	
 	UFUNCTION(NetMulticast,Unreliable)
 	void MC_UpdateHealthBar(float percent);
 
-
+	virtual void SetupHealthWidget_Implementation() override;
 
 	//*****************************************
 	// Pause Logic
@@ -97,11 +127,16 @@ public:
 	//*****************************************
 	// Passive Stats
 	//*****************************************
-	// Adjust stats on pawn via interface to avoid circular dependencies on ability component
-	// ability component의 의존성을 피하기 위해 interface를 통해 pawn의 스탯을 조정한다.
-
-	// Call Server to Update character specific stats
-	// 서버를 호출해서 캐릭터 스탯을 업데이트한다.
+	
+	/**
+	* Adjust stats on pawn via interface to avoid circular dependencies on ability component
+	* ability component의 의존성을 피하기 위해 interface를 통해 pawn의 스탯을 조정한다.
+	*/
+	
+	/**
+	* Call Server to Update character specific stats
+	* 서버를 호출해서 캐릭터 스탯을 업데이트한다.
+	*/
 	UFUNCTION()
 	virtual void AdjustPassive_Implementation(EPassiveAbilities Stat, float MultiplicationAmount) override;
 
@@ -110,19 +145,28 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
+	/**
+	 * Function is so we can override on children class since you cannot override on rep notifies\n
+	 * 
+	 */
+	void OROnRepCharacterClass();
+	
 	UFUNCTION()
 	void OnRep_Character();
 
+	/**
+	 * set skeletal mesh for multiplayer 
+	 */
 	UFUNCTION()
 	void OnRep_CharSK();
+	
 	// Components
 private:
 	UPROPERTY()
 	TObjectPtr<USphereComponent> AbilitySphere;
 
-	// TODO : AbilityComponent 구현 필요
-	// UPROPERTY()
-	// TObjectPtr<UAbilityComponent> AbilityComponent;
+	UPROPERTY()
+	TObjectPtr<UAbilitiesComponent> AbilityComponent;
 
 	UPROPERTY()
 	TObjectPtr<UCameraComponent> Camera;
@@ -131,7 +175,7 @@ private:
 	TObjectPtr<USpringArmComponent> SpringArm;
 
 	UPROPERTY()
-	TObjectPtr<UUserWidget> HealthWidget;
+	TObjectPtr<UWidgetComponent> HealthWidget;
 
 	// Character Setup
 public:
@@ -141,10 +185,9 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character Setup")
 	TObjectPtr<UObject> GM_Interface;
-
-	// TODO : SG_Player 구현 필요
-	// UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
-	// TObjectPtr<SG_Player> GameSave;
+	
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
+	TObjectPtr<USG_Player> GameSave;
 
 	UPROPERTY(ReplicatedUsing="OnRep_Character",VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
 	FAvailableCharacter Character;
@@ -169,9 +212,9 @@ public:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
 	float MaxHealth = 100.0f;
 	
-	// TODO : UUW_HealthBar 구현 필요
-	// UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
-	// TObjectPtr<UUW_HealthBar> HealthBarWidgetReference;
+	
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
+	TObjectPtr<UUW_HealthBar> HealthBarWidgetReference;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
 	int32 CurrentXP =0;
@@ -188,5 +231,7 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<UAnimInstance> CharacterAnimInstance;
+
+	TSubclassOf<UUW_HealthBar> HealthBarClass;
 
 };

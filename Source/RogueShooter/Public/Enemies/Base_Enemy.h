@@ -50,7 +50,7 @@ public:
 	UFUNCTION()
 	void DamagePlayer();
 
-	// TODO : Multicast이다. 어떻게 적용해야할까?
+	
 	UFUNCTION(NetMulticast,Unreliable)
 	void MC_EnemyAttack();
 

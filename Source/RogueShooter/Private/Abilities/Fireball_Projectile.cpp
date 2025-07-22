@@ -23,7 +23,7 @@ AFireball_Projectile::AFireball_Projectile()
 	ConstructorHelpers::FObjectFinder<UMaterialInstance> FireballMatFinder(*AssetPath::Material::FireBall);
 	if(FireballMatFinder.Succeeded())
 	{
-		GetCube()->SetMaterial(0,FireballMatFinder.Object);
+		Cube->SetMaterial(0,FireballMatFinder.Object);
 	}
 }
 
