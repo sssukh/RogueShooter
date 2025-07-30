@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Base_PlayerController.generated.h"
 
+class UUW_GameMenu;
 class UWidget;
 /**
  * 
@@ -29,12 +30,12 @@ public:
 	virtual void CleanUpUI();
 
 	// override for when pause menu called
-	// virtual void OnPauseMenuCalled();
+	virtual void OnPauseMenuCalled();
 
 	// override for when pause menu closed
-	// virtual void OnPauseMenuClosed();
+	virtual void OnPauseMenuClosed();
 public:
 	// TODO widget blueprint game menu 구현 필요 
-	// UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="PlayerController")
-	// TObjectPtr<UWidget> GameMenu;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="PlayerController")
+	TObjectPtr<UUW_GameMenu> GameMenu;
 };

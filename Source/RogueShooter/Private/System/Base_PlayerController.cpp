@@ -3,6 +3,7 @@
 
 #include "System/Base_PlayerController.h"
 
+#include "Blueprint/WidgetLayoutLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
 ABase_PlayerController::ABase_PlayerController()
@@ -38,5 +39,13 @@ void ABase_PlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void ABase_PlayerController::CleanUpUI()
 {
-	// TODO Remove all widget 구현 필요 
+	UWidgetLayoutLibrary::RemoveAllWidgets(GetWorld());
+}
+
+void ABase_PlayerController::OnPauseMenuCalled()
+{
+}
+
+void ABase_PlayerController::OnPauseMenuClosed()
+{
 }

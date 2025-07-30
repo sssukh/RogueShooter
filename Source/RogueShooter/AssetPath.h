@@ -84,6 +84,10 @@ namespace AssetPath
 		const FString FireballSound = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/Weapons/A_Axe_Swing_Cue.A_Axe_Swing_Cue'");
 
 		const FString ExplosionSound = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/Abilities/Cue_Explosion.Cue_Explosion'");
+		const FString ChestSound = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/Interaction/Cue_Chest.Cue_Chest'");
+
+		const FString CloseMenuSound = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/UI/Cue_CloseMenu.Cue_CloseMenu'");
+		const FString ChestGoldSound = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/Interaction/Cue_ChestGold.Cue_ChestGold'");
 	}
 	
 	namespace EffectTemplate

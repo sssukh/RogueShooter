@@ -19,7 +19,7 @@ class UCameraComponent;
 class USphereComponent;
 class IInterface_CharacterManager;
 
-DECLARE_MULTICAST_DELEGATE(FOnLoad);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoad);
 
 UCLASS()
 class ROGUESHOOTER_API ABase_Character : public ACharacter, public IInterface_CharacterManager

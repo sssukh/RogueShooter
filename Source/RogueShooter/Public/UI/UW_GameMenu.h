@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "UW_GameMenu.generated.h"
 
-DECLARE_MULTICAST_DELEGATE(FOnMenuClosed);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMenuClosed);
 
 class UButton;
 /**
