@@ -35,7 +35,7 @@ public:
 	// override for when pause menu closed
 	virtual void OnPauseMenuClosed();
 public:
-	// TODO widget blueprint game menu 구현 필요 
+	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="PlayerController")
 	TObjectPtr<UUW_GameMenu> GameMenu;
 };

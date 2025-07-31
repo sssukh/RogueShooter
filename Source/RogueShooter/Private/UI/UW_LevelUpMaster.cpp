@@ -98,7 +98,7 @@ void UUW_LevelUpMaster::AddSelection(FText Name, int32 Level, FText Desc, UTextu
 void UUW_LevelUpMaster::Close(EAbilityType Type, EActiveAbilities AAbility, EPassiveAbilities PAbility)
 {
 	if(OnClose.IsBound())
-		OnClose.Broadcast();
+		OnClose.Broadcast(Type,AAbility,PAbility);
 
 	RemoveFromParent();
 

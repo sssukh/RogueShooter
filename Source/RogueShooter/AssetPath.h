@@ -16,6 +16,7 @@ namespace AssetPath
 	namespace DataTable
 	{
 		const FString DT_AvailableCharacter = TEXT("");
+		const FString DT_ActiveAbilities = TEXT("");
 	}
 	namespace Curve
 	{

@@ -15,7 +15,7 @@ class UWidgetSwitcher;
 class UButton;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReady)
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnClose)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnClose,EAbilityType,Type,EActiveAbilities,AAbilities,EPassiveAbilities,PAbilities)
 
 /**
  * 
