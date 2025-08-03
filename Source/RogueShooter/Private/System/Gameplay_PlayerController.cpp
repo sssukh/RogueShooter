@@ -5,15 +5,24 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Components/AbilitiesComponent.h"
+#include "Components/ProgressBar.h"
+#include "Components/TextBlock.h"
+#include "GameFramework/PlayerState.h"
 #include "Interface/Interface_CharacterManager.h"
+#include "Interface/Interface_PlayerState.h"
+#include "Kismet/GameplayStatics.h"
 #include "Library/FunctionLibrary_Helper.h"
 #include "RogueShooter/AssetPath.h"
 #include "UI/UW_LevelUpMaster.h"
 #include "UI/UW_PlayerHud.h"
+#include "UI/UW_MatchResults.h"
+#include "Utility/RSLog.h"
 
 AGameplay_PlayerController::AGameplay_PlayerController()
 {
 }
+
+
 
 void AGameplay_PlayerController::SetupPlayer()
 {
@@ -43,6 +52,40 @@ void AGameplay_PlayerController::SetReference()
 	if(GetPawn()->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
 	{
 		AbilityComponent = IInterface_CharacterManager::Execute_GetAbilityComponent(GetPawn());
+	}
+}
+
+void AGameplay_PlayerController::UpdateCharacterUI(float Percent, int32 Level)
+{
+	PlayerHud->ProgressBar_XP->SetPercent(Percent);
+
+	PlayerHud->TextBlock_Level->SetText(FText::FromString(TEXT("Level %d",Level)));
+}
+
+void AGameplay_PlayerController::UpdateHotbar()
+{
+	UpdateHudHotbar(AbilityComponent->ActiveAbilitiesMap,AbilityComponent->PassiveAbilitiesMap);
+}
+
+void AGameplay_PlayerController::ShowEndMatchScreen(bool Victory, int32 EnemiesKilled)
+{
+	CleanUpUI();
+
+	if(UUW_MatchResults* MatchResultWidget = CreateWidget<UUW_MatchResults>(this,MatchResultClass))
+	{
+		MatchResultWidget->Victory = Victory;
+		MatchResultWidget->Kills = EnemiesKilled;
+
+		MatchResultWidget->AddToViewport();
+
+		if(Victory)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(),WinSound);
+		}
+		else
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(),LoseSound);
+		}
 	}
 }
 
@@ -143,7 +186,7 @@ void AGameplay_PlayerController::ExecuteLevelUp()
 
 		// TODO : weight에 따라 active나 passive를 우선적으로 추가하는 순서를 설정하도록 해야겠다.
 		// weight에 따라 Active를 우선적으로 추가할수도 Passive를 우선적으로 추가할수도 있다.
-		if(0.5f <= FMath::RandRange(0.0f,1.0f))
+		// if(0.5f <= FMath::RandRange(0.0f,1.0f))
 		{
 			if(CanAddActiveAbility)
 			{
@@ -165,7 +208,8 @@ void AGameplay_PlayerController::ExecuteLevelUp()
 						level = *findLevel;
 
 					++level;
-					
+
+					// TODO : enum을 string으로 변환하는 함수를 헬퍼로 만들어두자.
 					const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE,TEXT("EActiveAbilities"), true);
 					FString NameString;
 					if(EnumPtr)
@@ -238,5 +282,254 @@ void AGameplay_PlayerController::ExecuteLevelUp()
 
 		LevelUpUI->AddSelection(FText::FromString(TEXT("Gold Pile")),0,FText::FromString(TEXT("Add 50 Gold")),
 			CoinIcon,EActiveAbilities::Hammer,EPassiveAbilities::Ability_Bonus_Damage,EAbilityType::Gold);
+	}
+}
+
+bool AGameplay_PlayerController::CheckIfEvoReady(EActiveAbilities& Ability)
+{
+	TArray<EPassiveAbilities> PassiveArray = AbilityComponent->EvolutionPassiveArray;
+
+	TMap<EActiveAbilities,EPassiveAbilities> EvoMap = AbilityComponent->EvolutionMap;
+
+	if(EvoMap.IsEmpty())
+	{
+		Ability = EActiveAbilities::Hammer;
+		return false;
+	}
+
+	TArray<EActiveAbilities> ActiveAbilities;
+	EvoMap.GetKeys(ActiveAbilities);
+
+	for(EActiveAbilities AAbility : ActiveAbilities)
+	{
+		if(EPassiveAbilities* PAbility = EvoMap.Find(AAbility))
+		{
+			if(PassiveArray.Contains(PAbility))
+			{
+				Ability = AAbility;
+				return true;
+			}
+		}
+	}
+
+	
+}
+
+TArray<EActiveAbilities> AGameplay_PlayerController::CheckActiveAbilities(TMap<EActiveAbilities, int32> ActiveMap,
+	int32 MaxLevel)
+{
+	TArray<EActiveAbilities> Result;
+	
+	int32 MaxAbilityLevel = MaxLevel;
+
+	TMap<EActiveAbilities,int32> TempActiveMap = ActiveMap;
+
+	const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE,TEXT("EActiveAbilities"),true);
+	int32 EnumNum = EnumPtr->NumEnums();
+	// Check against max abount of active abilities
+	if(TempActiveMap.Num()<EnumNum)
+	{
+		for(EActiveAbilities AAbility : TEnumRange<EActiveAbilities>())
+		{
+			Result.Add(AAbility);
+		}
+		
+		// Remove Abilities that are maxed out
+		TArray<EActiveAbilities> AAbilities;
+		TempActiveMap.GetKeys(AAbilities);
+
+		for(EActiveAbilities aability : AAbilities)
+		{
+			if(TempActiveMap[aability]>=MaxAbilityLevel)
+			{
+				Result.Remove(aability);
+			}
+		}
+		// Return any abilities that are not yet learned or maxed out
+		return Result;
+	}
+	else
+	{
+		// Add Abilities that are not maxed out
+		TArray<EActiveAbilities> AAbilities;
+		TempActiveMap.GetKeys(AAbilities);
+
+		for(EActiveAbilities aability : AAbilities)
+		{
+			if(TempActiveMap[aability]<MaxAbilityLevel)
+			{
+				Result.Add(aability);
+			}
+		}
+
+		// return any abilities that are not yet maxed out
+		return Result;
+	}
+}
+
+TArray<EPassiveAbilities> AGameplay_PlayerController::CheckPassiveAbilities(TMap<EPassiveAbilities, int32> PassiveMap,
+	int32 MaxLevel)
+{
+	TArray<EPassiveAbilities> Result;
+	
+	int32 MaxAbilityLevel = MaxLevel;
+
+	TMap<EPassiveAbilities,int32> TempActiveMap = PassiveMap;
+
+	const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE,TEXT("EPassiveAbilities"),true);
+	int32 EnumNum = EnumPtr->NumEnums();
+	
+	// Check against max abount of active abilities
+	if(TempActiveMap.Num()<EnumNum)
+	{
+		for(EPassiveAbilities PAbility : TEnumRange<EPassiveAbilities>())
+		{
+			Result.Add(PAbility);
+		}
+		
+		// Remove Abilities that are maxed out
+		TArray<EPassiveAbilities> PAbilities;
+		TempActiveMap.GetKeys(PAbilities);
+
+		for(EPassiveAbilities pability : PAbilities)
+		{
+			if(TempActiveMap[pability]>=MaxAbilityLevel)
+			{
+				Result.Remove(pability);
+			}
+		}
+		// Return any abilities that are not yet learned or maxed out
+		return Result;
+	}
+	else
+	{
+		// Add Abilities that are not maxed out
+		TArray<EPassiveAbilities> PAbilities;
+		TempActiveMap.GetKeys(PAbilities);
+
+		for(EPassiveAbilities pability : PAbilities)
+		{
+			if(TempActiveMap[pability]<MaxAbilityLevel)
+			{
+				Result.Add(pability);
+			}
+		}
+
+		// return any abilities that are not yet maxed out
+		return Result;
+	}
+}
+
+void AGameplay_PlayerController::ProcessLevelUp(EAbilityType Type, EActiveAbilities AAbilities,
+                                                EPassiveAbilities PAbilities)
+{
+	LevelUpHudUp = false;
+
+	// Reset UI & Unpause
+	if(ChestHudUp)
+	{
+		PreparingUI = false;
+
+		if(!GetPawn()->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
+		{
+			RS_LOG_ERROR(TEXT("Pawn이 IInterface_CharacterManager를 상속받지 않았습니다."))
+			return;
+		}
+		
+		IInterface_CharacterManager::Execute_Pause(GetPawn(),false,false);
+
+		bShowMouseCursor =false;
+
+		FInputModeGameOnly InputGameOnly;
+		
+		SetInputMode(InputGameOnly);
+	}
+
+	// Level Up Ability
+	AssignAbility(Type,PAbilities,AAbilities);
+
+	
+	// Refresh after ability is modified
+	UpdateHotbar();
+
+	AbilityComponent->RefreshAbilities();
+}
+
+void AGameplay_PlayerController::ActivateEvolution(EActiveAbilities Evo)
+{
+	AbilityComponent->EvolutionMap.Remove(Evo);
+
+	AbilityComponent->EvolutionTracker[(int32)Evo] = true;
+
+	// Do Specific logic here that can't be handled in ability preparation
+	if(Evo == EActiveAbilities::Frost_Bolt)
+	{
+		AbilityComponent->FBTimer = 0.2f;
+	}
+}
+
+void AGameplay_PlayerController::AssignAbility(EAbilityType Type, EPassiveAbilities PAbility, EActiveAbilities AAbility)
+{
+	switch (Type)
+	{
+	case EAbilityType::Active:
+		switch (AAbility)
+		{
+		case EActiveAbilities::Hammer:
+			AbilityComponent->LevelUpHammer();
+			break;
+		case EActiveAbilities::Fireball:
+			AbilityComponent->LevelUpFireball();
+			break;
+		case EActiveAbilities::Lightning:
+			AbilityComponent->LevelUpLightning();
+			break;
+		case EActiveAbilities::Frost_Bolt:
+			AbilityComponent->LevelUpFrostBolt();
+			break;
+	default :
+		break;
+		}
+		break;
+	case EAbilityType::Passive:
+		switch (PAbility)
+		{
+		case EPassiveAbilities::Ability_Bonus_Damage:
+			AbilityComponent->LevelUpAbilityDamageBonus(false);
+			break;
+		case EPassiveAbilities::Health_Bonus:
+			AbilityComponent->LevelUpMaxHealth(false);
+			break;
+		case EPassiveAbilities::Speed_Bonus:
+			AbilityComponent->LevelUpSpeedBonus(false);
+			break;
+		case EPassiveAbilities::Ability_Cooldown_Reduction:
+			AbilityComponent->LevelUpTimerReduction(false);
+			break;
+		default:
+			break;
+		}
+		break;
+	case EAbilityType::Evolution:
+		ActivateEvolution(AAbility);
+		break;
+	case EAbilityType::Gold:
+		if(!GetPawn()->GetPlayerState()->GetClass()->ImplementsInterface(UInterface_PlayerState::StaticClass()))
+		{
+			RS_LOG_ERROR(TEXT("PlayerState가 PlayerState 인터페이스를 상속받지 않았습니다."))
+			return;
+		}
+		IInterface_PlayerState::Execute_OnGoldPickUp(GetPawn()->GetPlayerState(),50);
+		break;
+	case EAbilityType::Health:
+		if(!GetPawn()->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
+		{
+			RS_LOG_ERROR(TEXT("Pawn이 CharacterManager 인터페이스를 상속받지 않았습니다."))
+			return;
+		}
+		IInterface_CharacterManager::Execute_RestoreHealth(GetPawn(),9999.0f);
+		break;
+	default:
+		break;
 	}
 }

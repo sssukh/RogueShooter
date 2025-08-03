@@ -13,7 +13,8 @@ enum class EActiveAbilities : uint8
 	Hammer,
 	Frost_Bolt,
 	Lightning,
-	Fireball
+	Fireball,
+	MAX
 };
 
 UENUM(BlueprintType)
@@ -47,7 +48,8 @@ enum class EPassiveAbilities : uint8
 	Ability_Bonus_Damage,
 	Health_Bonus,
 	Ability_Cooldown_Reduction,
-	Speed_Bonus
+	Speed_Bonus,
+	MAX
 };
 
 USTRUCT(BlueprintType)
