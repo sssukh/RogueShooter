@@ -15,5 +15,5 @@ void UUW_MatchResults::NativeConstruct()
 
 	TextBlock_Result->SetText(Victory?FText::FromString(TEXT("VICTORY")):FText::FromString(TEXT("DEFEAT")));
 
-	TextBlock_Kills->SetText(FText::FromString(TEXT("Enemies killed : %d",Kills)));
+	TextBlock_Kills->SetText(FText::FromString(FString::Printf(TEXT("Enemies killed : %d"),Kills)));
 }

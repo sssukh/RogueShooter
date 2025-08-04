@@ -9,6 +9,7 @@
 #include "RogueShooter/RSEnumStruct.h"
 #include "Base_Character.generated.h"
 
+class AGameplay_PlayerController;
 class UWidgetComponent;
 class UUW_HealthBar;
 class UAbilitiesComponent;
@@ -55,8 +56,7 @@ public:
 	//*****************************************
 	
 	void CreateHealthWidget();
-
-	// TODO : GameplayPlayerController 구현 필요
+	
 	/**
 	 * set ref to PC \n
 	 */
@@ -82,6 +82,7 @@ public:
 	UFUNCTION()
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
+	UFUNCTION(Client,Unreliable)
 	void Death();
 
 	UFUNCTION(NetMulticast,Unreliable)
@@ -179,9 +180,8 @@ private:
 
 	// Character Setup
 public:
-	// TODO : GameplayPlayerController 구현 필요
-	// UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
-	// TObjectPtr<UGameplayPlayerController> LocalPlayerController;
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
+	TObjectPtr<AGameplay_PlayerController> LocalPlayerController;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character Setup")
 	TObjectPtr<UObject> GM_Interface;

@@ -7,6 +7,7 @@
 #include "RogueShooter/RSEnumStruct.h"
 #include "FunctionLibrary_Helper.generated.h"
 
+class UUW_LoadingScreen;
 class USG_Player;
 /**
  * 
@@ -26,7 +27,7 @@ public:
 	static UTexture2D* FindPassiveIcon(const UObject* WorldContextObject,EPassiveAbilities PAbility = EPassiveAbilities::Ability_Bonus_Damage);
 
 	UFUNCTION(BlueprintCallable,Category = "Function Library Helper",meta = (WorldContext = "WorldContextObject"))
-	static void CreateLoadingScreen(const UObject* WorldContextObject,FText LoadingInfo);
+	static void CreateLoadingScreen(const UObject* WorldContextObject,FText LoadingInfo, TSubclassOf<UUW_LoadingScreen> LoadingScreenClass);
 
 	
 	UFUNCTION(BlueprintCallable,Category = "Function Library Helper",meta = (WorldContext = "WorldContextObject"))

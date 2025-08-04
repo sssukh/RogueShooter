@@ -3,6 +3,6 @@
 
 #include "UI/UW_LevelUpItems.h"
 
-UUW_LevelUpItems::UUW_LevelUpItems(const FObjectInitializer ObjectInitializer) : Super(ObjectInitializer)
+UUW_LevelUpItems::UUW_LevelUpItems(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 }

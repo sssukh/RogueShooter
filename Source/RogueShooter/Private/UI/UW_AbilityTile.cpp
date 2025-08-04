@@ -21,5 +21,5 @@ void UUW_AbilityTile::NativeConstruct()
 	}
 	Image_Icon->SetBrushFromTexture(Icon,false);
 
-	TextBlock_Level->SetText(FText::FromString(TEXT("%d",Level)));
+	TextBlock_Level->SetText(FText::FromString(FString::Printf(TEXT("%d"),Level)));
 }

@@ -20,6 +20,7 @@ class ROGUESHOOTER_API ABase_PlayerState : public APlayerState, public IInterfac
 public:
 	ABase_PlayerState();
 
+	UFUNCTION()
 	void OnRep_GoldCount();
 	
 	UFUNCTION(Client,Unreliable)

@@ -6,16 +6,17 @@
 #include "Blueprint/UserWidget.h"
 #include "UW_LevelUpMaster.generated.h"
 
+class UUW_LevelUpCard;
 enum class EPassiveAbilities : uint8;
-enum class EActiveAbilities;
-enum class EAbilityType;
+enum class EActiveAbilities : uint8;
+enum class EAbilityType : uint8;
 class UUW_LevelUpItems;
 class ABase_Character;
 class UWidgetSwitcher;
 class UButton;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReady)
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnClose,EAbilityType,Type,EActiveAbilities,AAbilities,EPassiveAbilities,PAbilities)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReadyLevelUp);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnCloseLevelUp,EAbilityType,Type,EActiveAbilities,AAbilities,EPassiveAbilities,PAbilities);
 
 /**
  * 
@@ -25,7 +26,7 @@ class ROGUESHOOTER_API UUW_LevelUpMaster : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	UUW_LevelUpMaster(const FObjectInitializer ObjectInitializer);
+	UUW_LevelUpMaster(const FObjectInitializer& ObjectInitializer);
 
 	virtual void NativeConstruct() override;
 
@@ -69,7 +70,7 @@ public:
 	
 	TSubclassOf<UUW_LevelUpCard> LevelUpCardClass;
 	
-	FOnReady OnReady;
+	FOnReadyLevelUp OnReady;
 
-	FOnClose OnClose;
+	FOnCloseLevelUp OnClose;
 };

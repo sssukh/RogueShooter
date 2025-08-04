@@ -15,7 +15,7 @@ class ROGUESHOOTER_API UUW_LevelUpItems : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	UUW_LevelUpItems(const FObjectInitializer ObjectInitializer);
+	UUW_LevelUpItems(const FObjectInitializer& ObjectInitializer);
 
 public:
 	UPROPERTY(BlueprintReadWrite,Category = "UUW_LevelUpItems | Designer", meta = (BindWidget))

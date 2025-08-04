@@ -24,7 +24,7 @@ class ROGUESHOOTER_API UUW_LevelUpCard : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	UUW_LevelUpCard(const FObjectInitializer ObjectInitializer);
+	UUW_LevelUpCard(const FObjectInitializer& ObjectInitializer);
 
 public:
 	virtual void NativeConstruct() override;

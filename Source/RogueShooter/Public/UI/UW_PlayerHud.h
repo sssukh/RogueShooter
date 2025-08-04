@@ -25,7 +25,7 @@ public:
 
 	virtual void NativeConstruct() override;
 
-	void BuildHotbar(TMap<EActiveAbilities,int32> ActiveAbilities, TMap<EPassiveAbilities,int32> PassiveAbilities);
+	void BuildHotbar(const TMap<EActiveAbilities,int32>& ActiveAbilities, const TMap<EPassiveAbilities,int32>& PassiveAbilities);
 
 	void UpdateGold(int32 Gold);
 

@@ -3,10 +3,12 @@
 
 #include "Library/FunctionLibrary_Helper.h"
 
+#include "Blueprint/UserWidget.h"
 #include "Engine/DamageEvents.h"
 #include "Kismet/GameplayStatics.h"
 #include "RogueShooter/AssetPath.h"
 #include "Saves/SG_Player.h"
+#include "UI/UW_LoadingScreen.h"
 #include "Utility/RSLog.h"
 
 void UFunctionLibrary_Helper::DamageEnemiesOnce(const UObject* WorldContextObject, const TArray<FHitResult>& EnemyHits,
@@ -125,13 +127,22 @@ UTexture2D* UFunctionLibrary_Helper::FindPassiveIcon(const UObject* WorldContext
 	return result;
 }
 
-// TODO : WBLoadingScreenWidget 구현 필요 
-
-void UFunctionLibrary_Helper::CreateLoadingScreen(const UObject* WorldContextObject, FText LoadingInfo)
+void UFunctionLibrary_Helper::CreateLoadingScreen(const UObject* WorldContextObject, FText LoadingInfo,
+	TSubclassOf<UUW_LoadingScreen> LoadingScreenClass)
 {
-	// GetWorld()->GetFirstLocalPlayerFromController()
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(WorldContextObject,0);
 
+	if(PlayerController->IsLocalController())
+	{
+		if(UUW_LoadingScreen* LoadingScreen = CreateWidget<UUW_LoadingScreen>(PlayerController,LoadingScreenClass))
+		{
+			LoadingScreen->Text = LoadingInfo;
+
+			LoadingScreen->AddToViewport();
+		}
+	}
 }
+
 
 USG_Player* UFunctionLibrary_Helper::LoadPlayerData(const UObject* WorldContextObject)
 {

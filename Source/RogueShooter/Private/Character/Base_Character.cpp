@@ -19,6 +19,7 @@
 #include "RogueShooter/AssetPath.h"
 #include "Saves/SG_Player.h"
 #include "System/Base_GameMode.h"
+#include "System/Gameplay_PlayerController.h"
 #include "Utility/RSCollisionChannel.h"
 #include "Utility/RSLog.h"
 #include "UI/UW_HealthBar.h"
@@ -108,7 +109,7 @@ void ABase_Character::BeginPlay()
 	FTimerHandle BeginTimer;
 	GetWorld()->GetTimerManager().SetTimer(BeginTimer,FTimerDelegate::CreateLambda([this]()
 	{
-		// TODO : OC_SetupWidget() 호출 
+		OC_SetupWidgets();
 	}),
 	1.0f,
 	false
@@ -160,8 +161,10 @@ void ABase_Character::CreateHealthWidget()
 
 void ABase_Character::SetupReference()
 {
-	// TODO : GameplayPlayerController 구현 필요 
-	//	GetController()
+	if(AGameplay_PlayerController* Gameplay_PlayerController = Cast<AGameplay_PlayerController>(GetController()))
+	{
+		LocalPlayerController = Gameplay_PlayerController;
+	}
 }
 
 void ABase_Character::LoadLastCharacterClass()
@@ -210,12 +213,13 @@ float ABase_Character::TakeDamage(float DamageAmount, struct FDamageEvent const&
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
-void ABase_Character::Death()
+void ABase_Character::Death_Implementation()
 {
 	AbilityComponent->InvalidateTimers();
 
-	// TODO : Gameplay Controller 구현 필요 
+	DisableInput(LocalPlayerController);
 }
+
 
 void ABase_Character::MC_Death_Implementation()
 {

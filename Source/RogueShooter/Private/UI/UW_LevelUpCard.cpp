@@ -7,7 +7,7 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 
-UUW_LevelUpCard::UUW_LevelUpCard(const FObjectInitializer ObjectInitializer) : Super(ObjectInitializer)
+UUW_LevelUpCard::UUW_LevelUpCard(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 }
 
@@ -27,7 +27,7 @@ void UUW_LevelUpCard::NativeConstruct()
 		LevelName = FText::FromString(TEXT("New!"));
 	else
 	{
-		LevelName = FText::FromString(TEXT("Level : %d",Level));
+		LevelName = FText::FromString(FString::Printf(TEXT("Level : %d"),Level));
 	}
 	
 	TextBlock_Level->SetText(LevelName);

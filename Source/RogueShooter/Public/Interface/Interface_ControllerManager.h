@@ -24,7 +24,7 @@ class ROGUESHOOTER_API IInterface_ControllerManager
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Controller Manager")
-	void UpdateHudHotbar(const TMap<EActiveAbilities,int32>& Active, const TMap<EPassiveAbilities,int32>& Passive);
+	void UpdateHudHotbar(TMap<EActiveAbilities,int32>& Active, TMap<EPassiveAbilities,int32>& Passive);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Controller Manager")
 	void UpdateGold(int32 Amount);

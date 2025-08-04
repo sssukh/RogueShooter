@@ -10,9 +10,9 @@ class UUW_LevelUpCard;
 enum class EAbilityType : uint8;
 enum class EPassiveAbilities : uint8;
 enum class EActiveAbilities : uint8;
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReady);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReadyChest);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnClose);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCloseChest);
 
 class UWidgetSwitcher;
 class UUW_ChestItems;
@@ -64,9 +64,9 @@ public:
 	UPROPERTY()
 	TObjectPtr<UWidgetSwitcher> WidgetSwitcher_LevelUp;
 
-	FOnReady OnReady;
+	FOnReadyChest OnReady;
 
-	FOnClose OnClose;
+	FOnCloseChest OnClose;
 
 	UPROPERTY()
 	TObjectPtr<USoundBase> ChestSound;

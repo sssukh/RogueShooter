@@ -13,7 +13,7 @@
 #include "UI/UW_LevelUpItems.h"
 #include "Utility/RSLog.h"
 
-UUW_LevelUpMaster::UUW_LevelUpMaster(const FObjectInitializer ObjectInitializer) : Super(ObjectInitializer)
+UUW_LevelUpMaster::UUW_LevelUpMaster(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	static ConstructorHelpers::FObjectFinder<USoundBase> ChestSoundFinder(*AssetPath::Sound::ChestSound);
 
@@ -37,7 +37,9 @@ UUW_LevelUpMaster::UUW_LevelUpMaster(const FObjectInitializer ObjectInitializer)
 	}
 	
 	// TODO : LevelUpCardClass 로드하기
-
+	static ConstructorHelpers::FClassFinder<UUW_LevelUpCard> LevelUpCardClassFinder(*AssetPath::Blueprint::WBP_LevelUpCard_C);
+	if(LevelUpCardClassFinder.Succeeded())
+		LevelUpCardClass = LevelUpCardClassFinder.Class;
 }
 
 void UUW_LevelUpMaster::NativeConstruct()

@@ -24,8 +24,8 @@ void UUW_PlayerHud::NativeConstruct()
 	}),2.0f,false);
 }
 
-void UUW_PlayerHud::BuildHotbar(TMap<EActiveAbilities, int32> ActiveAbilities,
-	TMap<EPassiveAbilities, int32> PassiveAbilities)
+void UUW_PlayerHud::BuildHotbar(const TMap<EActiveAbilities, int32>& ActiveAbilities,
+	const TMap<EPassiveAbilities, int32>& PassiveAbilities)
 {
 	HorizontalBox_Active->ClearChildren();
 
@@ -64,9 +64,11 @@ void UUW_PlayerHud::BuildHotbar(TMap<EActiveAbilities, int32> ActiveAbilities,
 	}
 }
 
+
+
 void UUW_PlayerHud::UpdateGold(int32 Gold)
 {
-	TextBlock_Gold->SetText(FText::FromString(TEXT("%d",Gold)));
+	TextBlock_Gold->SetText(FText::FromString(FString::Printf(TEXT("%d"),Gold)));
 }
 
 void UUW_PlayerHud::UpdateTime(FText Time)

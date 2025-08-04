@@ -17,6 +17,8 @@ namespace AssetPath
 	{
 		const FString DT_AvailableCharacter = TEXT("");
 		const FString DT_ActiveAbilities = TEXT("");
+		const FString DT_PassiveAbilities = TEXT("");
+
 	}
 	namespace Curve
 	{
@@ -66,6 +68,11 @@ namespace AssetPath
 		const FString BP_SG_Player_C = TEXT("");
 
 		const FString WBP_HealthBar_C = TEXT("");
+		const FString WBP_PlayerHud_C = TEXT("");
+		const FString WBP_LevelUpMaster_C = TEXT("");
+		const FString WBP_MatchResults_C = TEXT("");
+		const FString WBP_ChestMaster_C = TEXT("");
+		const FString WBP_LevelUpCard_C = TEXT("");
 	}
 	namespace Montage
 	{
@@ -89,6 +96,9 @@ namespace AssetPath
 
 		const FString CloseMenuSound = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/UI/Cue_CloseMenu.Cue_CloseMenu'");
 		const FString ChestGoldSound = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/Interaction/Cue_ChestGold.Cue_ChestGold'");
+
+		const FString WinSound = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/UI/Cue_CloseMenu.Cue_CloseMenu'");
+		const FString LoseSound = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/UI/Cue_Lose.Cue_Lose'");
 	}
 	
 	namespace EffectTemplate
