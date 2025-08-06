@@ -49,19 +49,19 @@ public:
 	void AddSelection(FText Name,int32 Level, FText Desc, UTexture2D* Icon, EActiveAbilities AAbility, EPassiveAbilities PAbility, EAbilityType Type);
 
 public:
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	TObjectPtr<ABase_Character> AsBaseCharacter;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	int32 Gold;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite, Category = "UW_ChestMaster | Designer", meta = (BindWidget))
 	TObjectPtr<UButton> Button_Intro;
 
 	UPROPERTY()
 	TObjectPtr<UUW_ChestItems> UW_ChestItems;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite, Category = "UW_ChestMaster | Designer", meta = (BindWidget))
 	TObjectPtr<UWidgetSwitcher> WidgetSwitcher_LevelUp;
 
 	FOnReadyChest OnReady;

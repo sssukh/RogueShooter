@@ -45,7 +45,7 @@ void UUW_PlayerHud::BuildHotbar(const TMap<EActiveAbilities, int32>& ActiveAbili
 		}
 	}
 
-	HorizontalBox_Passive->ClearChildren();
+	HorizontalBox_Passives->ClearChildren();
 
 	TArray<EPassiveAbilities> PAbilities;
 	PassiveAbilities.GetKeys(PAbilities);
@@ -59,7 +59,7 @@ void UUW_PlayerHud::BuildHotbar(const TMap<EActiveAbilities, int32>& ActiveAbili
 			AbilityTile->Icon = UFunctionLibrary_Helper::FindPassiveIcon(GetWorld(),passive);
 			AbilityTile->Level = *PassiveAbilities.Find(passive);
 
-			HorizontalBox_Passive->AddChild(AbilityTile);
+			HorizontalBox_Passives->AddChild(AbilityTile);
 		}
 	}
 }

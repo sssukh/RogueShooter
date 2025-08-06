@@ -22,15 +22,15 @@ public:
 
 	
 public:
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite, Category = "UW_ChestItems | Designer", meta = (BindWidget))
 	TObjectPtr<UButton> Button_Close;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite, Category = "UW_ChestItems | Designer", meta = (BindWidget))
 	TObjectPtr<UImage> Image;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite, Category = "UW_ChestItems | Designer", meta = (BindWidget))
 	TObjectPtr<UTextBlock> TextBlock_Gold;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite, Category = "UW_ChestItems | Designer", meta = (BindWidget))
 	TObjectPtr<UVerticalBox> VerticalBox_Items;
 };

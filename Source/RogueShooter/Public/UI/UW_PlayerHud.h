@@ -36,7 +36,7 @@ public:
 	TObjectPtr<UHorizontalBox> HorizontalBox_Active;
 
 	UPROPERTY(BlueprintReadWrite,Category = "UW_PlayerHud | Designer", meta = (BindWidget))
-	TObjectPtr<UHorizontalBox> HorizontalBox_Passive;
+	TObjectPtr<UHorizontalBox> HorizontalBox_Passives;
 
 	UPROPERTY(BlueprintReadWrite,Category = "UW_PlayerHud | Designer", meta = (BindWidget))
 	TObjectPtr<UImage> Image;

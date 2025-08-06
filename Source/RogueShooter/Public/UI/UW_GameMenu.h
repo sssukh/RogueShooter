@@ -34,10 +34,10 @@ public:
 	TObjectPtr<UButton> Button_Continue;
 
 	UPROPERTY(BlueprintReadWrite, Category="UW_GameMenu|Designer", meta=(BindWidget))
-	TObjectPtr<UButton> Button_QuitDesktop;
+	TObjectPtr<UButton> Button_Quit_Desktop;
 	
 	UPROPERTY(BlueprintReadWrite, Category="UW_GameMenu|Designer", meta=(BindWidget))
-	TObjectPtr<UButton> Button_QuitMenu;
+	TObjectPtr<UButton> Button_Quit_Menu;
 
 	UPROPERTY(BlueprintAssignable,BlueprintCallable)
 	FOnMenuClosed OnMenuClosed;
