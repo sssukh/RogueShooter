@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "UW_ServerBrowser.generated.h"
 
+class UUW_ServerItem;
 class UTextBlock;
 class UScrollBox;
 class UImage;
@@ -34,6 +35,8 @@ public:
 	void OnButtonRefreshClicked();
 
 	void RefreshServerList();
+	
+	void OnFindSession(const TArray<FOnlineSessionSearchResult>& SessionSearchResults, bool bWasSuccessful);
 public:
 	UPROPERTY(BlueprintReadWrite,Category="UW_ServerBrowser | Designer",meta = (BindWidget))
 	TObjectPtr<UButton> Button_Close;
@@ -57,8 +60,13 @@ public:
 	TObjectPtr<UTextBlock> TextBlock_Status;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="UW_ServerBrowser | Default")
-	int32 SessionsToFind;
+	int32 SessionsToFind = 25;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="UW_ServerBrowser | Default")
-	bool LAN;
+	bool LAN = false;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="UW_ServerBrowser | Set up")
+	TSubclassOf<UUW_ServerItem> ServerItemClass;
+
+	FDelegateHandle FindSessionDelegateHandle;
 };

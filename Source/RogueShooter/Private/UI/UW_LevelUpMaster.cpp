@@ -35,11 +35,6 @@ UUW_LevelUpMaster::UUW_LevelUpMaster(const FObjectInitializer& ObjectInitializer
 	{
 		ChestGoldSound = ChestGoldSoundFinder.Object;
 	}
-	
-	// TODO : LevelUpCardClass 로드하기
-	static ConstructorHelpers::FClassFinder<UUW_LevelUpCard> LevelUpCardClassFinder(*AssetPath::Blueprint::WBP_LevelUpCard_C);
-	if(LevelUpCardClassFinder.Succeeded())
-		LevelUpCardClass = LevelUpCardClassFinder.Class;
 }
 
 void UUW_LevelUpMaster::NativeConstruct()
@@ -62,7 +57,7 @@ void UUW_LevelUpMaster::ResetUI()
 
 void UUW_LevelUpMaster::ResetLevelUpItems()
 {
-	UW_LevelUpItems->VerticalBox_Items->ClearChildren();
+	WB_LevelUpItems->VerticalBox_Items->ClearChildren();
 
 	if(OnReady.IsBound())
 		OnReady.Broadcast();
@@ -91,7 +86,7 @@ void UUW_LevelUpMaster::AddSelection(FText Name, int32 Level, FText Desc, UTextu
 		LevelUpCard->PAbility = PAbility;
 		LevelUpCard->Type = Type;
 
-		UW_LevelUpItems->VerticalBox_Items->AddChildToVerticalBox(LevelUpCard);
+		WB_LevelUpItems->VerticalBox_Items->AddChildToVerticalBox(LevelUpCard);
 
 		LevelUpCard->OnSelected.AddDynamic(this,&UUW_LevelUpMaster::Close);
 	}

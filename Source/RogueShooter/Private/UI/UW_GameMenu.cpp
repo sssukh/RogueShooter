@@ -3,6 +3,7 @@
 
 #include "UI/UW_GameMenu.h"
 
+#include "MultiplayerSessionsSubsystem.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -15,8 +16,8 @@ void UUW_GameMenu::NativeConstruct()
 	Super::NativeConstruct();
 
 	Button_Continue->OnClicked.AddDynamic(this,&UUW_GameMenu::OnClicked_Continue);
-	Button_QuitDesktop->OnClicked.AddDynamic(this,&UUW_GameMenu::OnClicked_QuitDesktop);
-	Button_QuitMenu->OnClicked.AddDynamic(this,&UUW_GameMenu::OnClicked_QuitMenu);
+	Button_Quit_Desktop->OnClicked.AddDynamic(this,&UUW_GameMenu::OnClicked_QuitDesktop);
+	Button_Quit_Menu->OnClicked.AddDynamic(this,&UUW_GameMenu::OnClicked_QuitMenu);
 }
 
 void UUW_GameMenu::OnClicked_Continue()
@@ -35,8 +36,10 @@ void UUW_GameMenu::OnClicked_QuitDesktop()
 void UUW_GameMenu::OnClicked_QuitMenu()
 {
 	UGameplayStatics::OpenLevel(GetWorld(),FName(TEXT("M_MainMenu")));
+	
+	UGameInstance* GameInstance = UGameplayStatics::GetGameInstance(GetWorld());
 
+	UMultiplayerSessionsSubsystem* SessionsSubsystem = GameInstance->GetSubsystem<UMultiplayerSessionsSubsystem>();
 
-	// TODO : Destroy session
-	// UGameplayStatics::GetPlayerController(GetWorld(),0)->session
+	SessionsSubsystem->DestroySession();
 }

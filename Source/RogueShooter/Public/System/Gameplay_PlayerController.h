@@ -233,11 +233,9 @@ public:
 
 	
 
-	// TODO : 초기설정 
 	UPROPERTY()
 	TObjectPtr<UDataTable> DT_ActiveAbilities;
 
-	// TODO : 초기설정 
 	UPROPERTY()
 	TObjectPtr<UDataTable> DT_PassiveAbilities;
 	
@@ -253,15 +251,11 @@ public:
 	UPROPERTY()
 	TObjectPtr<USoundBase> LoseSound;
 	
-	// TODO : 초기설정
 	TSubclassOf<UUW_PlayerHud> PlayerHudClass;
 
-	// TODO : 초기설정
 	TSubclassOf<UUW_LevelUpMaster> LevelUpMasterClass;
 
-	// TODO : 초기설정 
 	TSubclassOf<UUW_MatchResults> MatchResultClass;
 
-	// TODO : 초기설정 
 	TSubclassOf<UUW_ChestMaster> ChestMasterClass;
 };

@@ -67,7 +67,7 @@ public:
 	UPROPERTY()
 	TObjectPtr<USoundBase> ChestGoldSound;
 
-	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="UUW_LevelUpMaster | Set up")
 	TSubclassOf<UUW_LevelUpCard> LevelUpCardClass;
 	
 	FOnReadyLevelUp OnReady;

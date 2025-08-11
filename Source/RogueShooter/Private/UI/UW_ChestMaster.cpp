@@ -35,11 +35,6 @@ UUW_ChestMaster::UUW_ChestMaster(const FObjectInitializer& ObjectInitializer) : 
 	{
 		ChestGoldSound = ChestGoldSoundFinder.Object;
 	}
-
-	// TODO : LevelUpCardClass 로드하기
-	static ConstructorHelpers::FClassFinder<UUW_LevelUpCard> LevelUpCardClassFinder(*AssetPath::Blueprint::WBP_LevelUpCard_C);
-	if(LevelUpCardClassFinder.Succeeded())
-		LevelUpCardClass = LevelUpCardClassFinder.Class;
 }
 
 void UUW_ChestMaster::NativeConstruct()

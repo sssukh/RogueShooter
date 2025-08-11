@@ -3,6 +3,7 @@
 
 #include "System/Base_PlayerController.h"
 
+#include "MultiplayerSessionsSubsystem.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -24,17 +25,21 @@ void ABase_PlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	// switch (EndPlayReason)
-	// {
-	// case(EEndPlayReason::Type::RemovedFromWorld):
-	// case(EEndPlayReason::Type::Quit):
-	// 	{
-	// 		UGameplayStatics::OpenLevel(this,FName("M_MainMenu"));
-	// 		// TODO : Destroy Session을 구현해야하는데 블루프린트 노드에 대응되는 함수가 따로 없는듯하다. 구현해야한다.
-	// 		
-	// 	}
-	// 	
-	// }
+	switch (EndPlayReason)
+	{
+	case(EEndPlayReason::Type::RemovedFromWorld):
+	case(EEndPlayReason::Type::Quit):
+		{
+			UGameplayStatics::OpenLevel(this,FName("M_MainMenu"));
+			
+			UGameInstance* GameInstance = UGameplayStatics::GetGameInstance(GetWorld());
+
+			UMultiplayerSessionsSubsystem* SessionsSubsystem = GameInstance->GetSubsystem<UMultiplayerSessionsSubsystem>();
+
+			SessionsSubsystem->DestroySession();
+		}
+		
+	}
 }
 
 void ABase_PlayerController::CleanUpUI()

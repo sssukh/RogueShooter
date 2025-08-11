@@ -11,9 +11,9 @@ class UButton;
 /**
  * 
  */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnYesClicked);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnYesClickedPopup);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnNoClicked);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnNoClickedPopup);
 
 UCLASS()
 class ROGUESHOOTER_API UUW_Popup : public UUserWidget
@@ -42,7 +42,7 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="UW_Popup | Default",meta = (ExposeOnSpawn))
 	FText DescriptionText;
 
-	FOnYesClicked OnYesClicked;
+	FOnYesClickedPopup OnYesClicked;
 
-	FOnNoClicked OnNoClicked;
+	FOnNoClickedPopup OnNoClicked;
 };

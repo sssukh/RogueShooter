@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "UW_LobbyMenu.generated.h"
 
+class UUW_LoadingScreen;
 class UUW_CharacterSelectionItem;
 struct FAvailableCharacter;
 enum class ECharacterClass : uint8;
@@ -25,7 +26,7 @@ class ROGUESHOOTER_API UUW_LobbyMenu : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	UUW_LobbyMenu(const FObjectInitializer ObjectInitializer);
+	UUW_LobbyMenu(const FObjectInitializer& ObjectInitializer);
 
 	virtual void NativeConstruct() override;
 	
@@ -103,13 +104,15 @@ public:
 	UPROPERTY(BlueprintReadWrite,Category="UW_LobbyMenu | Default")
 	TArray<FText> UnlockedCharacters;
 
-	UPROPERTY(Category="UW_LobbyMenu | DataTable")
+	UPROPERTY(BlueprintReadWrite,Category="UW_LobbyMenu | DataTable")
 	TObjectPtr<UDataTable> DT_AvailableCharacters;
 
-	// TODO : 초기설정 
-	UPROPERTY(Category="UW_LobbyMenu | DataTable")
+	UPROPERTY(BlueprintReadWrite,Category="UW_LobbyMenu | DataTable")
 	TObjectPtr<UDataTable> DT_AvailableMaps;
-	
-	// TODO : 초기설정 
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="UW_LobbyMenu | Set up")
 	TSubclassOf<UUW_CharacterSelectionItem> CharacterSelectionItemClass;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="UW_LobbyMenu | Set up")
+	TSubclassOf<UUW_LoadingScreen> LoadingScreenClass;
 };

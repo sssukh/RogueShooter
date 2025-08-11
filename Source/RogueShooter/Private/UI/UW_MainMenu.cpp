@@ -4,10 +4,14 @@
 #include "UI/UW_MainMenu.h"
 
 #include "Components/Button.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "RogueShooter/AssetPath.h"
 #include "UI/UW_HostMenu.h"
+#include "UI/UW_ServerBrowser.h"
 
-UUW_MainMenu::UUW_MainMenu(const FObjectInitializer ObjectInitializer) : Super()
+UUW_MainMenu::UUW_MainMenu(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+
 }
 
 void UUW_MainMenu::NativeConstruct()
@@ -31,10 +35,13 @@ void UUW_MainMenu::OnButtonHostClicked()
 
 void UUW_MainMenu::OnButtonExitClicked()
 {
-	// TODO : QuitGame
+	UKismetSystemLibrary::QuitGame(GetWorld(),nullptr,EQuitPreference::Quit,false);
 }
 
 void UUW_MainMenu::OnButtonJoinClicked()
 {
-	// TODO : ServerBrowser 구현 필요 
+	if(UUW_ServerBrowser* ServerBrowser = CreateWidget<UUW_ServerBrowser>(GetOwningPlayer(),ServerBrowserClass))
+	{
+		ServerBrowser->AddToViewport();
+	}
 }

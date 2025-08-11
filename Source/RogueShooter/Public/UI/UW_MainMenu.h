@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "UW_MainMenu.generated.h"
 
+class UUW_ServerBrowser;
 class UUW_HostMenu;
 class UButton;
 /**
@@ -16,7 +17,7 @@ class ROGUESHOOTER_API UUW_MainMenu : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	UUW_MainMenu(const FObjectInitializer ObjectInitializer);
+	UUW_MainMenu(const FObjectInitializer& ObjectInitializer);
 
 	virtual void NativeConstruct() override;
 
@@ -38,6 +39,9 @@ public:
 	UPROPERTY(BlueprintReadWrite,Category="UW_MainMenu | Designer",meta = (BindWidget))
 	TObjectPtr<UButton> Button_Join;
 
-	// TODO : 초기설정 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="UW_MainMenu | Set up")
 	TSubclassOf<UUW_HostMenu> HostMenuClass;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="UW_MainMenu | Set up")
+	TSubclassOf<UUW_ServerBrowser> ServerBrowserClass;
 };

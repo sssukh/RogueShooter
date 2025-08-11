@@ -11,10 +11,11 @@ class UUW_InfoPopup;
 class USG_Player;
 class UTextBlock;
 class UButton;
+struct FButtonStyle;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnClickedCharacterSelection,FAvailableCharacter,CharData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnClickedCharacterSelection,const FAvailableCharacter&,CharData);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPurchase,FAvailableCharacter,PurchasedChar);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPurchase,const FAvailableCharacter&,PurchasedChar);
 
 
 
@@ -75,6 +76,6 @@ public:
 
 	FOnPurchase OnPurchase;
 
-	// TODO : 초기설정 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="UW_CharacterSelectionItem | Set up")
 	TSubclassOf<UUW_InfoPopup> InfoPopupClass;
 };

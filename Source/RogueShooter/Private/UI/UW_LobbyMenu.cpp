@@ -10,19 +10,28 @@
 #include "Components/SizeBox.h"
 #include "Components/TextBlock.h"
 #include "Interface/Interface_CharacterManager.h"
+#include "Kismet/GameplayStatics.h"
 #include "Library/FunctionLibrary_Helper.h"
 #include "RogueShooter/AssetPath.h"
 #include "Saves/SG_Player.h"
 #include "System/Base_GameInstance.h"
+#include "System/Base_GameMode.h"
 #include "UI/UW_CharacterSelectionItem.h"
+#include "Utility/HelperFunctions.h"
 #include "Utility/RSLog.h"
 
-UUW_LobbyMenu::UUW_LobbyMenu(const FObjectInitializer ObjectInitializer) : Super(ObjectInitializer)
+UUW_LobbyMenu::UUW_LobbyMenu(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	static ConstructorHelpers::FObjectFinder<UDataTable> ACDataTableFinder(*AssetPath::DataTable::DT_AvailableCharacter);
 
 	if(ACDataTableFinder.Succeeded())
 		DT_AvailableCharacters = ACDataTableFinder.Object;
+
+	static ConstructorHelpers::FObjectFinder<UDataTable> AMDataTableFinder(*AssetPath::DataTable::DT_AvailableMaps);
+
+	if(AMDataTableFinder.Succeeded())
+		DT_AvailableMaps = AMDataTableFinder.Object;
+	
 }
 
 void UUW_LobbyMenu::NativeConstruct()
@@ -30,6 +39,25 @@ void UUW_LobbyMenu::NativeConstruct()
 	Super::NativeConstruct();
 
 	Button_Launch->OnClicked.AddDynamic(this,&UUW_LobbyMenu::OnButtonLaunchClicked);
+
+	LoadData();
+
+	HostCheck();
+
+	BuildMapSelection();
+}
+
+void UUW_LobbyMenu::OnButtonLaunchClicked()
+{
+	UFunctionLibrary_Helper::CreateLoadingScreen(GetWorld(),
+		FText::FromString(TEXT("Seamless travel  does not work in editor, must launch standalone or compiled game to travel between lobby and game play maps"))
+		,LoadingScreenClass);
+
+	UBase_GameInstance* GameInstance = Cast<UBase_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+
+	ABase_GameMode* GameMode = Cast<ABase_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	GameMode->ServerTravel_GamePlay(GameInstance->CurrentMap);
 }
 
 void UUW_LobbyMenu::LoadData()
@@ -50,7 +78,7 @@ void UUW_LobbyMenu::UpdateGold(int32 Gold)
 
 void UUW_LobbyMenu::HostCheck()
 {
-	if(!(GetWorld && GetWorld()->GetNetMode() != NM_Client))
+	if(!(GetWorld() && GetWorld()->GetNetMode() != NM_Client))
 	{
 		SizeBox_ServerButton->SetVisibility(ESlateVisibility::Collapsed);
 
@@ -66,29 +94,37 @@ void UUW_LobbyMenu::CreateCharacterList()
 
 	TArray<FName> RowNames = DT_AvailableCharacters->GetRowNames();
 
+	TArray<FString> UnlockedCharacterStrings;
+
+	for(FText Name : UnlockedCharacters)
+	{
+		UnlockedCharacterStrings.AddUnique(Name.ToString());
+	}
+	
 	for(FName Name : RowNames)
 	{
 		FAvailableCharacter* AvailableCharacter = DT_AvailableCharacters->FindRow<FAvailableCharacter>(Name,TEXT("DT_AvailableCharacter"));
 
-		// TODO : WB_CharacterSelectionItem 구현 필요
-
-		if(UUW_CharacterSelectionItem* CharacterSelectionItem = CreateWidget<UUW_CharacterSelectionItem>(GetOwningPlayer(),CharacterSelectionItemClass))
+		if(AvailableCharacter)
 		{
-			// Check to see if players has unlocked character
-			CharacterSelectionItem->Locked = !UnlockedCharacters.Contains(AvailableCharacter->CharacterName) && AvailableCharacter->DefaultLocked;
+			if(UUW_CharacterSelectionItem* CharacterSelectionItem = CreateWidget<UUW_CharacterSelectionItem>(GetOwningPlayer(),CharacterSelectionItemClass))
+			{
+				// Check to see if players has unlocked character
+				CharacterSelectionItem->Locked = (!UnlockedCharacterStrings.Contains(AvailableCharacter->CharacterName.ToString()) && AvailableCharacter->DefaultLocked);
 
-			CharacterSelectionItem->Cost = AvailableCharacter->UnlockCost;
+				CharacterSelectionItem->Cost = AvailableCharacter->UnlockCost;
 
-			CharacterSelectionItem->Description = AvailableCharacter->Description;
+				CharacterSelectionItem->Description = AvailableCharacter->Description;
 
-			CharacterSelectionItem->CharData = *AvailableCharacter;
+				CharacterSelectionItem->CharData = *AvailableCharacter;
 
-			ScrollBox_Characters->AddChild(CharacterSelectionItem);
+				ScrollBox_Characters->AddChild(CharacterSelectionItem);
 
-			// Setup dispatchers on button clicks
-			CharacterSelectionItem->OnClicked.AddDynamic(this,&UUW_LobbyMenu::UpdateCharacterSelection);
+				// Setup dispatchers on button clicks
+				CharacterSelectionItem->OnClicked.AddDynamic(this,&UUW_LobbyMenu::UpdateCharacterSelection);
 
-			CharacterSelectionItem->OnPurchase.AddDynamic(this,&UUW_LobbyMenu::CharacterPurchased);
+				CharacterSelectionItem->OnPurchase.AddDynamic(this,&UUW_LobbyMenu::CharacterPurchased);
+			}
 		}
 	}
 }
@@ -138,7 +174,16 @@ void UUW_LobbyMenu::CharacterPurchased(const FAvailableCharacter& PurchasedChar)
 		{
 			GameSave->Character = PurchasedChar;
 
-			GameSave->UnlockedCharacters.AddUnique(PurchasedChar.CharacterName);
+			bool bCheckUnique = true;
+			for(FText Name : GameSave->UnlockedCharacters)
+			{
+				if(Name.EqualTo(PurchasedChar.CharacterName))
+				{
+					bCheckUnique = false;
+				}
+			}
+			if(bCheckUnique)
+				GameSave->UnlockedCharacters.Add(PurchasedChar.CharacterName);
 
 			UnlockedCharacters = GameSave->UnlockedCharacters;
 

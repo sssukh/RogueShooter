@@ -160,7 +160,6 @@ USG_Player* UFunctionLibrary_Helper::LoadPlayerData(const UObject* WorldContextO
 	}
 	else
 	{
-		// TODO : AssetPath에 경로 추가하기
 		USG_Player* SG = Cast<USG_Player>(UGameplayStatics::CreateSaveGameObject(StaticLoadClass(USG_Player::StaticClass(),nullptr,*AssetPath::Blueprint::BP_SG_Player_C)));
 		
 		UDataTable* DT_AvailableCharacter = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(),nullptr,*AssetPath::DataTable::DT_AvailableCharacter));

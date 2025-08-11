@@ -6,6 +6,7 @@
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Library/FunctionLibrary_Helper.h"
+#include "RogueShooter/AssetPath.h"
 #include "Saves/SG_Player.h"
 #include "UI/UW_InfoPopup.h"
 

@@ -22,18 +22,19 @@ ABase_AIController::ABase_AIController()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	ConstructorHelpers::FObjectFinder<UBehaviorTree> BTFinder(*AssetPath::AI::BaseEnemyBT);
-	if(BTFinder.Succeeded())
-	{
-		BehaviorTree = BTFinder.Object;
-	}
+	
 }
 
 // Called when the game starts or when spawned
 void ABase_AIController::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	ConstructorHelpers::FObjectFinder<UBehaviorTree> BTFinder(*AssetPath::AI::BaseEnemyBT);
+	if(BTFinder.Succeeded())
+	{
+		BehaviorTree = BTFinder.Object;
+	}
 }
 
 // Called every frame

@@ -18,6 +18,7 @@ namespace AssetPath
 		const FString DT_AvailableCharacter = TEXT("");
 		const FString DT_ActiveAbilities = TEXT("");
 		const FString DT_PassiveAbilities = TEXT("");
+		const FString DT_AvailableMaps = TEXT("");
 
 	}
 	namespace Curve
@@ -73,6 +74,12 @@ namespace AssetPath
 		const FString WBP_MatchResults_C = TEXT("");
 		const FString WBP_ChestMaster_C = TEXT("");
 		const FString WBP_LevelUpCard_C = TEXT("");
+		const FString WBP_ServerItem_C = TEXT("");
+		const FString WBP_ServerBrowser_C = TEXT("");
+		const FString WBP_HostMenu_C = TEXT("");
+		const FString WBP_InfoPopup_C = TEXT("");
+		const FString WBP_LoadingScreen_C = TEXT("");
+		const FString WBP_CharacterSelectionItem_C = TEXT("");
 	}
 	namespace Montage
 	{

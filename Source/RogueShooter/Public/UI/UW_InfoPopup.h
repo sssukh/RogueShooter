@@ -9,8 +9,8 @@
 class UTextBlock;
 class UButton;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnYesClicked);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnNoClicked);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnYesClickedInfoPopup);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnNoClickedInfoPopup);
 
 /**
  * 
@@ -36,7 +36,7 @@ public:
 	UPROPERTY(BlueprintReadWrite,Category="UW_InfoPopup | Designer",meta = (BindWidget))
 	TObjectPtr<UTextBlock> TextBlock_PopupText;
 
-	FOnYesClicked OnYesClicked;
+	FOnYesClickedInfoPopup OnYesClicked;
 
-	FOnNoClicked OnNoClicked;
+	FOnNoClickedInfoPopup OnNoClicked;
 };

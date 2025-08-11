@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "UW_HostMenu.generated.h"
 
+class UUW_LoadingScreen;
 class UImage;
 class UComboBoxString;
 class UButton;
@@ -20,13 +21,22 @@ public:
 	UUW_HostMenu(const FObjectInitializer& ObjectInitializer);
 
 	virtual void NativeConstruct() override;
-	
+
+	// Create Lobby Session
 	UFUNCTION()
 	void OnButtonHostClicked();
 
 	UFUNCTION()
 	void OnButtonCloseClicked();
-	
+
+	UFUNCTION()
+	void OnCreateSession(bool bWasSuccessful);
+
+	UFUNCTION()
+	void OnLanSelectionChanged(FString SelectedItem,ESelectInfo::Type SelectionType);
+
+	UFUNCTION()
+	void OnPlayersSelectionChanged(FString SelectedItem,ESelectInfo::Type SelectionType);
 public:
 	UPROPERTY(BlueprintReadWrite,Category = "UW_HostMenu",meta=(BindWidget))
 	TObjectPtr<UButton> Button_Close;
@@ -47,5 +57,11 @@ public:
 	int32 MaxPlayers = 2;
 
 	UPROPERTY(BlueprintReadWrite,Category= "UW_HostMenu | Default")
-	bool LaN = false;
+	bool LAN = false;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category= "UW_HostMenu | Set up")
+	TSubclassOf<UUW_LoadingScreen> LoadingScreenClass;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Set up")
+	FString LevelName;
 };

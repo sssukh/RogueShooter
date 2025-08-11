@@ -77,5 +77,6 @@ public:
 	UPROPERTY()
 	TObjectPtr<USoundBase> ChestGoldSound;
 
+	UPROPERTY(BlueprintReadWrite,Category= "UW_ChestMaster | Default")
 	TSubclassOf<UUW_LevelUpCard> LevelUpCardClass;
 };

@@ -8,7 +8,11 @@ public class RogueShooter : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG", "AIModule", "GameplayTasks" });
+		PublicDependencyModuleNames.AddRange(new string[]
+		{
+			"Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "Slate","SlateCore", "UMG", "AIModule", "GameplayTasks"
+			,"MultiplayerSessions","OnlineSubsystem"
+		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
 

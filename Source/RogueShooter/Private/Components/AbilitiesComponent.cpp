@@ -28,8 +28,7 @@ UAbilitiesComponent::UAbilitiesComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// TODO : component 생성할 때 set해야한다고 한다.
-	// SetIsReplicated(true);
+	
 	
 	// ...
 
@@ -104,6 +103,8 @@ void UAbilitiesComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// TODO : component 생성할 때 set해야한다고 한다.
+	SetIsReplicated(true);
 	// ...
 	HammerDelegate.BindUFunction(this,FName("PrepareHammer"));
 

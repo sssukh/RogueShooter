@@ -70,7 +70,6 @@ ABase_Character::ABase_Character()
 	GetMesh()->SetRelativeLocation(FVector(0.0f,0.0f,-90.0f));
 	GetMesh()->SetRelativeRotation(FRotator(0.0f,270.0f,0.0f));
 
-	// TODO : healthbar 경로 추가 
 	static ConstructorHelpers::FClassFinder<UUW_HealthBar> HealthbarClassFinder(*AssetPath::Blueprint::WBP_HealthBar_C);
 	if(HealthbarClassFinder.Succeeded())
 	{
