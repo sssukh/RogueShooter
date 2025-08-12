@@ -62,7 +62,7 @@ void UUW_ChestMaster::ResetUI()
 
 	UGameplayStatics::PlaySound2D(GetWorld(),ChestSound);
 
-	UW_ChestItems->TextBlock_Gold->SetText(FText::FromString(std::to_string(Gold).c_str()));
+	UW_ChestItems->TextBlock_Gold->SetText(FText::FromString(FString::Printf(TEXT("%d"),Gold)));
 
 }
 

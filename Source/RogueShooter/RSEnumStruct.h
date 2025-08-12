@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "ParticleHelper.h"
 #include "RSEnumStruct.generated.h"
 
 class ABase_Enemy;
@@ -42,7 +43,7 @@ enum class EEnemyState : uint8
 	Disabled
 };
 
-UENUM()
+UENUM(BlueprintType)
 enum class EPassiveAbilities : uint8
 {
 	Ability_Bonus_Damage,
@@ -53,7 +54,7 @@ enum class EPassiveAbilities : uint8
 };
 
 USTRUCT(BlueprintType)
-struct FAbilityLevelUp
+struct FAbilityLevelUp : public FTableRowBase
 {
 	GENERATED_BODY()
 	
@@ -67,7 +68,7 @@ struct FAbilityLevelUp
 };
 
 USTRUCT(BlueprintType)
-struct FAvailableCharacter
+struct FAvailableCharacter :public FTableRowBase
 {
 	GENERATED_BODY()
 	
@@ -104,24 +105,24 @@ struct FAvailableCharacter
 };
 
 USTRUCT(BlueprintType)
-struct FAvailableMaps
+struct FAvailableMaps : public FTableRowBase
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Available Maps")
 	FName MapName;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Available Character")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Available Maps")
 	FText Description;
 };
 
 USTRUCT(BlueprintType)
-struct FEnemySpawnType
+struct FEnemySpawnType : public FTableRowBase
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Enemy Spawn Type")
-	TObjectPtr<ABase_Enemy> Enemy;
+	TSubclassOf<ABase_Enemy> Enemy;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Enemy Spawn Type")
 	int32 AllowedWave = 0 ;
@@ -131,10 +132,9 @@ struct FEnemySpawnType
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Enemy Spawn Type")
 	float Damage = 10.0f;
-
- 
+	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Enemy Spawn Type")
-	TObjectPtr<ASoul> Soul;
+	TSubclassOf<ASoul> Soul;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Enemy Spawn Type")
 	bool IsElite = false;

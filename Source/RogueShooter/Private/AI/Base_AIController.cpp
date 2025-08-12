@@ -30,10 +30,12 @@ void ABase_AIController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ConstructorHelpers::FObjectFinder<UBehaviorTree> BTFinder(*AssetPath::AI::BaseEnemyBT);
-	if(BTFinder.Succeeded())
+	if(BehaviorTree==nullptr)
 	{
-		BehaviorTree = BTFinder.Object;
+		BehaviorTree = Cast<UBehaviorTree>(
+			StaticLoadObject(UBehaviorTree::StaticClass(), nullptr, *AssetPath::AI::BaseEnemyBT)
+		);
+		
 	}
 }
 

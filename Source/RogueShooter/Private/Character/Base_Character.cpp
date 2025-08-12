@@ -20,13 +20,14 @@
 #include "Saves/SG_Player.h"
 #include "System/Base_GameMode.h"
 #include "System/Gameplay_PlayerController.h"
+#include "UI/UW_AbilityTile.h"
 #include "Utility/RSCollisionChannel.h"
 #include "Utility/RSLog.h"
 #include "UI/UW_HealthBar.h"
 
 
 // Sets default values
-ABase_Character::ABase_Character()
+ABase_Character::ABase_Character(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -53,7 +54,10 @@ ABase_Character::ABase_Character()
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
 	SpringArm->TargetArmLength = 2500.0f;
-	SpringArm->SetRelativeRotation(FRotator(0.0f,-35.0f,0.0f));
+	SpringArm->SetRelativeRotation(FRotator(-35.0f,0.0f,0.0f));
+	SpringArm->bInheritPitch = false;
+	SpringArm->bInheritRoll = false;
+	SpringArm->bInheritYaw = false;
 	SpringArm->SetupAttachment(GetCapsuleComponent());
 
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
@@ -94,6 +98,12 @@ ABase_Character::ABase_Character()
 
 		HealthWidget->SetupAttachment(RootComponent);
 	}
+
+	AbilityComponent = CreateDefaultSubobject<UAbilitiesComponent>(TEXT("AbilitiesComponent"));
+
+	AbilityComponent->bEditableWhenInherited=true;
+
+	AbilityComponent->MaxAbilityLevel = 5;
 }
 
 // Called when the game starts or when spawned
@@ -136,6 +146,11 @@ void ABase_Character::UpdateCharacterClass_Implementation(FAvailableCharacter Av
 	S_SetCharacterData(AvailableCharacter);
 }
 
+UAbilitiesComponent* ABase_Character::GetAbilityComponent_Implementation()
+{
+	return AbilityComponent;
+}
+
 void ABase_Character::S_SetCharacterMesh_Implementation(USkeletalMesh* SK)
 {
 	CharSK = SK;
@@ -168,10 +183,12 @@ void ABase_Character::SetupReference()
 
 void ABase_Character::LoadLastCharacterClass()
 {
-	USG_Player* SavedPlayer = UFunctionLibrary_Helper::LoadPlayerData(GetWorld());
-
-	GameSave = SavedPlayer;
-
+	if(USG_Player* SavedPlayer = UFunctionLibrary_Helper::LoadPlayerData(GetWorld()))
+		GameSave = SavedPlayer;
+	else
+	{
+		RS_LOG_ERROR(TEXT("Saved Player가 존재하지 않습니다."))
+	}
 	S_SetCharacterData(GameSave->Character);
 }
 
@@ -344,6 +361,17 @@ void ABase_Character::AdjustPassive_Implementation(EPassiveAbilities Stat, float
 
 	S_UpdatePassiveStat(Stat,MultiplicationAmount);
 }
+
+bool ABase_Character::IsAlive_Implementation()
+{
+	return !IsDead;
+}
+
+ABase_Character* ABase_Character::GetCharacter_Implementation()
+{
+	return this;
+}
+
 
 void ABase_Character::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {

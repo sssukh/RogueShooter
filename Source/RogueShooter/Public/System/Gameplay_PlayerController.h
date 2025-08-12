@@ -27,6 +27,20 @@ struct FAABIntPair
 	EActiveAbilities AAbility;
 	UPROPERTY()
 	int32 Value;
+
+	FAABIntPair()
+	{
+		AAbility = EActiveAbilities::Hammer;
+
+		Value = 0;
+	}
+
+	FAABIntPair(EActiveAbilities pAAbility, int32 pValue)
+	{
+		AAbility = pAAbility;
+
+		Value = pValue;
+	}
 };
 
 USTRUCT()
@@ -37,6 +51,20 @@ struct FPABIntPair
 	EPassiveAbilities PAbility;
 	UPROPERTY()
 	int32 Value;
+
+	FPABIntPair()
+	{
+		PAbility = EPassiveAbilities::Health_Bonus;
+
+		Value = 0;
+	}
+
+	FPABIntPair(EPassiveAbilities pPAbility, int32 pValue)
+	{
+		PAbility = pPAbility;
+
+		Value = pValue;
+	}
 };
 
 UCLASS()

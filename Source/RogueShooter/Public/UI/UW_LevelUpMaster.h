@@ -50,7 +50,7 @@ public:
 	TObjectPtr<UButton> Button_Intro;
 
 	UPROPERTY(BlueprintReadWrite,Category = "UUW_LevelUpMaster | Designer", meta = (BindWidget))
-	TObjectPtr<UUW_LevelUpItems> WB_LevelUpItems;
+	TObjectPtr<UUW_LevelUpItems> UW_LevelUpItems;
 	
 	UPROPERTY(BlueprintReadWrite,Category = "UUW_LevelUpMaster | Designer", meta = (BindWidget))
 	TObjectPtr<UWidgetSwitcher> WidgetSwitcher_LevelUp;

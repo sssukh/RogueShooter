@@ -23,7 +23,7 @@ class ROGUESHOOTER_API UAbilitiesComponent : public UActorComponent
 
 public:
 	// Sets default values for this component's properties
-	UAbilitiesComponent();
+	UAbilitiesComponent(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	// Called when the game starts

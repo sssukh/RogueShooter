@@ -14,24 +14,20 @@ AFireball_Projectile::AFireball_Projectile()
 	PrimaryActorTick.bCanEverTick = true;
 
 	
-	ConstructorHelpers::FClassFinder<ABase_Explosion> ExplosionClassFinder(*AssetPath::Blueprint::BP_BaseExplosion_C);
+	static ConstructorHelpers::FClassFinder<ABase_Explosion> ExplosionClassFinder(*AssetPath::Blueprint::BP_BaseExplosion_C);
 	if(ExplosionClassFinder.Succeeded())
 	{
 		ExplosionClass = ExplosionClassFinder.Class;
 	}
 
-	ConstructorHelpers::FObjectFinder<UMaterialInstance> FireballMatFinder(*AssetPath::Material::FireBall);
-	if(FireballMatFinder.Succeeded())
-	{
-		Cube->SetMaterial(0,FireballMatFinder.Object);
-	}
+	
 }
 
 // Called when the game starts or when spawned
 void AFireball_Projectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	Cube->SetMaterial(0,FireballMaterial);
 }
 
 // Called every frame

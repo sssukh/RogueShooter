@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "FloatingTextActor.generated.h"
 
+class UUW_FloatingTextWidget;
 class UTextBlock;
 class UWidgetComponent;
 
@@ -64,4 +65,6 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UTextBlock> TextBlock;
+
+	TSubclassOf<UUW_FloatingTextWidget> FloatingTextClass;
 };

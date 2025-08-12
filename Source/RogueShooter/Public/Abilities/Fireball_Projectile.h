@@ -33,5 +33,7 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta = (ExposeOnSpawn = "true"))
 	TSubclassOf<ABase_Explosion> ExplosionClass;
-	
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category= "Fireball Projectile | Set up")
+	TObjectPtr<UMaterialInstance> FireballMaterial;
 };

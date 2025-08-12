@@ -31,7 +31,7 @@ AFloatingTextActor::AFloatingTextActor()
 	
 	// 위젯 클래스 설정
 	
-	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClassFinder(*AssetPath::Blueprint::WB_FloatingTextWidget_C);
+	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClassFinder(*AssetPath::Blueprint::WBP_FloatingTextWidget_C);
 	if(WidgetClassFinder.Succeeded())
 	{
 		Widget->SetWidgetClass(WidgetClassFinder.Class);

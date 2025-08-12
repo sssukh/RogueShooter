@@ -15,10 +15,10 @@ namespace AssetPath
 
 	namespace DataTable
 	{
-		const FString DT_AvailableCharacter = TEXT("");
-		const FString DT_ActiveAbilities = TEXT("");
-		const FString DT_PassiveAbilities = TEXT("");
-		const FString DT_AvailableMaps = TEXT("");
+		const FString DT_AvailableCharacter = TEXT("DataTable'/Game/RogueShooter/Blueprints/DataTables/DT_AvailableCharacters.DT_AvailableCharacters'");
+		const FString DT_ActiveAbilities = TEXT("DataTable'/Game/RogueShooter/Blueprints/DataTables/DT_ActiveAbilities.DT_ActiveAbilities'");
+		const FString DT_PassiveAbilities = TEXT("DataTable'/Game/RogueShooter/Blueprints/DataTables/DT_PassiveAbilities.DT_PassiveAbilities'");
+		const FString DT_AvailableMaps = TEXT("DataTable'/Game/RogueShooter/Blueprints/DataTables/DT_AvailableMaps.DT_AvailableMaps'");
 
 	}
 	namespace Curve
@@ -58,7 +58,6 @@ namespace AssetPath
 	
 	namespace Blueprint
 	{
-		const FString WB_FloatingTextWidget_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/WB_FloatingTextWidget.WB_FloatingTextWidget_C'");
 		const FString BP_BaseSoul_C = TEXT("Blueprint'/Game/RogueShooter/Blueprints/GameplayActors/BP_BaseSoul.BP_BaseSoul_C'");
 		const FString BP_FloatingTextActor_C = TEXT("Blueprint'/Game/RogueShooter/Blueprints/GameplayActors/BP_FloatingTextActor.BP_FloatingTextActor_C'");
 		const FString BP_BaseExplosion_C = TEXT("Blueprint'/Game/RogueShooter/Blueprints/Abilities/BP_BaseExplosion.BP_BaseExplosion_C'");
@@ -66,13 +65,14 @@ namespace AssetPath
 		const FString BP_LightningExplosion_C = TEXT("Blueprint'/Game/RogueShooter/Blueprints/Abilities/BP_LightningExplosion.BP_LightningExplosion_C'");
 		const FString BP_FireballProjectile_C = TEXT("Blueprint'/Game/RogueShooter/Blueprints/Abilities/BP_FireballProjectile.BP_FireballProjectile_C'");
 
-		const FString BP_SG_Player_C = TEXT("");
+		const FString BP_SG_Player_C = TEXT("Blueprint'/Game/RogueShooter/Blueprints/Saves/BP_SG_Player.BP_SG_Player_C'");
 
-		const FString WBP_HealthBar_C = TEXT("");
-		const FString WBP_PlayerHud_C = TEXT("");
-		const FString WBP_LevelUpMaster_C = TEXT("");
-		const FString WBP_MatchResults_C = TEXT("");
-		const FString WBP_ChestMaster_C = TEXT("");
+		const FString WBP_FloatingTextWidget_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/UWB_FloatingTextWidget.UWB_FloatingTextWidget_C'");
+		const FString WBP_HealthBar_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/UWB_HealthBar.UWB_HealthBar_C'");
+		const FString WBP_PlayerHud_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/UWB_PlayerHud.UWB_PlayerHud_C'");
+		const FString WBP_LevelUpMaster_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/UWB_LevelUpMaster.UWB_LevelUpMaster_C'");
+		const FString WBP_MatchResults_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/UWB_MatchResults.UWB_MatchResults_C'");
+		const FString WBP_ChestMaster_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/UWB_ChestMaster.UWB_ChestMaster_C'");
 		const FString WBP_LevelUpCard_C = TEXT("");
 		const FString WBP_ServerItem_C = TEXT("");
 		const FString WBP_ServerBrowser_C = TEXT("");

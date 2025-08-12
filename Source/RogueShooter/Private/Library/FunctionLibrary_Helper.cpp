@@ -166,6 +166,7 @@ USG_Player* UFunctionLibrary_Helper::LoadPlayerData(const UObject* WorldContextO
 
 		if(DT_AvailableCharacter)
 		{
+			// DT의 row 타입을 바꿔줘야한다.
 			const FAvailableCharacter* RowData = DT_AvailableCharacter->FindRow<FAvailableCharacter>(TEXT("Char1"),TEXT("DT_AvailableCharacter"));
 			if(RowData)
 			{

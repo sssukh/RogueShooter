@@ -29,7 +29,7 @@ class ROGUESHOOTER_API ABase_Character : public ACharacter, public IInterface_Ch
 
 public:
 	// Sets default values for this character's properties
-	ABase_Character();
+	ABase_Character(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	// Called when the game starts or when spawned
@@ -42,8 +42,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UFUNCTION()
-	virtual void UpdateCharacterClass_Implementation(FAvailableCharacter Character) override;
+	
 
 	UFUNCTION(Server,Reliable)
 	void S_SetCharacterMesh(USkeletalMesh* SK);
@@ -51,6 +50,36 @@ public:
 	UFUNCTION(Server,Unreliable)
 	void S_SetCharacterData(FAvailableCharacter CharacterData);
 
+	//*****************************************
+	// Interface_CharacterManager
+	//*****************************************
+
+	virtual void SetupHealthWidget_Implementation() override;
+	
+	UFUNCTION()
+	virtual void UpdateCharacterClass_Implementation(FAvailableCharacter Character) override;
+
+	virtual UAbilitiesComponent* GetAbilityComponent_Implementation() override;
+	
+	UFUNCTION()
+	virtual void Pause_Implementation(bool Pause, bool Override) override;
+
+	/**
+	* Call Server to Update character specific stats
+	* 서버를 호출해서 캐릭터 스탯을 업데이트한다.
+	*/
+	UFUNCTION()
+	virtual void AdjustPassive_Implementation(EPassiveAbilities Stat, float MultiplicationAmount) override;
+
+	virtual bool IsAlive_Implementation() override;
+	
+	virtual ABase_Character* GetCharacter_Implementation() override;
+	
+	// Interface 상속 
+	UFUNCTION()
+	virtual void RestoreHealth_Implementation(float amount) override;
+	
+	
 	//*****************************************
 	// Character Setup
 	//*****************************************
@@ -88,9 +117,7 @@ public:
 	UFUNCTION(NetMulticast,Unreliable)
 	void MC_Death();
 
-	// Interface 상속 
-	UFUNCTION()
-	virtual void RestoreHealth_Implementation(float amount) override;
+	
 
 	// server 
 	UFUNCTION(Server,Unreliable)
@@ -105,8 +132,8 @@ public:
 	
 	UFUNCTION(NetMulticast,Unreliable)
 	void MC_UpdateHealthBar(float percent);
-
-	virtual void SetupHealthWidget_Implementation() override;
+	
+	
 
 	//*****************************************
 	// Pause Logic
@@ -122,8 +149,7 @@ public:
 	UFUNCTION(Client,Reliable)
 	void OC_Pause(bool Pause, bool Override);
 
-	UFUNCTION()
-	virtual void Pause_Implementation(bool Pause, bool Override) override;
+	
 
 	//*****************************************
 	// Passive Stats
@@ -134,12 +160,7 @@ public:
 	* ability component의 의존성을 피하기 위해 interface를 통해 pawn의 스탯을 조정한다.
 	*/
 	
-	/**
-	* Call Server to Update character specific stats
-	* 서버를 호출해서 캐릭터 스탯을 업데이트한다.
-	*/
-	UFUNCTION()
-	virtual void AdjustPassive_Implementation(EPassiveAbilities Stat, float MultiplicationAmount) override;
+	
 
 	UFUNCTION(Server,Reliable)
 	void S_UpdatePassiveStat(EPassiveAbilities Stat,float Value);
@@ -162,20 +183,20 @@ public:
 	void OnRep_CharSK();
 	
 	// Components
-private:
-	UPROPERTY()
+public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<USphereComponent> AbilitySphere;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<UAbilitiesComponent> AbilityComponent;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<UCameraComponent> Camera;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<USpringArmComponent> SpringArm;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<UWidgetComponent> HealthWidget;
 
 	// Character Setup
@@ -233,5 +254,4 @@ public:
 	TObjectPtr<UAnimInstance> CharacterAnimInstance;
 
 	TSubclassOf<UUW_HealthBar> HealthBarClass;
-
 };

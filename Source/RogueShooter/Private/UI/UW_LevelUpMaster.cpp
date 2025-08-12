@@ -57,7 +57,7 @@ void UUW_LevelUpMaster::ResetUI()
 
 void UUW_LevelUpMaster::ResetLevelUpItems()
 {
-	WB_LevelUpItems->VerticalBox_Items->ClearChildren();
+	UW_LevelUpItems->VerticalBox_Items->ClearChildren();
 
 	if(OnReady.IsBound())
 		OnReady.Broadcast();
@@ -86,7 +86,7 @@ void UUW_LevelUpMaster::AddSelection(FText Name, int32 Level, FText Desc, UTextu
 		LevelUpCard->PAbility = PAbility;
 		LevelUpCard->Type = Type;
 
-		WB_LevelUpItems->VerticalBox_Items->AddChildToVerticalBox(LevelUpCard);
+		UW_LevelUpItems->VerticalBox_Items->AddChildToVerticalBox(LevelUpCard);
 
 		LevelUpCard->OnSelected.AddDynamic(this,&UUW_LevelUpMaster::Close);
 	}
