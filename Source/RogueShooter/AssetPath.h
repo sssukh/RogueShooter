@@ -4,7 +4,9 @@ namespace AssetPath
 {
 	namespace AI
 	{
-		const FString BaseEnemyBT = TEXT("BehaviorTree'/Game/RogueShooter/Blueprints/AI/BT_Base_Enemy.BT_Base_Enemy'");	
+		const FString BaseEnemyBT = TEXT("BehaviorTree'/Game/RogueShooter/Blueprints/AI/BT_Base_Enemy.BT_Base_Enemy'");
+
+		const FString EQS_FSP = TEXT("");
 	}
 
 	namespace Animation
@@ -19,6 +21,9 @@ namespace AssetPath
 		const FString DT_ActiveAbilities = TEXT("DataTable'/Game/RogueShooter/Blueprints/DataTables/DT_ActiveAbilities.DT_ActiveAbilities'");
 		const FString DT_PassiveAbilities = TEXT("DataTable'/Game/RogueShooter/Blueprints/DataTables/DT_PassiveAbilities.DT_PassiveAbilities'");
 		const FString DT_AvailableMaps = TEXT("DataTable'/Game/RogueShooter/Blueprints/DataTables/DT_AvailableMaps.DT_AvailableMaps'");
+		const FString DT_EnemyEliteSpawns= TEXT("DataTable'/Game/SurvivorsTemplate/Blueprints/DataTables/DT_ExampleEliteSpawn.DT_ExampleEliteSpawn'");
+		const FString DT_EnemySpawns= TEXT("DataTable'/Game/SurvivorsTemplate/Blueprints/DataTables/DT_ExampleSpawn.DT_ExampleSpawn'");
+
 
 	}
 	namespace Curve

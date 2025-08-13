@@ -3,11 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Character/Base_Character.h"
+#include "EnvironmentQuery/EnvQueryTypes.h"
 #include "GameFramework/Actor.h"
+#include "Interface/Interface_GameManager.h"
 #include "GameManager.generated.h"
 
+class ABase_Character;
+
 UCLASS()
-class ROGUESHOOTER_API AGameManager : public AActor
+class ROGUESHOOTER_API AGameManager : public AActor, public IInterface_GameManager
 {
 	GENERATED_BODY()
 
@@ -22,4 +27,206 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	// Handle UI XP update
+	void UpdateCharactersXP(float pPercent, int32 pLevel);
+
+	virtual void OnPlayerDeath_Implementation() override;
+	
+	void EndGame(bool Victory);
+
+	// Save Player Data
+	void SavePlayerData();
+
+	/////////////////////////////////////
+	/// Spawn System
+	/////////////////////////////////////
+
+	void SpawnWave();
+
+	// Ensure we are not over spawn limits
+	void ContinueSpawning();
+
+	void DecreaseEnemyCount();
+
+	void IncreaseEnemyCount();
+
+	// TODO : EQS
+	void PrepareEliteSpawn();
+	
+	/////////////////////////////////////
+	/// Character Logic
+	/////////////////////////////////////
+
+	/**
+	 *	Create an Xp array that stores how much Xp is needed for each level
+	 */
+	void CreateXPTable();
+
+	/**
+	 *	return xp need to next level
+	 * @return xp need to next level
+	 * 
+	 */
+	int32 XPToNextLevel();
+
+	/**
+	 * add xp to tracker and update UI
+	 * 
+	 */
+	void AddXp(int32 XP);
+
+	/**
+	 *	Prepare UI for Level up
+	 * 
+	 */
+	void PrepareLevelUp();
+
+	
+	/////////////////////////////////////
+	/// Setup
+	/////////////////////////////////////
+
+	void GameSetup();
+
+	void SpawnSetup();
+
+	void PrepareWaveEnemies();
+
+	// build an array with references to player and controller;
+	// on player characters, set an interface reference to GM, to avoid circular references
+	void BuildPlayerArray();
+
+	void SetReferences();
+
+	void StartTimer();
+
+	void PrepareWaveElites();
+
+
+	/////////////////////////////////////
+	/// GameLogic
+	/////////////////////////////////////
+
+	// TODO : EQSQueryInstance 뭔지 모르겟음 
+	void SpawnEnemy(FEnvQueryInstance Instance, EEnvQueryStatus::Type Status);
+
+	void FindSpawnLocation();
+
+	// On Player death - see if anyone else is alive - if so - keep match running
+	void DetemineGameStatus();
+
+	void UpdateTimer();
+
+	void ProcessEndGame();
+
+	void IncreaseWaveIndex();
+
+	// TODO : EQSQueryInstance 뭔지 모르겟음 
+	void SpawnElite(FEnvQueryInstance Instance, EEnvQueryStatus::Type Status);
+
+	// Check if the wave index has enemies assigned - if not - use previous saved enemies
+	void UpdateEnemyWave();
+
+	// send game time to every player
+	UFUNCTION()
+	void OnRep_GameTime();
+
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
+public:
+	/////////////////////////////////////
+	/// Member Variables
+	/////////////////////////////////////
+	
+	// Character Logic
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Character Logic")
+	int32 MaxLevel = 99;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Character Logic")
+	TArray<int32> XPArray;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Character Logic")
+	int32 Level = 1;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Character Logic")
+	int32 NeededXP;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Character Logic")
+	int32 CurrentXP;
+
+	// Timers
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Timers")
+	FTimerHandle SpawnTimerReference;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Timers")
+	FTimerHandle PhaseIndexTimer;
+	
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Timers")
+	FTimerHandle ClockReference;
+
+	// Game Logic
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Game Logic")
+	TArray<ABase_Character*> PlayerCharacterArray;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Game Logic")
+	TArray<AGameplay_PlayerController*> PlayerControllerArray;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Game Logic")
+	int32 EnemiesKilled;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Game Logic")
+	int32 Time;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Game Logic")
+	int32 Minutes;
+
+	UPROPERTY(ReplicatedUsing="OnRep_GameTime",VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Game Logic")
+	FText GameTime;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Game Logic")
+	int32 MaxGameTime = 10;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Game Logic")
+	float SpawnInterval = 7.0f;
+
+	// Spawn Logic
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Spawn Logic")
+	int32 WaveIndex;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Spawn Logic")
+	TArray<FEnemySpawnType> PreparedEnemies;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Spawn Logic")
+	int32 MaxEnemies = 45;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Spawn Logic")
+	int32 CurrentEnemyCount;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Spawn Logic")
+	int32 MaxEnemiesPerWave = 20;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Spawn Logic")
+	int32 MinEnemiesPerWave = 10;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Spawn Logic")
+	int32 NumberOfEnemiesToSpawn = 0;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Spawn Logic")
+	int32 CurrentEnemySpawnIndex = 0;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Spawn Logic")
+	TArray<FEnemySpawns> EnemySpawns;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Spawn Logic")
+	TArray<FEnemySpawns> EliteSpawns;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="GameManager | Spawn Logic", meta = (ExposeOnSpawn))
+	TObjectPtr<UDataTable> EnemySpawnDT;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="GameManager | Spawn Logic",meta = (ExposeOnSpawn))
+	TObjectPtr<UDataTable> EnemyEliteSpawnDT;
+
+	// TODO : 초기설정 
+	TObjectPtr<UEnvQuery> EQS_FindSpawnPoint;
 };

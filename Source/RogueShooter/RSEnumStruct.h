@@ -155,11 +155,7 @@ struct FEnemySpawns
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Enemy Spawns")
 	TArray<FEnemySpawnType> Spawns;
-
-	FEnemySpawns()
-	{
-		Spawns.Add(FEnemySpawnType());
-	}
+	
 };
 
 
