@@ -68,6 +68,8 @@ void AGameplay_PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	
+	
 	SetupPlayer();
 }
 

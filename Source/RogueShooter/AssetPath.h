@@ -6,7 +6,7 @@ namespace AssetPath
 	{
 		const FString BaseEnemyBT = TEXT("BehaviorTree'/Game/RogueShooter/Blueprints/AI/BT_Base_Enemy.BT_Base_Enemy'");
 
-		const FString EQS_FSP = TEXT("");
+		const FString EQS_FSP = TEXT("EnvQuery'/Game/SurvivorsTemplate/Blueprints/AI/EQS_FindSpawnPoint.EQS_FindSpawnPoint'");
 	}
 
 	namespace Animation
@@ -52,6 +52,8 @@ namespace AssetPath
 		const FString BaseChestMat = TEXT("MaterialInstanceConstant'/Engine/VREditor/LaserPointer/LaserPointerMaterialInst.LaserPointerMaterialInst'");
 		const FString Blue = TEXT("MaterialInstanceConstant'/Engine/ArtTools/RenderToTexture/Materials/Debug/M_Emissive_Color_0-0-127.M_Emissive_Color_0-0-127'");
 		const FString FireBall = TEXT("Material'/Engine/VREditor/LaserPointer/M_LaserPointer-Core.M_LaserPointer-Core'");
+
+		const FString PotionMaterial = TEXT("Material'/Game/SurvivorsTemplate/Demo/Items/Pickups/PotionPickups/Assets/M_PotionGlass.M_PotionGlass'");
 	}
 
 	namespace Mesh
@@ -59,6 +61,8 @@ namespace AssetPath
 		const FString ChamferCube = TEXT("StaticMesh'/Game/SurvivorsTemplate/Demo/LevelPrototyping/Meshes/SM_ChamferCube.SM_ChamferCube'");
 		const FString BaseEnemyMesh = TEXT("SkeletalMesh'/Game/SurvivorsTemplate/Demo/InfinityBladeAdversaries/Enemy/Enemy_Gruntling/SK_Exodus_Gruntling.SK_Exodus_Gruntling'");
 		const FString Cube = TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'");
+
+		const FString Potion = TEXT("StaticMesh'/Game/SurvivorsTemplate/Demo/Items/Pickups/PotionPickups/Assets/SM_PotionBottle.SM_PotionBottle'");
 	}
 	
 	namespace Blueprint

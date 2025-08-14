@@ -41,7 +41,7 @@ AGameManager::AGameManager()
 void AGameManager::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	if(HasAuthority())
 	{
 		FTimerHandle Delay;
