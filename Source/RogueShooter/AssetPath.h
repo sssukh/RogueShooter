@@ -54,6 +54,10 @@ namespace AssetPath
 		const FString FireBall = TEXT("Material'/Engine/VREditor/LaserPointer/M_LaserPointer-Core.M_LaserPointer-Core'");
 
 		const FString PotionMaterial = TEXT("Material'/Game/SurvivorsTemplate/Demo/Items/Pickups/PotionPickups/Assets/M_PotionGlass.M_PotionGlass'");
+
+		const FString GoldMaterial = TEXT("Material'/Game/SurvivorsTemplate/Demo/Items/Gold/M_Gold.M_Gold'");
+
+		const FString CubeYellow = TEXT("MaterialInstanceConstant'/Engine/VREditor/BasicMeshes/MI_Cube_01.MI_Cube_01'");
 	}
 
 	namespace Mesh
@@ -63,6 +67,10 @@ namespace AssetPath
 		const FString Cube = TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'");
 
 		const FString Potion = TEXT("StaticMesh'/Game/SurvivorsTemplate/Demo/Items/Pickups/PotionPickups/Assets/SM_PotionBottle.SM_PotionBottle'");
+
+		const FString SM_TD_Gold_Pile = TEXT("StaticMesh'/Game/SurvivorsTemplate/Demo/Items/Gold/SM_TD_Gold_Pile.SM_TD_Gold_Pile'");
+
+		const FString SM_Cube = TEXT("StaticMesh'/Engine/VREditor/BasicMeshes/SM_Cube_01.SM_Cube_01'");
 	}
 	
 	namespace Blueprint
@@ -115,6 +123,9 @@ namespace AssetPath
 
 		const FString WinSound = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/UI/Cue_CloseMenu.Cue_CloseMenu'");
 		const FString LoseSound = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/UI/Cue_Lose.Cue_Lose'");
+
+		const FString GoldPickup = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/Interaction/Cue_GoldPickup.Cue_GoldPickup'");
+		const FString HealthPickup = TEXT("SoundCue'/Game/SurvivorsTemplate/Demo/Sounds/Character/Cue_Health.Cue_Health'");
 	}
 	
 	namespace EffectTemplate
@@ -129,5 +140,9 @@ namespace AssetPath
 
 		const FString ImpactIce = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Combat_Ice/Impact/P_Impact_Ice.P_Impact_Ice'");
 		const FString Explosion = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Monsters/FX_Monster_Gruntling/Bomber/P_FireBombExplosion.P_FireBombExplosion'");
+
+		const FString DeadMansLoot = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Treasure/Gold_Bag/P_DeadMans_Loot.P_DeadMans_Loot'");
+		const FString GoldSparkle = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Treasure/Gold_Bag/P_GoldSparkle_Bag_Pickup.P_GoldSparkle_Bag_Pickup'");
+		const FString HealthPickup = TEXT("ParticleSystem'/Game/SurvivorsTemplate/Demo/Effects/FX_Archive/P_HealthOrb_Pickup.P_HealthOrb_Pickup'");
 	}
 }

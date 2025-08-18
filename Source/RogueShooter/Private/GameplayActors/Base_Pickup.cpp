@@ -24,6 +24,10 @@ ABase_Pickup::ABase_Pickup()
 	static ConstructorHelpers::FObjectFinder<UMaterialInstance> PotionMatFinder(*AssetPath::Material::PotionMaterial);
 	if(PotionMatFinder.Succeeded())
 		StaticMesh->SetMaterial(0,PotionMatFinder.Object);
+
+	Sphere->SetSphereRadius(96.0f);
+
+	Sphere->SetLineThickness(0.0f);
 }
 
 // Called when the game starts or when spawned
@@ -46,12 +50,18 @@ void ABase_Pickup::OnSphereComponentBeginOverlap(UPrimitiveComponent* Overlapped
 	if(!HasAuthority())
 		return;
 
+	MC_PickupEffects();
+	
 	DoPickupAction(OtherActor);
 
 	Destroy();
 }
 
 void ABase_Pickup::DoPickupAction(AActor* Character)
+{
+}
+
+void ABase_Pickup::MC_PickupEffects()
 {
 }
 
