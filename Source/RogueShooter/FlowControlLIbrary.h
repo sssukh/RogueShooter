@@ -19,6 +19,8 @@ public:
 	
 	FORCEINLINE void Reset() { bDoOnce = true; }
 
+	// 실행 시 reset이 되어있거나 아직 실행되지 않은 상태라면 상태변화 후 true를 반환
+	// 그렇지 않으면 false를 반환
 	FORCEINLINE bool Execute()
 	{
 		if (bDoOnce)

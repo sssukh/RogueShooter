@@ -33,6 +33,8 @@ AStash::AStash()
 	Sphere->SetSphereRadius(96.0f);
 
 	Sphere->SetLineThickness(0.0f);
+
+	DoOnce.Reset();
 }
 
 // Called when the game starts or when spawned
@@ -62,9 +64,33 @@ void AStash::SpawnItem()
 	GetWorld()->SpawnActor(pickupclass,&SpawnLocation,&SpawnRotator,ActorSpawnParameters);
 }
 
+void AStash::ResetActivation(bool bReset)
+{
+	if(bReset)
+		DoOnce.Reset();
+
+	if(!DoOnce.Execute())
+		return;
+	
+	SpawnItem();
+
+	FTimerHandle Timer;
+	GetWorldTimerManager().SetTimer(Timer,FTimerDelegate::CreateUObject(this,&AStash::ResetStash),StashResetTime,false);
+}
+
 void AStash::ResetStash()
 {
-	
+	if(CheckForItems())
+	{
+		FTimerHandle Timer;
+		GetWorldTimerManager().SetTimer(Timer,FTimerDelegate::CreateUObject(this,&AStash::ResetStash),StashResetTime,false);
+	}
+	else
+	{
+		HideStash_Implementation(false);
+
+		ResetActivation(true);
+	}
 }
 
 void AStash::HideStash_Implementation(bool Hide)
@@ -80,7 +106,8 @@ void AStash::HideStash_Implementation(bool Hide)
 
 bool AStash::CheckForItems()
 {
-	TArray<FHitResult> HitResults;
+	// 자기 자신을 제외하고 트레이스를 한다.
+	FHitResult HitResult;
 
 	FVector ActorLocation = GetActorLocation();	
 	
@@ -88,16 +115,27 @@ bool AStash::CheckForItems()
 	ObjectQueryParams.AddObjectTypesToQuery(ECC_COLLISION_PICKUPITEM);
 
 	FCollisionQueryParams params;
-	params.
-	GetWorld()->SweepMultiByObjectType(HitResults,ActorLocation,ActorLocation,FQuat::Identity,ObjectQueryParams,FCollisionShape::MakeSphere(32.0f));
+	params.AddIgnoredActor(this);
+	
+	bool result = GetWorld()->SweepSingleByObjectType(HitResult,ActorLocation,ActorLocation,FQuat::Identity,ObjectQueryParams,FCollisionShape::MakeSphere(32.0f));
 
 #if ENABLE_DRAW_DEBUG
 	DrawDebugSphere(GetWorld(),ActorLocation,32.0f,32,FColor::Blue,false,2.0f);
 #endif
+
+	return result;
 }
 
 float AStash::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
                          class AController* EventInstigator, AActor* DamageCauser)
 {
+	HideStash_Implementation(true);
+
+	if(HasAuthority())
+	{
+		ResetActivation(false);
+	}
+
+		
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }

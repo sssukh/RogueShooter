@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "RogueShooter/FlowControlLIbrary.h"
 #include "Stash.generated.h"
 
 class ABase_Pickup;
@@ -29,7 +30,7 @@ public:
 	// Spawn Item when stash takes damage
 	void SpawnItem();
 
-	void ResetActivation();
+	void ResetActivation(bool bReset);
 
 	void ResetStash();
 
@@ -52,6 +53,8 @@ public:
 
 	UPROPERTY(BlueprintReadWrite,Category="Stash | Default")
 	TArray<TSubclassOf<ABase_Pickup>> PossibleItemsToSpawn;
+
+	FDoOnce DoOnce;
 };
 
 
