@@ -21,8 +21,8 @@ namespace AssetPath
 		const FString DT_ActiveAbilities = TEXT("DataTable'/Game/RogueShooter/Blueprints/DataTables/DT_ActiveAbilities.DT_ActiveAbilities'");
 		const FString DT_PassiveAbilities = TEXT("DataTable'/Game/RogueShooter/Blueprints/DataTables/DT_PassiveAbilities.DT_PassiveAbilities'");
 		const FString DT_AvailableMaps = TEXT("DataTable'/Game/RogueShooter/Blueprints/DataTables/DT_AvailableMaps.DT_AvailableMaps'");
-		const FString DT_EnemyEliteSpawns= TEXT("DataTable'/Game/SurvivorsTemplate/Blueprints/DataTables/DT_ExampleEliteSpawn.DT_ExampleEliteSpawn'");
-		const FString DT_EnemySpawns= TEXT("DataTable'/Game/SurvivorsTemplate/Blueprints/DataTables/DT_ExampleSpawn.DT_ExampleSpawn'");
+		const FString DT_EnemyEliteSpawns= TEXT("DataTable'/Game/RogueShooter/Blueprints/DataTables/DT_ExampleEliteSpawn.DT_ExampleEliteSpawn'");
+		const FString DT_EnemySpawns= TEXT("DataTable'/Game/RogueShooter/Blueprints/DataTables/DT_ExampleSpawn.DT_ExampleSpawn'");
 
 
 	}
@@ -97,6 +97,8 @@ namespace AssetPath
 		const FString WBP_InfoPopup_C = TEXT("");
 		const FString WBP_LoadingScreen_C = TEXT("");
 		const FString WBP_CharacterSelectionItem_C = TEXT("");
+		const FString WBP_LobbyMenu_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/UWB_LobbyMenu.UWB_LobbyMenu_C'");
+		const FString WBP_MainMenu_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/UWB_MainMenu.UWB_MainMenu_C'");
 	}
 	namespace Montage
 	{

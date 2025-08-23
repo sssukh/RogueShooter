@@ -35,6 +35,8 @@ AGameManager::AGameManager()
 	static ConstructorHelpers::FObjectFinder<UEnvQuery> EQS_FSPFinder(*AssetPath::AI::EQS_FSP);
 	if(EQS_FSPFinder.Succeeded())
 		EQS_FindSpawnPoint = EQS_FSPFinder.Object;
+
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned

@@ -13,6 +13,8 @@ ABase_Pickup::ABase_Pickup()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 
 	StaticMesh->SetRelativeLocation(FVector(0.0f,0.0f,20.0f));
@@ -25,9 +27,15 @@ ABase_Pickup::ABase_Pickup()
 	if(PotionMatFinder.Succeeded())
 		StaticMesh->SetMaterial(0,PotionMatFinder.Object);
 
+	StaticMesh->SetupAttachment(RootComponent);
+	
+	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
+	
 	Sphere->SetSphereRadius(96.0f);
 
 	Sphere->SetLineThickness(0.0f);
+
+	Sphere->SetupAttachment(StaticMesh);
 }
 
 // Called when the game starts or when spawned

@@ -3,13 +3,16 @@
 
 #include "RogueShooter/Public/System/Base_GameMode.h"
 
+#include "MultiplayerSessionsSubsystem.h"
 #include "Interface/Interface_CharacterManager.h"
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/PlayerState.h"
+#include "Kismet/GameplayStatics.h"
 
 ABase_GameMode::ABase_GameMode()
 {
 }
+
 
 void ABase_GameMode::ResetPauseCount()
 {
@@ -53,17 +56,16 @@ int32 ABase_GameMode::GetAlivePlayers()
 // TODO command
 void ABase_GameMode::ServerTravel_Lobby()
 {
-	FString cmd = "ServerTravel /Game/SurvivorsTemplate/Maps/M_Lobby";
+	FString cmd = "/Game/SurvivorsTemplate/Maps/M_Lobby";
 	
-	GetWorld()->Exec(GetWorld(),*cmd);
+	GetWorld()->ServerTravel(cmd);
+	
 }
 
 // TODO command
 void ABase_GameMode::ServerTravel_GamePlay(FName Map)
 {
-	FString cmd = "ServerTravel /Game/SurvivorsTemplate/Maps/";
+	FString cmd = FString::Printf(TEXT("/Game/SurvivorsTemplate/Maps/%s"),*Map.ToString());
 
-	cmd.Append(Map.ToString());
-	
-	GetWorld()->Exec(GetWorld(),*cmd);
+	GetWorld()->ServerTravel(cmd);
 }

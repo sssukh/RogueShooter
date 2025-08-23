@@ -16,6 +16,8 @@ AStash::AStash()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+	
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 
 	StaticMesh->SetRelativeLocation(FVector(0.0f,0.0f,25.0f));
@@ -30,10 +32,16 @@ AStash::AStash()
 	if(MatFinder.Succeeded())
 		StaticMesh->SetMaterial(0,MatFinder.Object);
 	
+	StaticMesh->SetupAttachment(RootComponent);
+	
+	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
+	
 	Sphere->SetSphereRadius(96.0f);
 
 	Sphere->SetLineThickness(0.0f);
 
+	Sphere->SetupAttachment(StaticMesh);
+	
 	DoOnce.Reset();
 }
 
