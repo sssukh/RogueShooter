@@ -29,7 +29,7 @@ class ROGUESHOOTER_API ABase_Character : public ACharacter, public IInterface_Ch
 
 public:
 	// Sets default values for this character's properties
-	ABase_Character(const FObjectInitializer& ObjectInitializer);
+	ABase_Character();
 
 protected:
 	// Called when the game starts or when spawned

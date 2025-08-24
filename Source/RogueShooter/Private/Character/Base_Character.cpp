@@ -27,7 +27,7 @@
 
 
 // Sets default values
-ABase_Character::ABase_Character(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+ABase_Character::ABase_Character()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -65,7 +65,7 @@ ABase_Character::ABase_Character(const FObjectInitializer& ObjectInitializer) : 
 	Camera->SetProjectionMode(ECameraProjectionMode::Perspective);
 	Camera->SetupAttachment(SpringArm);
 
-	ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceFinder(*AssetPath::Animation::BaseCharAnim);
+	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceFinder(*AssetPath::Animation::BaseCharAnim);
 	if(AnimInstanceFinder.Succeeded())
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceFinder.Class);
@@ -73,6 +73,13 @@ ABase_Character::ABase_Character(const FObjectInitializer& ObjectInitializer) : 
 	
 	GetMesh()->SetRelativeLocation(FVector(0.0f,0.0f,-90.0f));
 	GetMesh()->SetRelativeRotation(FRotator(0.0f,270.0f,0.0f));
+
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshFinder(*AssetPath::Mesh::SKM_Quinn_Simple);
+
+	if(MeshFinder.Succeeded())
+	{
+		GetMesh()->SetSkeletalMesh(MeshFinder.Object);
+	}
 
 	static ConstructorHelpers::FClassFinder<UUW_HealthBar> HealthbarClassFinder(*AssetPath::Blueprint::WBP_HealthBar_C);
 	if(HealthbarClassFinder.Succeeded())

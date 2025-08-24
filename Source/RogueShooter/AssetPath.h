@@ -71,6 +71,8 @@ namespace AssetPath
 		const FString SM_TD_Gold_Pile = TEXT("StaticMesh'/Game/SurvivorsTemplate/Demo/Items/Gold/SM_TD_Gold_Pile.SM_TD_Gold_Pile'");
 
 		const FString SM_Cube = TEXT("StaticMesh'/Engine/VREditor/BasicMeshes/SM_Cube_01.SM_Cube_01'");
+
+		const FString SKM_Quinn_Simple = TEXT("SkeletalMesh'/Game/SurvivorsTemplate/Demo/Characters/Mannequins/Meshes/SKM_Quinn_Simple.SKM_Quinn_Simple'");
 	}
 	
 	namespace Blueprint
