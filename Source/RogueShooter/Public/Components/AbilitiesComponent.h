@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "RogueShooter/FlowControlLIbrary.h"
 #include "AbilitiesComponent.generated.h"
 
@@ -16,7 +15,7 @@ class ABase_Character;
 enum class EPassiveAbilities : uint8;
 enum class EActiveAbilities : uint8;
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup=(Custom), Blueprintable, meta=(BlueprintSpawnableComponent))
 class ROGUESHOOTER_API UAbilitiesComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -129,72 +128,72 @@ public:
 	
 public:
 	// Ability
-	UPROPERTY(Replicated,VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Passive")
+	UPROPERTY(Replicated,EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Passive")
 	float AbilityTimerMultiplier = 1.0f;
 	
-	UPROPERTY(Replicated,VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Passive")
+	UPROPERTY(Replicated,EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Passive")
 	float AbilityDamageMultiplier = 1.0f;
 
 	// Actives
-	UPROPERTY(Replicated,VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
+	UPROPERTY(Replicated,EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
 	float HammerTimer = 1.0f;
 	
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
 	float HammerDamage = 8.0f;
 	
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
 	float HammerRadius = 300.0f;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
 	float FBTimer = 1.0f;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
 	float FBDamage = 5.0f;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
 	float LightningTimer = 2.0f;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
 	float LightningDamage = 20.0f;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
 	float LightningRadius = 150.0f;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
 	int32 FBFireCount = 0;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
 	float FBFireIndex = 0.0f;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
 	float FireballDamage = 10.0f;
 	
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
 	float FireballTimer = 2.0f;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
 	float FireballRadius = 150.0f;
 
 	// Abilities
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent")
 	TMap<EActiveAbilities,int32> ActiveAbilitiesMap;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent")
 	TMap<EActiveAbilities,EPassiveAbilities> EvolutionMap;
 	
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent")
 	TMap<EPassiveAbilities,int32> PassiveAbilitiesMap;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent")
 	TArray<EPassiveAbilities> EvolutionPassiveArray;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent")
 	int32 MaxAbilityLevel = 5;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent")
 	TArray<bool> EvolutionTracker;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent")
 	TArray<FTimerHandle> ActiveTimers;
 
 	// Setup
@@ -202,10 +201,10 @@ public:
 	// UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Setup")
 	// EDrawDebugTrace::Type Debug;
 	
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Gameplay")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Gameplay")
 	TObjectPtr<AActor> NearestActor;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent")
 	FVector LastLightningLoc;
 
 	// Active Ability Delegate
@@ -215,34 +214,37 @@ public:
 	FTimerDelegate LightningDelegate;
 
 	// Emitter
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UParticleSystem> HammerEffect;
 	
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<USoundBase> HammerSound;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UParticleSystem> FireballEffect;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<USoundBase> FireballSound;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UParticleSystem> FrostBoltEffect;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<USoundBase> FrostBoltSound;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UParticleSystem> LightningEffect;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<USoundBase> LightningSound;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<ABase_Projectile> BaseProjectileClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<ALightningExplosion> LightningClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AFireball_Projectile> FireballClass;
 
 	FFlipflop FireballFlipflop;

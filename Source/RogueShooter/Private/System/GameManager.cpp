@@ -4,6 +4,7 @@
 #include "System/GameManager.h"
 
 #include "Components/AbilitiesComponent.h"
+#include "Enemies/Base_Enemy.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "EnvironmentQuery/EnvQuery.h"
 #include "GameFramework/GameState.h"
@@ -156,7 +157,19 @@ void AGameManager::IncreaseEnemyCount()
 
 void AGameManager::PrepareEliteSpawn()
 {
-	// TODO : EQS 
+	ABase_Character* RandChar = PlayerCharacterArray[FMath::RandRange(0,PlayerCharacterArray.Num())];
+
+	if(IsValid(RandChar))
+	{
+		UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(GetWorld(),
+			EQS_FindSpawnPoint,RandChar,EEnvQueryRunMode::AllMatching,nullptr
+			);
+
+		if(QueryInstance)
+		{
+			QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this,&AGameManager::SpawnElite);
+		}
+	}
 }
 
 void AGameManager::CreateXPTable()
@@ -335,14 +348,68 @@ void AGameManager::PrepareWaveElites()
 	}
 }
 
-void AGameManager::SpawnEnemy(FEnvQueryInstance Instance, EEnvQueryStatus::Type Status)
+void AGameManager::SpawnEnemy(UEnvQueryInstanceBlueprintWrapper* Instance, EEnvQueryStatus::Type Status)
 {
+	// Get results of query to find good location to spawn
 	if(PreparedEnemies.IsEmpty())
 	{
 		RS_LOG_ERROR(TEXT("ERROR: Enemy data table not setup correctly!"))
 		return;
 	}
-	// EQS 공부하고 할것.
+
+	TArray<FVector> ResultLocations;
+
+	// Spawn point not found - retry
+	if(!Instance->GetQueryResultsAsLocations(ResultLocations))
+	{
+		FindSpawnLocation();
+
+		RS_LOG_ERROR(TEXT("ERROR : Did Not Find Spawn Location"))
+		RS_LOG_SCREEN_ERROR(TEXT("ERROR : Did Not Find Spawn Location"))
+		return;
+	}
+
+	// Spawn Enemy
+	FEnemySpawnType EnemySpawnType = PreparedEnemies[FMath::RandRange(0,PreparedEnemies.Num())];
+
+	FVector Location = ResultLocations[FMath::RandRange(0,ResultLocations.Num())] + FVector(0.0f,0.0f,25.0f);
+
+	FTransform Transform = FTransform::Identity;
+	Transform.SetTranslation(Location);
+
+	
+	
+	if(ABase_Enemy* Enemy = GetWorld()->SpawnActorDeferred<ABase_Enemy>(EnemySpawnType.Enemy,Transform))
+	{
+		Enemy->PlayerArray = PlayerCharacterArray;
+
+		Enemy->Damage = EnemySpawnType.Damage;
+
+		Enemy->Health = EnemySpawnType.Health;
+
+		Enemy->SoulClass = EnemySpawnType.Soul;
+
+		Enemy->bIsElite = EnemySpawnType.IsElite;
+
+		Enemy->ScaleHPToLevel = EnemySpawnType.IsScaleHptoLevel;
+
+		Enemy->GM_Interface = this;
+
+		Enemy->CharLevel = Level;
+
+		Enemy->FinishSpawning(Transform);
+
+		// Keep Track of Total Enemies
+		Enemy->OnDeath.AddDynamic(this,&AGameManager::AGameManager::DecreaseEnemyCount);
+
+		IncreaseEnemyCount();
+
+		// For Spawning System
+		++CurrentEnemySpawnIndex;
+
+		ContinueSpawning();
+	}
+
 }
 
 void AGameManager::FindSpawnLocation()
@@ -356,10 +423,13 @@ void AGameManager::FindSpawnLocation()
 		return;
 	}
 
-	UEnvQueryInstanceBlueprintWrapper* EQSBlueprintWrapper =  UEnvQueryManager::RunEQSQuery(GetWorld(),EQS_FindSpawnPoint,RandPlayer,EEnvQueryRunMode::AllMatching,nullptr);
+	UEnvQueryInstanceBlueprintWrapper* QueryInstance =  UEnvQueryManager::RunEQSQuery(GetWorld(),EQS_FindSpawnPoint,
+		RandPlayer,EEnvQueryRunMode::AllMatching,nullptr);
 
-	// EQS 찾아보고 오자.
-	// EQSBlueprintWrapper->GetOnQueryFinishedEvent().Add(this,&AGameManager::SpawnEnemy);
+	if(QueryInstance)
+	{
+		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this,&AGameManager::SpawnEnemy);
+	}
 }
 
 void AGameManager::DetemineGameStatus()
@@ -439,8 +509,64 @@ void AGameManager::IncreaseWaveIndex()
 	PrepareEliteSpawn();
 }
 
-void AGameManager::SpawnElite(FEnvQueryInstance Instance, EEnvQueryStatus::Type Status)
+void AGameManager::SpawnElite(UEnvQueryInstanceBlueprintWrapper* Instance, EEnvQueryStatus::Type Status)
 {
+	// First, see if there are any valid elite spawns set for this wave
+
+	TArray<FEnemySpawnType> EliteTypes = EliteSpawns[WaveIndex].Spawns;
+	
+	if(EliteTypes.IsEmpty())
+	{
+		return;
+	}
+
+	// Determine if spawn location was found
+	TArray<FVector> ResultLocations;
+
+	// Spawn point not found - retry
+	if(!Instance->GetQueryResultsAsLocations(ResultLocations))
+	{
+		PrepareEliteSpawn();
+
+		RS_LOG_ERROR(TEXT("Error : Did Not Find Spawn Location"))
+
+		RS_LOG_SCREEN_ERROR(TEXT("Error : Did Not Find Spawn Location"))
+		return;
+	}
+
+	// Spawn
+	FEnemySpawnType EliteSpawnType = EliteTypes[FMath::RandRange(0,EliteTypes.Num())];
+
+	FVector Location = ResultLocations[FMath::RandRange(0,ResultLocations.Num())] + FVector(0.0f,0.0f,25.0f);
+
+	FTransform Transform = FTransform::Identity;
+	Transform.SetTranslation(Location);
+	
+	if(ABase_Enemy* Elite = GetWorld()->SpawnActorDeferred<ABase_Enemy>(EliteSpawnType.Enemy,Transform))
+	{
+		Elite->PlayerArray = PlayerCharacterArray;
+
+		Elite->Damage = EliteSpawnType.Damage;
+
+		Elite->Health = EliteSpawnType.Health;
+
+		Elite->SoulClass = EliteSpawnType.Soul;
+
+		Elite->bIsElite = EliteSpawnType.IsElite;
+
+		Elite->ScaleHPToLevel = EliteSpawnType.IsScaleHptoLevel;
+
+		Elite->GM_Interface = this;
+
+		Elite->CharLevel = Level;
+
+		Elite->FinishSpawning(Transform);
+
+		// Keep Track of Total Enemies
+		Elite->OnDeath.AddDynamic(this,&AGameManager::AGameManager::DecreaseEnemyCount);
+
+		IncreaseEnemyCount();
+	}
 }
 
 void AGameManager::UpdateEnemyWave()

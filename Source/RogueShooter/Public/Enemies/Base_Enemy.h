@@ -124,7 +124,7 @@ public:
 	TObjectPtr<ABase_AIController> BaseControllerReference;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup", meta = (ExposeOnSpawn = "true"))
-	TSubclassOf<ASoul> Soul;
+	TSubclassOf<ASoul> SoulClass;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup", meta = (ExposeOnSpawn = "true"))
 	bool bIsElite = false;
@@ -164,8 +164,6 @@ public:
 	
 	FDoOnce TakeDamageDoOnce;
 
-	UPROPERTY()
-	TSubclassOf<ASoul> SoulClass;
 
 	UPROPERTY()
 	TSubclassOf<AFloatingTextActor> FTActorClass;

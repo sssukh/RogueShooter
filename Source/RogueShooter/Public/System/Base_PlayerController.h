@@ -36,6 +36,6 @@ public:
 	virtual void OnPauseMenuClosed();
 public:
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="PlayerController")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Default")
 	TObjectPtr<UUW_GameMenu> GameMenu;
 };

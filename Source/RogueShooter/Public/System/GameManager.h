@@ -9,6 +9,7 @@
 #include "Interface/Interface_GameManager.h"
 #include "GameManager.generated.h"
 
+class UEnvQueryInstanceBlueprintWrapper;
 class ABase_Character;
 
 UCLASS()
@@ -47,11 +48,12 @@ public:
 	// Ensure we are not over spawn limits
 	void ContinueSpawning();
 
+	UFUNCTION()
 	void DecreaseEnemyCount();
 
 	void IncreaseEnemyCount();
 
-	// TODO : EQS
+	// Spawn in Elite Array
 	void PrepareEliteSpawn();
 	
 	/////////////////////////////////////
@@ -108,8 +110,8 @@ public:
 	/// GameLogic
 	/////////////////////////////////////
 
-	// TODO : EQSQueryInstance 뭔지 모르겟음 
-	void SpawnEnemy(FEnvQueryInstance Instance, EEnvQueryStatus::Type Status);
+	UFUNCTION()
+	void SpawnEnemy(UEnvQueryInstanceBlueprintWrapper* Instance, EEnvQueryStatus::Type Status);
 
 	void FindSpawnLocation();
 
@@ -122,8 +124,8 @@ public:
 
 	void IncreaseWaveIndex();
 
-	// TODO : EQSQueryInstance 뭔지 모르겟음 
-	void SpawnElite(FEnvQueryInstance Instance, EEnvQueryStatus::Type Status);
+	UFUNCTION()
+	void SpawnElite(UEnvQueryInstanceBlueprintWrapper* Instance, EEnvQueryStatus::Type Status);
 
 	// Check if the wave index has enemies assigned - if not - use previous saved enemies
 	void UpdateEnemyWave();
@@ -226,7 +228,7 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="GameManager | Spawn Logic",meta = (ExposeOnSpawn))
 	TObjectPtr<UDataTable> EnemyEliteSpawnDT;
-
-	// TODO : 초기설정 
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="GameManager | Default")
 	TObjectPtr<UEnvQuery> EQS_FindSpawnPoint;
 };
