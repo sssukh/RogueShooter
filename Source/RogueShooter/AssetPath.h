@@ -86,6 +86,8 @@ namespace AssetPath
 
 		const FString BP_SG_Player_C = TEXT("Blueprint'/Game/RogueShooter/Blueprints/Saves/BP_SG_Player.BP_SG_Player_C'");
 
+		const FString BP_Base_AIController_C = TEXT("Blueprint'/Game/RogueShooter/Blueprints/AI/BP_Base_AIController.BP_Base_AIController_C'");
+		
 		const FString WBP_FloatingTextWidget_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/UWB_FloatingTextWidget.UWB_FloatingTextWidget_C'");
 		const FString WBP_HealthBar_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/UWB_HealthBar.UWB_HealthBar_C'");
 		const FString WBP_PlayerHud_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/UWB_PlayerHud.UWB_PlayerHud_C'");

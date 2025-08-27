@@ -60,7 +60,7 @@ void AStash::Tick(float DeltaTime)
 
 void AStash::SpawnItem()
 {
-	TSubclassOf<ABase_Pickup> pickupclass = PossibleItemsToSpawn[FMath::RandRange(0,PossibleItemsToSpawn.Num())];
+	TSubclassOf<ABase_Pickup> pickupclass = PossibleItemsToSpawn[FMath::RandRange(0,PossibleItemsToSpawn.Num()-1)];
 
 	FVector SpawnLocation = GetActorLocation();
 

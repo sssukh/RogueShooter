@@ -86,7 +86,9 @@ void ABase_AIController::FindTarget()
 	{
 		if(Target->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
 		{
-			if(!IInterface_CharacterManager::Execute_IsAlive(Target))
+			bool bAlive = IInterface_CharacterManager::Execute_IsAlive(Target);
+			
+			if(!bAlive)
 			{
 				UpdateTargetArray();
 			}

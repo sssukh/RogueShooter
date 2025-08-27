@@ -4,6 +4,7 @@
 #include "System/GameManager.h"
 
 #include "Components/AbilitiesComponent.h"
+#include "Enemies/Base_Elite.h"
 #include "Enemies/Base_Enemy.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "EnvironmentQuery/EnvQuery.h"
@@ -157,7 +158,7 @@ void AGameManager::IncreaseEnemyCount()
 
 void AGameManager::PrepareEliteSpawn()
 {
-	ABase_Character* RandChar = PlayerCharacterArray[FMath::RandRange(0,PlayerCharacterArray.Num())];
+	ABase_Character* RandChar = PlayerCharacterArray[FMath::RandRange(0,PlayerCharacterArray.Num()-1)];
 
 	if(IsValid(RandChar))
 	{
@@ -264,7 +265,7 @@ void AGameManager::SpawnSetup()
 
 	GetWorldTimerManager().SetTimer(SpawnTimerReference,FTimerDelegate::CreateLambda([&]()
 	{
-		// SpawnWave();
+		SpawnWave();
 	}),
 	SpawnInterval,
 	true);
@@ -282,7 +283,7 @@ void AGameManager::PrepareWaveEnemies()
 	// first - Create enough items in array for each minute of game
 	for(int time=0;time<=MaxGameTime;++time)
 	{
-		EliteSpawns.Add(FEnemySpawns());
+		EnemySpawns.Add(FEnemySpawns());
 	}
 
 	// then populate based on data table
@@ -292,7 +293,7 @@ void AGameManager::PrepareWaveEnemies()
 	{
 		FEnemySpawnType* EnemySpawnType = EnemySpawnDT->FindRow<FEnemySpawnType>(RowName,TEXT("EnemySpawnDT"));
 
-		EliteSpawns[EnemySpawnType->AllowedWave].Spawns.Add(*EnemySpawnType);
+		EnemySpawns[EnemySpawnType->AllowedWave].Spawns.Add(*EnemySpawnType);
 	}
 }
 
@@ -370,9 +371,9 @@ void AGameManager::SpawnEnemy(UEnvQueryInstanceBlueprintWrapper* Instance, EEnvQ
 	}
 
 	// Spawn Enemy
-	FEnemySpawnType EnemySpawnType = PreparedEnemies[FMath::RandRange(0,PreparedEnemies.Num())];
+	FEnemySpawnType EnemySpawnType = PreparedEnemies[FMath::RandRange(0,PreparedEnemies.Num()-1)];
 
-	FVector Location = ResultLocations[FMath::RandRange(0,ResultLocations.Num())] + FVector(0.0f,0.0f,25.0f);
+	FVector Location = ResultLocations[FMath::RandRange(0,ResultLocations.Num()-1)] + FVector(0.0f,0.0f,25.0f);
 
 	FTransform Transform = FTransform::Identity;
 	Transform.SetTranslation(Location);
@@ -414,7 +415,7 @@ void AGameManager::SpawnEnemy(UEnvQueryInstanceBlueprintWrapper* Instance, EEnvQ
 
 void AGameManager::FindSpawnLocation()
 {
-	int32 randIndex = FMath::RandRange(0,PlayerCharacterArray.Num());
+	int32 randIndex = FMath::RandRange(0,PlayerCharacterArray.Num()-1);
 
 	ABase_Character* RandPlayer = PlayerCharacterArray[randIndex];
 	if(!IsValid(RandPlayer))
@@ -535,14 +536,14 @@ void AGameManager::SpawnElite(UEnvQueryInstanceBlueprintWrapper* Instance, EEnvQ
 	}
 
 	// Spawn
-	FEnemySpawnType EliteSpawnType = EliteTypes[FMath::RandRange(0,EliteTypes.Num())];
+	FEnemySpawnType EliteSpawnType = EliteTypes[FMath::RandRange(0,EliteTypes.Num()-1)];
 
-	FVector Location = ResultLocations[FMath::RandRange(0,ResultLocations.Num())] + FVector(0.0f,0.0f,25.0f);
+	FVector Location = ResultLocations[FMath::RandRange(0,ResultLocations.Num()-1)] + FVector(0.0f,0.0f,25.0f);
 
 	FTransform Transform = FTransform::Identity;
 	Transform.SetTranslation(Location);
 	
-	if(ABase_Enemy* Elite = GetWorld()->SpawnActorDeferred<ABase_Enemy>(EliteSpawnType.Enemy,Transform))
+	if(ABase_Elite* Elite = GetWorld()->SpawnActorDeferred<ABase_Elite>(EliteSpawnType.Enemy,Transform))
 	{
 		Elite->PlayerArray = PlayerCharacterArray;
 

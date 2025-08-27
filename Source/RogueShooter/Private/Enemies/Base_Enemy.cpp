@@ -116,18 +116,26 @@ ABase_Enemy::ABase_Enemy()
 
 	TakeDamageDoOnce.Reset();
 
-	ConstructorHelpers::FClassFinder<ASoul> SoulClassFinder(*AssetPath::Blueprint::BP_BaseSoul_C);
+	static ConstructorHelpers::FClassFinder<ASoul> SoulClassFinder(*AssetPath::Blueprint::BP_BaseSoul_C);
 	if(SoulClassFinder.Succeeded())
 	{
 		SoulClass = SoulClassFinder.Class;
 	}
 
-	ConstructorHelpers::FClassFinder<AFloatingTextActor> FTActorClassFinder(*AssetPath::Blueprint::BP_FloatingTextActor_C);
+	static ConstructorHelpers::FClassFinder<AFloatingTextActor> FTActorClassFinder(*AssetPath::Blueprint::BP_FloatingTextActor_C);
 	if(FTActorClassFinder.Succeeded())
 	{
 		FTActorClass = FTActorClassFinder.Class;
 	}
 
+	static ConstructorHelpers::FClassFinder<ABase_AIController> AIControllerFinder(*AssetPath::Blueprint::BP_Base_AIController_C);
+	if(AIControllerFinder.Succeeded())
+	{
+		AIControllerClass = AIControllerFinder.Class;
+	}
+
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	
 	ScaleHP();
 }
 

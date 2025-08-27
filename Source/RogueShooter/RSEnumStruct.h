@@ -153,6 +153,8 @@ struct FEnemySpawns
 {
 	GENERATED_BODY()
 
+	FEnemySpawns(){Spawns = TArray<FEnemySpawnType>();}
+	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Enemy Spawns")
 	TArray<FEnemySpawnType> Spawns;
 	

@@ -381,7 +381,7 @@ void AGameplay_PlayerController::ExecuteLevelUp()
 			if(CanAddActiveAbility)
 			{
 				// Remove from local array so we do not have duplicate
-				EActiveAbilities ActiveAbility = AvailableActiveAbilities[FMath::RandRange(0,AvailableActiveAbilities.Num())];
+				EActiveAbilities ActiveAbility = AvailableActiveAbilities[FMath::RandRange(0,AvailableActiveAbilities.Num()-1)];
 
 				AvailableActiveAbilities.Remove(ActiveAbility);
 
@@ -422,7 +422,7 @@ void AGameplay_PlayerController::ExecuteLevelUp()
 			}
 			else
 			{
-				EPassiveAbilities PassiveAbility = AvailablePassiveAbilities[FMath::RandRange(0,AvailablePassiveAbilities.Num())];
+				EPassiveAbilities PassiveAbility = AvailablePassiveAbilities[FMath::RandRange(0,AvailablePassiveAbilities.Num()-1)];
 
 				AvailablePassiveAbilities.Remove(PassiveAbility);
 
@@ -728,7 +728,7 @@ void AGameplay_PlayerController::BuildAndProcessChest(int32 index)
 		if(bCanAddActiveAbility)
 			{
 				// Remove from local array so we do not have duplicate
-				EActiveAbilities ActiveAbility = AvailableActiveAbilities[FMath::RandRange(0,AvailableActiveAbilities.Num())];
+				EActiveAbilities ActiveAbility = AvailableActiveAbilities[FMath::RandRange(0,AvailableActiveAbilities.Num()-1)];
 
 				AvailableActiveAbilities.Remove(ActiveAbility);
 
@@ -769,7 +769,7 @@ void AGameplay_PlayerController::BuildAndProcessChest(int32 index)
 			}
 			else
 			{
-				EPassiveAbilities PassiveAbility = AvailablePassiveAbilities[FMath::RandRange(0,AvailablePassiveAbilities.Num())];
+				EPassiveAbilities PassiveAbility = AvailablePassiveAbilities[FMath::RandRange(0,AvailablePassiveAbilities.Num()-1)];
 
 				AvailablePassiveAbilities.Remove(PassiveAbility);
 
