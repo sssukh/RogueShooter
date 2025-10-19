@@ -17,6 +17,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "RogueShooter/AssetPath.h"
 #include "Utility/RSCollisionChannel.h"
+#include "Utility/RSLog.h"
 
 
 // Sets default values
@@ -146,12 +147,28 @@ void ABase_Enemy::BeginPlay()
 
 	DamageSphereOverlapDelegate.BindUFunction(this,FName("DamagePlayer"));
 	RetriggerDelegate.BindUFunction(this,FName("ResetDoOnce"));
+
+	UE_LOG(LogTemp, Warning, TEXT("Enemy %s BeginPlay, Controller: %s"),
+		*GetName(),
+		GetController() ? *GetController()->GetName() : TEXT("NULL"));
 }
 
 // Called every frame
 void ABase_Enemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	static float LogInterval = 1.0f;
+	static float TimeAccum = 0.0f;
+	TimeAccum += DeltaTime;
+
+	if (TimeAccum > LogInterval)
+	{
+		TimeAccum = 0.0f;
+		UE_LOG(LogTemp, Warning, TEXT("Tick: Enemy %s Controller: %s"),
+			*GetName(),
+			GetController() ? *GetController()->GetName() : TEXT("NULL"));
+	}
 }
 
 // Called to bind functionality to input
@@ -249,27 +266,41 @@ float ABase_Enemy::TakeDamage(float DamageAmount, struct FDamageEvent const& Dam
 
 	if(Health<=0)
 	{
+		EnemyDeath();
+	}
+	
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}
+
+void ABase_Enemy::EnemyDeath()
+{
+	if(HasAuthority())
+	{
 		if(TakeDamageDoOnce.Execute())
 		{
 			bIsDead =  true;
 
 			// On Death 호출
-
 			SpawnSoul();
 
 			GetCharacterMovement()->StopMovementImmediately();
 
-			BaseControllerReference->StopMovement();
+			ABase_AIController* AIController = Cast<ABase_AIController>(GetController());
 
-			BaseControllerReference->EndAI();
+			if(AIController)
+			{
+				RS_LOG_SCREEN(TEXT("%s is Dead on Server"),*GetName())
+				
+				AIController->StopMovement();
+
+				AIController->EndAI();
+			}
 
 			MC_Enemy_Death();
 
 			DetachFromControllerPendingDestroy();
 		}
 	}
-	
-	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
 void ABase_Enemy::MC_Enemy_Death_Implementation()

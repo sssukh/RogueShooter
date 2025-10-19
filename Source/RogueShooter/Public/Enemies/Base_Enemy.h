@@ -63,6 +63,8 @@ public:
 	// Life and Death
 	UFUNCTION()
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+	void EnemyDeath();
 	
 	UFUNCTION(NetMulticast,Unreliable)
 	void MC_Enemy_Death();
@@ -119,9 +121,6 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup")
 	bool bIsDead = false;
-	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup")
-	TObjectPtr<ABase_AIController> BaseControllerReference;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup", meta = (ExposeOnSpawn = "true"))
 	TSubclassOf<ASoul> SoulClass;

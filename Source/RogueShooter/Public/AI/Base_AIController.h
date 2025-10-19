@@ -32,6 +32,10 @@ public:
 	UFUNCTION()
 	virtual void OnPossess(APawn* InPawn) override;
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+	virtual void OnUnPossess() override;
+	
 	// when AI starts - find a good player to chase
 	// AI가 동작하기 시작하면 추적할 플레이어를 찾는다.
 	UFUNCTION()

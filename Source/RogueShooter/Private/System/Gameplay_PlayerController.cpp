@@ -224,6 +224,10 @@ void AGameplay_PlayerController::SetupPlayer()
 	CreateGameplayUI();
 
 	SetReference();
+
+	AbilityComponent->SetStartingAbility();
+
+	UpdateHotbar();
 }
 
 void AGameplay_PlayerController::CreateGameplayUI()
@@ -254,7 +258,7 @@ void AGameplay_PlayerController::UpdateCharacterUI(float Percent, int32 Level)
 
 void AGameplay_PlayerController::UpdateHotbar()
 {
-	UpdateHudHotbar(AbilityComponent->ActiveAbilitiesMap,AbilityComponent->PassiveAbilitiesMap);
+	Execute_UpdateHudHotbar(this,AbilityComponent->ActiveAbilitiesMap,AbilityComponent->PassiveAbilitiesMap);
 }
 
 void AGameplay_PlayerController::ShowEndMatchScreen(bool Victory, int32 EnemiesKilled)

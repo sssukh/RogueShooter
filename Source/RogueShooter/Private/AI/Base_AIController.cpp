@@ -52,8 +52,8 @@ void ABase_AIController::OnPossess(APawn* InPawn)
 	if(ABase_Enemy* Enemy = Cast<ABase_Enemy>(InPawn))
 	{
 		AsBaseEnemy = Enemy;
-
-		AsBaseEnemy->BaseControllerReference = this;
+		
+		RS_LOG_ERROR(TEXT("%s has been set to %s"),*this->GetName(), *Enemy->GetName())
 
 		PlayerArray = AsBaseEnemy->PlayerArray;
 
@@ -66,6 +66,20 @@ void ABase_AIController::OnPossess(APawn* InPawn)
 
 		BeginAI();
 	}
+}
+
+void ABase_AIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	RS_LOG_ERROR(TEXT("%s has called EndPlay"),*this->GetName())
+}
+
+void ABase_AIController::OnUnPossess()
+{
+	Super::OnUnPossess();
+
+	RS_LOG_ERROR(TEXT("%s has called OnUnPossess"),*this->GetName())
 }
 
 void ABase_AIController::BeginAI()

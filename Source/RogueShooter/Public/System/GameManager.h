@@ -136,6 +136,8 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
+	void SetGameTimeOnServer(FString& pSecond);
+	
 public:
 	/////////////////////////////////////
 	/// Member Variables

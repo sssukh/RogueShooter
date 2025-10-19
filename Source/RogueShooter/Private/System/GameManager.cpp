@@ -400,6 +400,11 @@ void AGameManager::SpawnEnemy(UEnvQueryInstanceBlueprintWrapper* Instance, EEnvQ
 
 		Enemy->FinishSpawning(Transform);
 
+		if(Enemy->GetController()==nullptr)
+		{
+			RS_LOG_ERROR(TEXT("%s has not possessed by controller"),*Enemy->GetName())
+		}
+		
 		// Keep Track of Total Enemies
 		Enemy->OnDeath.AddDynamic(this,&AGameManager::AGameManager::DecreaseEnemyCount);
 
@@ -465,7 +470,9 @@ void AGameManager::UpdateTimer()
 
 	FString second = Time<10?FString::Printf(TEXT("0%d"),Time):FString::Printf(TEXT("%d"),Time);
 	
-	GameTime = FText::FromString(FString::Printf(TEXT("%d:%s"),Minutes,*second));
+	// GameTime = FText::FromString(FString::Printf(TEXT("%d:%s"),Minutes,*second));
+
+	SetGameTimeOnServer(second);
 
 	if(Minutes>=MaxGameTime)
 	{
@@ -585,6 +592,7 @@ void AGameManager::OnRep_GameTime()
 	APlayerController* Controller = UGameplayStatics::GetPlayerController(GetWorld(),0);
 	if(Controller->GetClass()->ImplementsInterface(UInterface_ControllerManager::StaticClass()))
 	{
+		RS_LOG_SCREEN(TEXT("OnRep_GameTime Called. Value is %s"),*GameTime.ToString());
 		IInterface_ControllerManager::Execute_UpdateTime(Controller,GameTime);
 	}
 	else
@@ -598,5 +606,17 @@ void AGameManager::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& O
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AGameManager,GameTime);
+}
+
+void AGameManager::SetGameTimeOnServer(FString& pSecond)
+{
+	if(!HasAuthority())
+	{
+		return;
+	}
+
+	GameTime = FText::FromString(FString::Printf(TEXT("%d:%s"),Minutes,*pSecond));
+	
+	OnRep_GameTime();
 }
 

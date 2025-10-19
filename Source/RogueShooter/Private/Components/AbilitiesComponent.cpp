@@ -106,13 +106,15 @@ void UAbilitiesComponent::BeginPlay()
 	// TODO : component 생성할 때 set해야한다고 한다.
 	SetIsReplicated(true);
 	// ...
-	HammerDelegate.BindUFunction(this,FName("PrepareHammer"));
 
-	FrostBoltDelegate.BindUFunction(this,FName("PrepareFrostbolt"));
-
-	LightningDelegate.BindUFunction(this,FName("PrepareLightning"));
-
-	FireBallDelegate.BindUFunction(this,FName("PrepareFireball"));
+	if (GetClass()->FindFunctionByName(FName("PrepareHammer")) == nullptr) {
+		UE_LOG(LogTemp, Error, TEXT("리플렉션에서 PrepareHammer를 찾을 수 없습니다!"));
+	} else {
+		UE_LOG(LogTemp, Warning, TEXT("리플렉션에 PrepareHammer 정상 등록됨."));
+	}
+	
+	
+	
 }
 
 
@@ -146,6 +148,9 @@ float UAbilitiesComponent::CalculateBonusDamage(float InMultiplyer)
 
 bool UAbilitiesComponent::CheckEvoActive(EActiveAbilities InEnumActive)
 {
+	if(EvolutionTracker.IsEmpty())
+		return false;
+	
 	return EvolutionTracker[(int32)InEnumActive];
 }
 
@@ -176,9 +181,17 @@ void UAbilitiesComponent::LevelUpHammer()
 
 void UAbilitiesComponent::GrantHammer(bool Cast)
 {
+	HammerDelegate.BindUFunction(this,FName("PrepareHammer"));
+	if(!HammerDelegate.IsBound())
+	{
+		RS_LOG_ERROR(TEXT("바운드 실패"))
+	}
+	
 	FTimerHandle HammerTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(HammerTimerHandle, HammerDelegate,CalculateTimerMode(HammerTimer),true);
 
+	
+	
 	ActiveTimers.AddUnique(HammerTimerHandle);
 
 	if(Cast)
@@ -245,6 +258,12 @@ void UAbilitiesComponent::LevelUpFrostBolt()
 
 void UAbilitiesComponent::GrantFrostBolt(bool Cast)
 {
+	FrostBoltDelegate.BindUFunction(this,FName("PrepareFrostbolt"));
+	if(!FrostBoltDelegate.IsBound())
+	{
+		RS_LOG_ERROR(TEXT("바운드 실패"))
+	}
+	
 	FTimerHandle FrostTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(FrostTimerHandle,FrostBoltDelegate,CalculateTimerMode(FBTimer),true);
 	ActiveTimers.AddUnique(FrostTimerHandle);
@@ -339,6 +358,12 @@ void UAbilitiesComponent::LevelUpLightning()
 
 void UAbilitiesComponent::GrantLightning(bool Cast)
 {
+	LightningDelegate.BindUFunction(this,FName("PrepareLightning"));
+	if(!LightningDelegate.IsBound())
+	{
+		RS_LOG_ERROR(TEXT("바운드 실패"))
+	}
+	
 	FTimerHandle LightningTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(LightningTimerHandle,LightningDelegate,CalculateTimerMode(LightningTimer),true);
 	ActiveTimers.AddUnique(LightningTimerHandle);
@@ -435,6 +460,11 @@ void UAbilitiesComponent::LevelUpFireball()
 
 void UAbilitiesComponent::GrantFireball(bool Cast)
 {
+	FireBallDelegate.BindUFunction(this,FName("PrepareFireball"));
+	if(!FireBallDelegate.IsBound())
+	{
+		RS_LOG_ERROR(TEXT("바운드 실패"))
+	}
 	FTimerHandle FireballTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(FireballTimerHandle,FireBallDelegate,CalculateTimerMode(FireballTimer),true);
 
