@@ -242,6 +242,13 @@ void AGameManager::PrepareLevelUp()
 	}
 }
 
+void AGameManager::TransferXP_Implementation(int32 XP)
+{
+	// IInterface_GameManager::TransferXP_Implementation(XP);
+
+	AddXp(XP);
+}
+
 void AGameManager::GameSetup()
 {
 	// Xp is managed in game manager to ensure Xp is synced between all players

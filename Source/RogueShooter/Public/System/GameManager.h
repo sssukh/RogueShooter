@@ -84,6 +84,7 @@ public:
 	 */
 	void PrepareLevelUp();
 
+	virtual void TransferXP_Implementation(int32 XP) override;
 	
 	/////////////////////////////////////
 	/// Setup
@@ -192,7 +193,7 @@ public:
 	int32 MaxGameTime = 10;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Game Logic")
-	float SpawnInterval = 7.0f;
+	float SpawnInterval =2.0f;
 
 	// Spawn Logic
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="GameManager | Spawn Logic")

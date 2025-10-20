@@ -31,6 +31,10 @@ public:
 
 	UFUNCTION()
 	void ButtonOnClicked();
+
+	UFUNCTION()
+	void LoadIconAsynchronous(const TSoftObjectPtr<UTexture2D>& IconToLoad);
+	
 public:
 	UPROPERTY(BlueprintReadWrite, Category = "UW_LevelUpCard | Designer", meta = (BindWidget))
 	TObjectPtr<UButton> Button;
@@ -56,9 +60,10 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="UW_LevelUpCard | Member", meta = (ExposeOnSpawn))
 	int32 Level;
 
+	// TODO : 삭제 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="UW_LevelUpCard | Member", meta = (ExposeOnSpawn))
 	TObjectPtr<UTexture2D> Icon;
-
+	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="UW_LevelUpCard | Member", meta = (ExposeOnSpawn))
 	EActiveAbilities AAbility;
 
@@ -69,4 +74,11 @@ public:
 	EAbilityType Type;
 
 	FOnSelected OnSelected;
+	
+	// TODO : 블루프린트에서 로딩 이미지 설정 후 다시 코드에서 설정해보기 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="UW_LevelUpCard | Member")
+	TObjectPtr<UTexture2D> LoadingIcon;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="UW_LevelUpCard | Member")
+	TObjectPtr<UTexture2D> LoadedIcon;
 };

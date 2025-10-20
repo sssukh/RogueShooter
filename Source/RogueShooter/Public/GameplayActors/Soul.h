@@ -8,6 +8,7 @@
 #include "RogueShooter/FlowControlLIbrary.h"
 #include "Soul.generated.h"
 
+class UProjectileMovementComponent;
 class FOnTimelineEvent;
 class FOnTimelineFloat;
 struct FDoOnce;
@@ -42,8 +43,7 @@ public:
 	UFUNCTION(Category = "On Overlap Event")
 	void OuterSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	UFUNCTION()
-	void SoulLocationUpdate(float Alpha);
+	void SoulHomingToPlayer();
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Soul | Component")
 	TObjectPtr<USceneComponent> DefaultSceneRoot;
@@ -57,6 +57,9 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Soul | Component")
 	TObjectPtr<UParticleSystemComponent> ParticleSystemComponent;
 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Soul | Component")
+	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
+	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Soul | Component")
 	TObjectPtr<AActor> OtherActor;
 
@@ -74,15 +77,6 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	FDoOnce SphereDoOnce;
-
-	UPROPERTY()
-	FTimeline Timeline;
-
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	TObjectPtr<UCurveFloat> TimeCurve;
-
-	UPROPERTY()
-	FOnTimelineFloat TimelineUpdate;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<UParticleSystem> EmitterTemplate;

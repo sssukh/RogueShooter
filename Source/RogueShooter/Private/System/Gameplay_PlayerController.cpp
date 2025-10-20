@@ -415,9 +415,10 @@ void AGameplay_PlayerController::ExecuteLevelUp()
 
 						if(AbilityLevelUp)
 						{
+							// 왜 aability랑 pability에 직접 값들을 넣어놨을까?
 							LevelUpUI->AddSelection(FText::FromString(NameString),level,AbilityLevelUp->LevelUpText,
 								UFunctionLibrary_Helper::FindActiveIcon(GetWorld(),ActiveAbility),
-								EActiveAbilities::Hammer,EPassiveAbilities::Ability_Bonus_Damage,EAbilityType::Active);
+								ActiveAbility,EPassiveAbilities::Ability_Bonus_Damage,EAbilityType::Active);
 
 							break;
 						}

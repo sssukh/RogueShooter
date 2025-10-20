@@ -6,9 +6,12 @@
 #include "Components/Button.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Engine/AssetManager.h"
+#include "Utility/RSLog.h"
 
 UUW_LevelUpCard::UUW_LevelUpCard(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	
 }
 
 void UUW_LevelUpCard::NativeConstruct()
@@ -17,7 +20,9 @@ void UUW_LevelUpCard::NativeConstruct()
 
 	Button->OnClicked.AddDynamic(this,&UUW_LevelUpCard::ButtonOnClicked);
 
-	Image_Icon->SetBrushFromTexture(Icon);
+	// 아직 로드가 안되었다면 로딩중 이미지 설정 
+	if(LoadedIcon == nullptr)
+		Image_Icon->SetBrushFromTexture(LoadingIcon);
 
 	TextBlock_Name->SetText(Name);
 
@@ -44,4 +49,29 @@ void UUW_LevelUpCard::ButtonOnClicked()
 {
 	if(OnSelected.IsBound())
 		OnSelected.Broadcast(Type,AAbility,PAbility);
+}
+
+void UUW_LevelUpCard::LoadIconAsynchronous(const TSoftObjectPtr<UTexture2D>& IconToLoad)
+{
+	if(IconToLoad.IsNull())
+	{
+		RS_LOG_WARNING("IconToLoad is Null")
+
+		return;
+	}
+
+	// UAssetManager는 스트리밍을 관리하는 싱글톤입니다.
+	UAssetManager& AssetManager = UAssetManager::Get();
+    
+	FStreamableManager& StreamableManager = AssetManager.Get().GetStreamableManager(); // 5.0 이후
+
+	// 비동기 로드를 요청합니다.
+	StreamableManager.RequestAsyncLoad(IconToLoad.ToSoftObjectPath(), FStreamableDelegate::CreateLambda(
+		// 로드가 완료되면 이 람다(Lambda) 함수가 실행됩니다.
+		[IconToLoad,this]()
+		{
+			LoadedIcon = IconToLoad.Get();
+			Image_Icon->SetBrushFromTexture(LoadedIcon);
+		}
+	));
 }

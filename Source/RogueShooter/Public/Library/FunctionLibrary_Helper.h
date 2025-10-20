@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "RogueShooter/AssetPath.h"
 #include "RogueShooter/RSEnumStruct.h"
 #include "FunctionLibrary_Helper.generated.h"
 
@@ -21,10 +22,10 @@ public:
 	static void DamageEnemiesOnce(const UObject* WorldContextObject, const TArray<FHitResult>& EnemyHits, float Damage, AController* Instigator, AActor* Causer);
 
 	UFUNCTION(BlueprintCallable,Category = "Function Library Helper", BlueprintPure,meta = (WorldContext = "WorldContextObject"))
-	static UTexture2D* FindActiveIcon(const UObject* WorldContextObject,EActiveAbilities AAbility=EActiveAbilities::Hammer);
+	static TSoftObjectPtr<UTexture2D> FindActiveIcon(const UObject* WorldContextObject,EActiveAbilities AAbility=EActiveAbilities::Hammer);
 
 	UFUNCTION(BlueprintCallable,Category = "Function Library Helper", BlueprintPure,meta = (WorldContext = "WorldContextObject"))
-	static UTexture2D* FindPassiveIcon(const UObject* WorldContextObject,EPassiveAbilities PAbility = EPassiveAbilities::Ability_Bonus_Damage);
+	static TSoftObjectPtr<UTexture2D> FindPassiveIcon(const UObject* WorldContextObject,EPassiveAbilities PAbility = EPassiveAbilities::Ability_Bonus_Damage);
 
 	UFUNCTION(BlueprintCallable,Category = "Function Library Helper",meta = (WorldContext = "WorldContextObject"))
 	static void CreateLoadingScreen(const UObject* WorldContextObject,FText LoadingInfo, TSubclassOf<UUW_LoadingScreen> LoadingScreenClass);
@@ -36,4 +37,5 @@ public:
 	
 	UFUNCTION(BlueprintCallable,Category = "Function Library Helper",meta = (WorldContext = "WorldContextObject"))
 	static void SavePlayerData(const UObject* WorldContextObject,USG_Player* SaveData);
+	
 };

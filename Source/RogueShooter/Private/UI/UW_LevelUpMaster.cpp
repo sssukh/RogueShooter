@@ -73,7 +73,10 @@ void UUW_LevelUpMaster::SetReference()
 	}
 }
 
-void UUW_LevelUpMaster::AddSelection(FText Name, int32 Level, FText Desc, UTexture2D* Icon, EActiveAbilities AAbility,
+// icon을 로딩중 이미지로 변경할 것(실제 사용할 이미지는 로드 후 적용할 것)
+// 위젯 내에 softobjectptr (Icon to load)변수를 둘 것.
+// expose on spawn 키워드를 두어서 여기서 위젯 생성할 때 soft 경로를 전달.
+void UUW_LevelUpMaster::AddSelection(FText Name, int32 Level, FText Desc, TSoftObjectPtr<UTexture2D> Icon, EActiveAbilities AAbility,
 	EPassiveAbilities PAbility, EAbilityType Type)
 {
 	if(UUW_LevelUpCard* LevelUpCard = CreateWidget<UUW_LevelUpCard>(GetOwningPlayer(),LevelUpCardClass))
@@ -81,7 +84,6 @@ void UUW_LevelUpMaster::AddSelection(FText Name, int32 Level, FText Desc, UTextu
 		LevelUpCard->Name = Name;
 		LevelUpCard->Level = Level;
 		LevelUpCard->Description = Desc;
-		LevelUpCard->Icon = Icon;
 		LevelUpCard->AAbility = AAbility;
 		LevelUpCard->PAbility = PAbility;
 		LevelUpCard->Type = Type;
@@ -89,7 +91,10 @@ void UUW_LevelUpMaster::AddSelection(FText Name, int32 Level, FText Desc, UTextu
 		UW_LevelUpItems->VerticalBox_Items->AddChildToVerticalBox(LevelUpCard);
 
 		LevelUpCard->OnSelected.AddDynamic(this,&UUW_LevelUpMaster::Close);
+
+		LevelUpCard->LoadIconAsynchronous(Icon);
 	}
+
 }
 
 void UUW_LevelUpMaster::Close(EAbilityType Type, EActiveAbilities AAbility, EPassiveAbilities PAbility)

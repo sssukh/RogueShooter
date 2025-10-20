@@ -5,8 +5,10 @@
 
 #include "FrameTypes.h"
 #include "PhysicsReplication.h"
+#include "Character/Base_Character.h"
 #include "Components/SphereComponent.h"
 #include "Components/TimelineComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "Interface/Interface_GameManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -54,11 +56,15 @@ ASoul::ASoul()
 
 	ParticleSystemComponent->SetAutoActivate(true);
 
-	ConstructorHelpers::FObjectFinder<UCurveFloat> CurveFinder(*AssetPath::Curve::Curve_Soul);
-	if(CurveFinder.Succeeded())
-	{
-		TimeCurve = CurveFinder.Object;
-	}
+	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovement");
+
+	ProjectileMovement->InitialSpeed = 0.0f;
+
+	ProjectileMovement->MaxSpeed = 1500.0f;
+
+	ProjectileMovement->ProjectileGravityScale = 0.0f;
+
+	ProjectileMovement->bIsHomingProjectile = false;
 	
 	// 구조 설정 
 	SetRootComponent(Sphere);
@@ -66,7 +72,7 @@ ASoul::ASoul()
 	Inner->SetupAttachment(Sphere);
 	
 	ParticleSystemComponent->SetupAttachment(Sphere);
-
+	
 	DoOnce.Reset();
 
 	SphereDoOnce.Reset();
@@ -76,10 +82,6 @@ ASoul::ASoul()
 void ASoul::BeginPlay()
 {
 	Super::BeginPlay();
-
-	TimelineUpdate.BindUFunction(this,FName("SoulLocationUpdate"));
-
-	Timeline.AddInterpFloat(TimeCurve,TimelineUpdate);
 
 	// sphere component에 바인드
 	Sphere->OnComponentBeginOverlap.AddDynamic(this,&ASoul::OuterSphereBeginOverlap);
@@ -93,12 +95,6 @@ void ASoul::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	Timeline.TickTimeline(DeltaTime);
-
-	if(OtherActor)
-	{
-		Destination = OtherActor->GetActorLocation();
-	}
 }
 
 void ASoul::AddXP()
@@ -108,10 +104,8 @@ void ASoul::AddXP()
 	{
 		IInterface_GameManager::Execute_TransferXP(GM_Interface,XPAmount);
 
-		// TODO : 임시로 외부로 옮기자
 		Destroy();
 	}
-	Destroy();
 }
 
 void ASoul::InnerSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* pOtherActor,
@@ -126,23 +120,28 @@ void ASoul::InnerSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 void ASoul::OuterSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* pOtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// TODO : 임시로 authority 빼둠 
 	if(!HasAuthority())
 		return;
 
-	// Do Once 실행 
-	if(!SphereDoOnce.Execute())
-		return;
+	// outer sphere에 오버랩 된 액터가 character 인 경우에만 작동 
+	if(ABase_Character* Player = Cast<ABase_Character>(pOtherActor))
+	{
+		// Do Once 실행 
+		if(!SphereDoOnce.Execute())
+			return;
+		
+		this->OtherActor = pOtherActor;
 
-	this->OtherActor = pOtherActor;
+		SoulHomingToPlayer();
+	}
 
-	StartingLocation = GetActorLocation();
-
-	Timeline.PlayFromStart();
 }
 
-void ASoul::SoulLocationUpdate(float Alpha)
+
+void ASoul::SoulHomingToPlayer()
 {
-	this->SetActorLocation(FVector::SlerpVectorToDirection(StartingLocation,Destination,Alpha));
+	ProjectileMovement->bIsHomingProjectile = true;
+
+	ProjectileMovement->HomingTargetComponent = OtherActor->GetRootComponent();
 }
 

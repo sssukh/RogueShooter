@@ -36,7 +36,7 @@ public:
 
 	void SetReference();
 
-	void AddSelection(FText Name,int32 Level, FText Desc, UTexture2D* Icon, EActiveAbilities AAbility, EPassiveAbilities PAbility, EAbilityType Type);
+	void AddSelection(FText Name,int32 Level, FText Desc, TSoftObjectPtr<UTexture2D> Icon, EActiveAbilities AAbility, EPassiveAbilities PAbility, EAbilityType Type);
 
 	UFUNCTION()
 	void Close(EAbilityType Type, EActiveAbilities AAbility, EPassiveAbilities PAbility);

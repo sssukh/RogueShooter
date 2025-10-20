@@ -4,10 +4,12 @@
 #include "Library/FunctionLibrary_Helper.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Engine/AssetManager.h"
 #include "Engine/DamageEvents.h"
 #include "Kismet/GameplayStatics.h"
 #include "RogueShooter/AssetPath.h"
 #include "Saves/SG_Player.h"
+#include "System/Subsystem/MyGameInstanceSubsystem.h"
 #include "UI/UW_LoadingScreen.h"
 #include "Utility/RSLog.h"
 
@@ -31,100 +33,27 @@ void UFunctionLibrary_Helper::DamageEnemiesOnce(const UObject* WorldContextObjec
 	}
 }
 
-UTexture2D* UFunctionLibrary_Helper::FindActiveIcon(const UObject* WorldContextObject, EActiveAbilities AAbility)
+TSoftObjectPtr<UTexture2D> UFunctionLibrary_Helper::FindActiveIcon(const UObject* WorldContextObject, EActiveAbilities AAbility)
 {
-	UTexture2D* result = nullptr;
-	switch (AAbility)
-	{
-	case (EActiveAbilities::Hammer):
-		{
-			ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::HammerDrop);
-			if(TexFinder.Succeeded())
-			{
-				result = TexFinder.Object;
-			}
-			break;
-		}
-	case(EActiveAbilities::Frost_Bolt):
-		{
-			ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::IceSpear);
-			if(TexFinder.Succeeded())
-			{
-				result = TexFinder.Object;
-			}
-			break;
-		}
-	case(EActiveAbilities::Lightning):
-		{
-			ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::Lightning);
-			if(TexFinder.Succeeded())
-			{
-				result = TexFinder.Object;
-			}
-			break;
-		}
-	case(EActiveAbilities::Fireball):
-		{
-			ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::Fireball);
-			if(TexFinder.Succeeded())
-			{
-				result = TexFinder.Object;
-			}
-			break;
-		}
-	default:
-		break;
-	}
+	UGameInstance* GameInstance = WorldContextObject->GetWorld()->GetGameInstance();
+	if (!GameInstance) return nullptr;
 
-	return result;
+	UMyGameInstanceSubsystem* MySubsystem = GameInstance->GetSubsystem<UMyGameInstanceSubsystem>();
+	if (!MySubsystem) return nullptr ;
+
+	return MySubsystem->GetAAIconFromDB(AAbility);
+	
 }
 
-UTexture2D* UFunctionLibrary_Helper::FindPassiveIcon(const UObject* WorldContextObject, EPassiveAbilities PAbility)
+TSoftObjectPtr<UTexture2D> UFunctionLibrary_Helper::FindPassiveIcon(const UObject* WorldContextObject, EPassiveAbilities PAbility)
 {
-	UTexture2D* result = nullptr;
-	switch (PAbility)
-	{
-	case (EPassiveAbilities::Ability_Bonus_Damage):
-		{
-			ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::Upgrade);
-			if(TexFinder.Succeeded())
-			{
-				result = TexFinder.Object;
-			}
-			break;
-		}
-	case(EPassiveAbilities::Health_Bonus):
-		{
-			ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::HealthIncrease);
-			if(TexFinder.Succeeded())
-			{
-				result = TexFinder.Object;
-			}
-			break;
-		}
-	case(EPassiveAbilities::Ability_Cooldown_Reduction):
-		{
-			ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::SpeedoMeter);
-			if(TexFinder.Succeeded())
-			{
-				result = TexFinder.Object;
-			}
-			break;
-		}
-	case(EPassiveAbilities::Speed_Bonus):
-		{
-			ConstructorHelpers::FObjectFinder<UTexture2D> TexFinder(*AssetPath::Texture::Run);
-			if(TexFinder.Succeeded())
-			{
-				result = TexFinder.Object;
-			}
-			break;
-		}
-	default:
-		break;
-	}
+	UGameInstance* GameInstance = WorldContextObject->GetWorld()->GetGameInstance();
+	if (!GameInstance) return nullptr;
 
-	return result;
+	UMyGameInstanceSubsystem* MySubsystem = GameInstance->GetSubsystem<UMyGameInstanceSubsystem>();
+	if (!MySubsystem) return nullptr ;
+
+	return MySubsystem->GetPAIconFromDB(PAbility);
 }
 
 void UFunctionLibrary_Helper::CreateLoadingScreen(const UObject* WorldContextObject, FText LoadingInfo,
@@ -185,3 +114,5 @@ void UFunctionLibrary_Helper::SavePlayerData(const UObject* WorldContextObject, 
 {
 	UGameplayStatics::SaveGameToSlot(SaveData,TEXT("PlayerData1"),0);
 }
+
+
