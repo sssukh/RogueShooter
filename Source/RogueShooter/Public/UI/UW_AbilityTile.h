@@ -20,6 +20,9 @@ public:
 
 	virtual void NativeConstruct() override;
 
+	UFUNCTION()
+	void OnIconLoaded_Internal(UObject* LoadedAsset); 
+
 public:
 	UPROPERTY(BlueprintReadWrite, Category="UW_AbilityTile | Designer", meta = (BindWidget))
 	TObjectPtr<UImage> Image_Icon;
@@ -27,9 +30,13 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category="UW_AbilityTile | Designer", meta = (BindWidget))
 	TObjectPtr<UTextBlock> TextBlock_Level;
 
+	// TODO : 로딩 아이콘으로 설정 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="UW_AbilityTile", meta = (ExposeOnSpawn))
-	TObjectPtr<UTexture2D> Icon;
+	TObjectPtr<UTexture2D> LoadingIcon;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="UW_AbilityTile", meta = (ExposeOnSpawn))
 	int32 Level = 0;
+
+	UPROPERTY()
+	TObjectPtr<UTexture2D> LoadedIcon;
 };

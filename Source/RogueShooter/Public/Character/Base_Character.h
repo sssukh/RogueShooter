@@ -79,6 +79,8 @@ public:
 	UFUNCTION()
 	virtual void RestoreHealth_Implementation(float amount) override;
 	
+
+	virtual USphereComponent* GetAbilitySphere_Implementation() override;
 	
 	//*****************************************
 	// Character Setup

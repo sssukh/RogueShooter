@@ -46,7 +46,7 @@ void AFireball_Projectile::NotifyHit(class UPrimitiveComponent* MyComp, AActor* 
 	explosionTransform.SetIdentity();
 	explosionTransform.SetLocation(GetActorLocation());
 	
-	if(ABase_Explosion* explosion = GetWorld()->SpawnActorDeferred<ABase_Explosion>(ExplosionClass,explosionTransform,nullptr,nullptr,ESpawnActorCollisionHandlingMethod::AlwaysSpawn))
+	if(ABase_Explosion* explosion = GetWorld()->SpawnActorDeferred<ABase_Explosion>(ExplosionClass,explosionTransform,nullptr,GetInstigator(),ESpawnActorCollisionHandlingMethod::AlwaysSpawn))
 	{
 		explosion->Radius = Radius;
 		explosion->Damage = Damage;

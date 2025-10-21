@@ -33,6 +33,12 @@ namespace AssetPath
 		const FString Curve_Movement = TEXT("CurveFloat'/Game/RogueShooter/Resource/MovementCurve.MovementCurve'");
 	}
 
+	namespace DataAsset
+	{
+		const FString DA_AAbilityIcons = TEXT("AAbilitySet'/Game/RogueShooter/Resource/AAbilityIcon.AAbilityIcon'");
+		const FString DA_PAbilityIcons = TEXT("PAbilitySet'/Game/RogueShooter/Resource/PAbilityIcon.PAbilityIcon'");
+
+	}
 	namespace Texture
 	{
 		const FString Fireball = TEXT("Texture2D'/Game/SurvivorsTemplate/Textures/fireball.fireball'");
@@ -94,7 +100,7 @@ namespace AssetPath
 		const FString WBP_LevelUpMaster_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/UWB_LevelUpMaster.UWB_LevelUpMaster_C'");
 		const FString WBP_MatchResults_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/UWB_MatchResults.UWB_MatchResults_C'");
 		const FString WBP_ChestMaster_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/UWB_ChestMaster.UWB_ChestMaster_C'");
-		const FString WBP_LevelUpCard_C = TEXT("");
+		const FString WBP_LevelUpCard_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/UWB_LevelUpCard.UWB_LevelUpCard_C'");
 		const FString WBP_ServerItem_C = TEXT("");
 		const FString WBP_ServerBrowser_C = TEXT("");
 		const FString WBP_HostMenu_C = TEXT("");
@@ -103,6 +109,7 @@ namespace AssetPath
 		const FString WBP_CharacterSelectionItem_C = TEXT("");
 		const FString WBP_LobbyMenu_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/UWB_LobbyMenu.UWB_LobbyMenu_C'");
 		const FString WBP_MainMenu_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/UWB_MainMenu.UWB_MainMenu_C'");
+		const FString WBP_AbilityTile_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/UWB_AbilityTile.UWB_AbilityTile_C'");
 	}
 	namespace Montage
 	{

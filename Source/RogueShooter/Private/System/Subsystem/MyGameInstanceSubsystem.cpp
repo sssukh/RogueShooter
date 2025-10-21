@@ -5,7 +5,26 @@
 
 #include "Data/AAbilitySet.h"
 #include "Data/PAbilitySet.h"
+#include "RogueShooter/AssetPath.h"
 #include "Utility/RSLog.h"
+
+
+UMyGameInstanceSubsystem::UMyGameInstanceSubsystem()
+{
+	static ConstructorHelpers::FObjectFinder<UAAbilitySet> AAbilityFinder(*AssetPath::DataAsset::DA_AAbilityIcons);
+
+	if(AAbilityFinder.Succeeded())
+	{
+		AAbilityIconDB = AAbilityFinder.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UPAbilitySet> PAbilityFinder(*AssetPath::DataAsset::DA_PAbilityIcons);
+
+	if(PAbilityFinder.Succeeded())
+	{
+		PAbilityIconDB = PAbilityFinder.Object;
+	}
+}
 
 TSoftObjectPtr<UTexture2D> UMyGameInstanceSubsystem::GetAAIconFromDB(EActiveAbilities AAbility)
 {
@@ -17,7 +36,7 @@ TSoftObjectPtr<UTexture2D> UMyGameInstanceSubsystem::GetAAIconFromDB(EActiveAbil
 		}
 	}
 	
-	RS_LOG_WARNING("Fail to find Active Ability Icon")
+	RS_LOG_WARNING(TEXT("Fail to find Active Ability Icon"))
 	return nullptr;
 }
 
@@ -31,6 +50,6 @@ TSoftObjectPtr<UTexture2D> UMyGameInstanceSubsystem::GetPAIconFromDB(EPassiveAbi
 		}
 	}
 
-	RS_LOG_WARNING("Fail to find Passive Ability Icon")
+	RS_LOG_WARNING(TEXT("Fail to find Passive Ability Icon"))
 	return nullptr;
 }

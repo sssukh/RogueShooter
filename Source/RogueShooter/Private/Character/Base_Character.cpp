@@ -270,6 +270,11 @@ void ABase_Character::RestoreHealth_Implementation(float amount)
 	S_RestoreHealth(amount);
 }
 
+USphereComponent* ABase_Character::GetAbilitySphere_Implementation()
+{
+	return AbilitySphere;
+}
+
 void ABase_Character::SetupHealthWidget_Implementation()
 {
 	// IInterface_CharacterManager::SetupHealthWidget_Implementation();
@@ -296,6 +301,8 @@ void ABase_Character::MC_UpdateHealthBar_Implementation(float percent)
 	}
 }
 
+// TODO : 블루프린트 식 pause가 구현되어 있다.
+// TODO : C++식 Pause를 구현해서 대체하자.
 void ABase_Character::S_Pause_Implementation(bool Pause, bool Override)
 {
 	if(Pause)

@@ -6,6 +6,7 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "MyGameInstanceSubsystem.generated.h"
 
+class UPAbilitySet;
 enum class EActiveAbilities : uint8;
 class UAAbilitySet;
 /**
@@ -16,8 +17,9 @@ class ROGUESHOOTER_API UMyGameInstanceSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 public:
-	UMyGameInstanceSubsystem();
 
+	UMyGameInstanceSubsystem();
+	
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Database")
 	TObjectPtr<UAAbilitySet> AAbilityIconDB;
 

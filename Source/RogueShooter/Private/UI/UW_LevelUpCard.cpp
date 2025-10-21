@@ -51,27 +51,14 @@ void UUW_LevelUpCard::ButtonOnClicked()
 		OnSelected.Broadcast(Type,AAbility,PAbility);
 }
 
-void UUW_LevelUpCard::LoadIconAsynchronous(const TSoftObjectPtr<UTexture2D>& IconToLoad)
+
+
+void UUW_LevelUpCard::OnIconLoaded_Internal(UObject* LoadedAsset)
 {
-	if(IconToLoad.IsNull())
+	if(LoadedAsset)
 	{
-		RS_LOG_WARNING("IconToLoad is Null")
-
-		return;
+		LoadedIcon = Cast<UTexture2D>(LoadedAsset);
+		Image_Icon->SetBrushFromTexture(LoadedIcon);
 	}
-
-	// UAssetManager는 스트리밍을 관리하는 싱글톤입니다.
-	UAssetManager& AssetManager = UAssetManager::Get();
-    
-	FStreamableManager& StreamableManager = AssetManager.Get().GetStreamableManager(); // 5.0 이후
-
-	// 비동기 로드를 요청합니다.
-	StreamableManager.RequestAsyncLoad(IconToLoad.ToSoftObjectPath(), FStreamableDelegate::CreateLambda(
-		// 로드가 완료되면 이 람다(Lambda) 함수가 실행됩니다.
-		[IconToLoad,this]()
-		{
-			LoadedIcon = IconToLoad.Get();
-			Image_Icon->SetBrushFromTexture(LoadedIcon);
-		}
-	));
+	// 스피너 아이콘 제거?
 }

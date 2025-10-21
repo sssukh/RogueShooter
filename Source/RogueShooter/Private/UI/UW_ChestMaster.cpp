@@ -12,6 +12,7 @@
 #include "Components/WidgetSwitcher.h"
 #include "Kismet/GameplayStatics.h"
 #include "RogueShooter/AssetPath.h"
+#include "System/Subsystem/UIAssetCacheSubsystem.h"
 #include "UI/UW_ChestItems.h"
 #include "Utility/RSLog.h"
 #include "UI/UW_LevelUpCard.h"
@@ -113,7 +114,7 @@ void UUW_ChestMaster::ResetLevelupItems()
 		OnReady.Broadcast();
 }
 
-void UUW_ChestMaster::AddSelection(FText Name, int32 Level, FText Desc, UTexture2D* Icon, EActiveAbilities AAbility,
+void UUW_ChestMaster::AddSelection(FText Name, int32 Level, FText Desc, TSoftObjectPtr<UTexture2D> Icon, EActiveAbilities AAbility,
                                    EPassiveAbilities PAbility, EAbilityType Type)
 {
 	if(UUW_LevelUpCard* LevelUpCard = CreateWidget<UUW_LevelUpCard>(GetOwningPlayer(),LevelUpCardClass))
@@ -121,7 +122,6 @@ void UUW_ChestMaster::AddSelection(FText Name, int32 Level, FText Desc, UTexture
 		LevelUpCard->Name = Name;
 		LevelUpCard->Level = Level;
 		LevelUpCard->Description = Desc;
-		LevelUpCard->Icon = Icon;
 		LevelUpCard->AAbility = AAbility;
 		LevelUpCard->PAbility = PAbility;
 		LevelUpCard->Type = Type;
@@ -129,5 +129,18 @@ void UUW_ChestMaster::AddSelection(FText Name, int32 Level, FText Desc, UTexture
 		UW_ChestItems->VerticalBox_Items->AddChildToVerticalBox(LevelUpCard);
 
 		LevelUpCard->Button->SetIsEnabled(false);
+
+		UGameInstance* GameInstance = GetGameInstance();
+		if(!GameInstance) return;
+
+		UUIAssetCacheSubsystem* AssetCache = GameInstance->GetSubsystem<UUIAssetCacheSubsystem>();
+
+		FOnAssetLoaded CardUICallback;
+
+		CardUICallback.AddDynamic(LevelUpCard,&UUW_LevelUpCard::OnIconLoaded_Internal);
+
+		// 애셋 요청 
+		AssetCache->RequestAsset(Icon,CardUICallback);
 	}
 }
+

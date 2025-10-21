@@ -7,10 +7,16 @@
 #include "Components/TextBlock.h"
 #include "Library/FunctionLibrary_Helper.h"
 #include "RogueShooter/RSEnumStruct.h"
+#include "System/Subsystem/UIAssetCacheSubsystem.h"
 #include "UI/UW_AbilityTile.h"
 
 UUW_PlayerHud::UUW_PlayerHud(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	static ConstructorHelpers::FClassFinder<UUW_AbilityTile> AbilityTileFinder(*AssetPath::Blueprint::WBP_AbilityTile_C);
+	if(AbilityTileFinder.Succeeded())
+	{
+		AbilityTileClass = AbilityTileFinder.Class;
+	}
 }
 
 void UUW_PlayerHud::NativeConstruct()
@@ -38,7 +44,18 @@ void UUW_PlayerHud::BuildHotbar(const TMap<EActiveAbilities, int32>& ActiveAbili
 
 		if(AbilityTile != nullptr)
 		{
-			AbilityTile->Icon = UFunctionLibrary_Helper::FindActiveIcon(GetWorld(),active);
+			UGameInstance* GameInstance = GetGameInstance();
+			if(!GameInstance) return;
+
+			UUIAssetCacheSubsystem* AssetCache = GameInstance->GetSubsystem<UUIAssetCacheSubsystem>();
+
+			FOnAssetLoaded CardUICallback;
+
+			CardUICallback.AddDynamic(AbilityTile,&UUW_AbilityTile::OnIconLoaded_Internal);
+
+			// 애셋 요청 
+			AssetCache->RequestAsset(UFunctionLibrary_Helper::FindActiveIcon(GetWorld(),active),CardUICallback);
+			
 			AbilityTile->Level = *ActiveAbilities.Find(active);
 
 			HorizontalBox_Active->AddChild(AbilityTile);
@@ -56,7 +73,18 @@ void UUW_PlayerHud::BuildHotbar(const TMap<EActiveAbilities, int32>& ActiveAbili
 
 		if(AbilityTile != nullptr)
 		{
-			AbilityTile->Icon = UFunctionLibrary_Helper::FindPassiveIcon(GetWorld(),passive);
+			UGameInstance* GameInstance = GetGameInstance();
+			if(!GameInstance) return;
+
+			UUIAssetCacheSubsystem* AssetCache = GameInstance->GetSubsystem<UUIAssetCacheSubsystem>();
+
+			FOnAssetLoaded CardUICallback;
+
+			CardUICallback.AddDynamic(AbilityTile,&UUW_AbilityTile::OnIconLoaded_Internal);
+
+			// 애셋 요청 
+			AssetCache->RequestAsset(UFunctionLibrary_Helper::FindPassiveIcon(GetWorld(),passive),CardUICallback);
+			
 			AbilityTile->Level = *PassiveAbilities.Find(passive);
 
 			HorizontalBox_Passives->AddChild(AbilityTile);

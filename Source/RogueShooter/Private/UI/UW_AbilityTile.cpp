@@ -15,11 +15,21 @@ void UUW_AbilityTile::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	if(Icon == nullptr)
+	if(LoadingIcon == nullptr)
 	{
 		RS_LOG_ERROR(TEXT("Icon이 설정되지 않았습니다."))
 	}
-	Image_Icon->SetBrushFromTexture(Icon,false);
+	if(LoadedIcon == nullptr)
+		Image_Icon->SetBrushFromTexture(LoadingIcon,false);
 
 	TextBlock_Level->SetText(FText::FromString(FString::Printf(TEXT("%d"),Level)));
+}
+
+void UUW_AbilityTile::OnIconLoaded_Internal(UObject* LoadedAsset)
+{
+	if(LoadedAsset)
+	{
+		LoadedIcon = Cast<UTexture2D>(LoadedAsset);
+		Image_Icon->SetBrushFromTexture(LoadedIcon);
+	}
 }

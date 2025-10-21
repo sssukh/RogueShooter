@@ -196,7 +196,9 @@ void AGameManager::AddXp(int32 XP)
 
 	CurrentXP = CurrentXP+XP;
 
-	UpdateCharactersXP(CurrentXP/NeededXP,Level);
+
+	
+	UpdateCharactersXP((float)CurrentXP/NeededXP,Level);
 
 	if(CurrentXP>=NeededXP)
 	{

@@ -484,7 +484,7 @@ void UAbilitiesComponent::PrepareFireball()
 		RS_LOG_ERROR(TEXT("User Character가 IInterface_CharacterManager를 상속받지 않았습니다."))
 		return;
 	}
-
+	// null이다? 왜?
 	USphereComponent* AbilitySphere = IInterface_CharacterManager::Execute_GetAbilitySphere(GetOwner());
 
 	TArray<FOverlapResult> OverlapResults;
@@ -511,7 +511,7 @@ void UAbilitiesComponent::PrepareFireball()
 	{
 		Actors.AddUnique(overlap.GetActor());
 	}
-	
+	// null이다. 왜?
 	ABase_Character* Char = IInterface_CharacterManager::Execute_GetCharacter(GetOwner());
 
 	AActor* LocNearestActor = UGameplayStatics::FindNearestActor(GetOwner()->GetActorLocation(),Actors,distance);
@@ -547,7 +547,7 @@ void UAbilitiesComponent::S_ExecuteFireball_Implementation(AActor* Target, ABase
 	FireballTransform.SetRotation((Target->GetActorLocation() - Character->GetActorLocation()).Rotation().Quaternion());
 	
 	if(AFireball_Projectile* Fireball = GetWorld()->SpawnActorDeferred<AFireball_Projectile>(FireballClass,FireballTransform
-		,nullptr,nullptr,ESpawnActorCollisionHandlingMethod::AlwaysSpawn))
+		,nullptr,Character,ESpawnActorCollisionHandlingMethod::AlwaysSpawn))
 	{
 		Fireball->Radius = Radius;
 		Fireball->Damage = Damage;

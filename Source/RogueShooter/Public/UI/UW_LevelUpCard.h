@@ -33,7 +33,7 @@ public:
 	void ButtonOnClicked();
 
 	UFUNCTION()
-	void LoadIconAsynchronous(const TSoftObjectPtr<UTexture2D>& IconToLoad);
+	void OnIconLoaded_Internal(UObject* LoadedAsset);
 	
 public:
 	UPROPERTY(BlueprintReadWrite, Category = "UW_LevelUpCard | Designer", meta = (BindWidget))

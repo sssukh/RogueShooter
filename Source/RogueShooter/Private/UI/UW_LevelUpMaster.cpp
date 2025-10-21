@@ -9,6 +9,7 @@
 #include "Components/WidgetSwitcher.h"
 #include "Kismet/GameplayStatics.h"
 #include "RogueShooter/AssetPath.h"
+#include "System/Subsystem/UIAssetCacheSubsystem.h"
 #include "UI/UW_LevelUpCard.h"
 #include "UI/UW_LevelUpItems.h"
 #include "Utility/RSLog.h"
@@ -34,6 +35,12 @@ UUW_LevelUpMaster::UUW_LevelUpMaster(const FObjectInitializer& ObjectInitializer
 	if(ChestGoldSoundFinder.Succeeded())
 	{
 		ChestGoldSound = ChestGoldSoundFinder.Object;
+	}
+
+	static ConstructorHelpers::FClassFinder<UUW_LevelUpCard> LevelupCardFinder(*AssetPath::Blueprint::WBP_LevelUpCard_C);
+	if(LevelupCardFinder.Succeeded())
+	{
+		LevelUpCardClass = LevelupCardFinder.Class;
 	}
 }
 
@@ -79,6 +86,7 @@ void UUW_LevelUpMaster::SetReference()
 void UUW_LevelUpMaster::AddSelection(FText Name, int32 Level, FText Desc, TSoftObjectPtr<UTexture2D> Icon, EActiveAbilities AAbility,
 	EPassiveAbilities PAbility, EAbilityType Type)
 {
+	// assetPath에 levelupCard 클래스 추가할것.
 	if(UUW_LevelUpCard* LevelUpCard = CreateWidget<UUW_LevelUpCard>(GetOwningPlayer(),LevelUpCardClass))
 	{
 		LevelUpCard->Name = Name;
@@ -92,7 +100,17 @@ void UUW_LevelUpMaster::AddSelection(FText Name, int32 Level, FText Desc, TSoftO
 
 		LevelUpCard->OnSelected.AddDynamic(this,&UUW_LevelUpMaster::Close);
 
-		LevelUpCard->LoadIconAsynchronous(Icon);
+		UGameInstance* GameInstance = GetGameInstance();
+		if(!GameInstance) return;
+
+		UUIAssetCacheSubsystem* AssetCache = GameInstance->GetSubsystem<UUIAssetCacheSubsystem>();
+
+		FOnAssetLoaded CardUICallback;
+
+		CardUICallback.AddDynamic(LevelUpCard,&UUW_LevelUpCard::OnIconLoaded_Internal);
+
+		// 애셋 요청 
+		AssetCache->RequestAsset(Icon,CardUICallback);
 	}
 
 }

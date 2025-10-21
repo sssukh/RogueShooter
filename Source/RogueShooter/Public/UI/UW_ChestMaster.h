@@ -46,8 +46,7 @@ public:
 
 	void ResetLevelupItems();
 
-	void AddSelection(FText Name,int32 Level, FText Desc, UTexture2D* Icon, EActiveAbilities AAbility, EPassiveAbilities PAbility, EAbilityType Type);
-
+	void AddSelection(FText Name,int32 Level, FText Desc, TSoftObjectPtr<UTexture2D> Icon, EActiveAbilities AAbility, EPassiveAbilities PAbility, EAbilityType Type);
 public:
 	UPROPERTY(BlueprintReadWrite)
 	TObjectPtr<ABase_Character> AsBaseCharacter;
