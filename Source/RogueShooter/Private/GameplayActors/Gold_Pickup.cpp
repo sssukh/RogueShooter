@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "RogueShooter/AssetPath.h"
+#include "System/Base_PlayerState.h"
 #include "Utility/RSLog.h"
 
 
@@ -66,9 +67,9 @@ void AGold_Pickup::DoPickupAction(AActor* Character)
 {
 	Super::DoPickupAction(Character);
 
-	if(Character->GetInstigatorController()->GetClass()->ImplementsInterface(UInterface_PlayerState::StaticClass()))
+	if(Character->GetInstigatorController()->GetPlayerState<ABase_PlayerState>()->GetClass()->ImplementsInterface(UInterface_PlayerState::StaticClass()))
 	{
-		IInterface_PlayerState::Execute_OnGoldPickUp(Character->GetInstigatorController(),GoldAmount);
+		IInterface_PlayerState::Execute_OnGoldPickUp(Character->GetInstigatorController()->GetPlayerState<ABase_PlayerState>(),GoldAmount);
 	}
 	else
 	{

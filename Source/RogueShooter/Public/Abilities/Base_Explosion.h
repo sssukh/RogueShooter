@@ -35,7 +35,7 @@ public:
 	// EDrawDebugTrace::Type DrawDebugType;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta = (ExposeOnSpawn = "true"))
-	float Damage;
+	float Damage = 1.0f;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta = (ExposeOnSpawn = "true"))
 	TObjectPtr<UParticleSystem> DamageVFX;

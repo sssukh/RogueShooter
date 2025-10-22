@@ -81,4 +81,6 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="UW_LevelUpCard | Member")
 	TObjectPtr<UTexture2D> LoadedIcon;
+
+	bool bIsLoaded = false;
 };

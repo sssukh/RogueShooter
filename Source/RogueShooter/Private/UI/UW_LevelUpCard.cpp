@@ -21,7 +21,7 @@ void UUW_LevelUpCard::NativeConstruct()
 	Button->OnClicked.AddDynamic(this,&UUW_LevelUpCard::ButtonOnClicked);
 
 	// 아직 로드가 안되었다면 로딩중 이미지 설정 
-	if(LoadedIcon == nullptr)
+	if(!bIsLoaded)
 		Image_Icon->SetBrushFromTexture(LoadingIcon);
 
 	TextBlock_Name->SetText(Name);
@@ -57,8 +57,8 @@ void UUW_LevelUpCard::OnIconLoaded_Internal(UObject* LoadedAsset)
 {
 	if(LoadedAsset)
 	{
-		LoadedIcon = Cast<UTexture2D>(LoadedAsset);
-		Image_Icon->SetBrushFromTexture(LoadedIcon);
+		bIsLoaded = true;
+		Image_Icon->SetBrushFromTexture(Cast<UTexture2D>(LoadedAsset));
 	}
 	// 스피너 아이콘 제거?
 }

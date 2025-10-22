@@ -43,7 +43,6 @@ public:
 	UFUNCTION(Category = "On Overlap Event")
 	void OuterSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	void SoulHomingToPlayer();
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Soul | Component")
 	TObjectPtr<USceneComponent> DefaultSceneRoot;
@@ -57,9 +56,6 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Soul | Component")
 	TObjectPtr<UParticleSystemComponent> ParticleSystemComponent;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Soul | Component")
-	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
-	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Soul | Component")
 	TObjectPtr<AActor> OtherActor;
 
@@ -81,6 +77,10 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<UParticleSystem> EmitterTemplate;
 
-	FVector Destination;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Soul | Setting")
+	float FollowingSpeed = 6.0f;
 	
+	FVector Destination;
+
+	bool bIsFollowing = false;
 };

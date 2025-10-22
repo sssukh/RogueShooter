@@ -30,6 +30,7 @@ public:
 	void OC_Save();
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
 public:
 	// Interface
 

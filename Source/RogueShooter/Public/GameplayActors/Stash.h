@@ -42,16 +42,16 @@ public:
 	// If Stash is damaged - give item and hide actor until reset time hits
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 public:
-	UPROPERTY(BlueprintReadWrite,Category="Stash | Component")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Stash | Component")
 	TObjectPtr<USphereComponent> Sphere;
 
-	UPROPERTY(BlueprintReadWrite,Category="Stash | Component")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Stash | Component")
 	TObjectPtr<UStaticMeshComponent> StaticMesh;
 
-	UPROPERTY(BlueprintReadWrite,Category="Stash | Default")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Stash | Default")
 	float StashResetTime = 30.0f;
 
-	UPROPERTY(BlueprintReadWrite,Category="Stash | Default")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Stash | Default")
 	TArray<TSubclassOf<ABase_Pickup>> PossibleItemsToSpawn;
 
 	FDoOnce DoOnce;

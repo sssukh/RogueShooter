@@ -309,6 +309,8 @@ void ABase_Character::S_Pause_Implementation(bool Pause, bool Override)
 	{
 		MC_Pause(Pause);
 
+		AbilityComponent->PauseAbilities();
+		
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(),0.0001f);
 
 		AGameModeBase* GameMode = UGameplayStatics::GetGameMode(GetWorld());
@@ -336,6 +338,8 @@ void ABase_Character::S_Pause_Implementation(bool Pause, bool Override)
 
 		MC_Pause(Pause);
 
+		AbilityComponent->UnPauseAbilities();
+		
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(),1.0f);
 
 		BaseGameMode->GameIsPaused = false;

@@ -39,4 +39,6 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<UTexture2D> LoadedIcon;
+
+	bool bIsLoaded = false;
 };

@@ -55,16 +55,6 @@ ASoul::ASoul()
 	}
 
 	ParticleSystemComponent->SetAutoActivate(true);
-
-	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovement");
-
-	ProjectileMovement->InitialSpeed = 0.0f;
-
-	ProjectileMovement->MaxSpeed = 1500.0f;
-
-	ProjectileMovement->ProjectileGravityScale = 0.0f;
-
-	ProjectileMovement->bIsHomingProjectile = false;
 	
 	// 구조 설정 
 	SetRootComponent(Sphere);
@@ -83,6 +73,8 @@ void ASoul::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SetActorTickEnabled(false);
+	
 	// sphere component에 바인드
 	Sphere->OnComponentBeginOverlap.AddDynamic(this,&ASoul::OuterSphereBeginOverlap);
 
@@ -95,6 +87,14 @@ void ASoul::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if(bIsFollowing && OtherActor)
+	{
+		FVector TargetLocation = OtherActor->GetActorLocation();
+
+		FVector NewLocation = FMath::VInterpTo(GetActorLocation(),TargetLocation,DeltaTime,FollowingSpeed);
+
+		SetActorLocation(NewLocation);
+	}
 }
 
 void ASoul::AddXP()
@@ -132,16 +132,13 @@ void ASoul::OuterSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 		
 		this->OtherActor = pOtherActor;
 
-		SoulHomingToPlayer();
+		bIsFollowing = true;
+
+		SetActorTickEnabled(true);
 	}
 
 }
 
 
-void ASoul::SoulHomingToPlayer()
-{
-	ProjectileMovement->bIsHomingProjectile = true;
 
-	ProjectileMovement->HomingTargetComponent = OtherActor->GetRootComponent();
-}
 

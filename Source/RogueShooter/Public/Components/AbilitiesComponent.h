@@ -125,6 +125,10 @@ public:
 	
 	UFUNCTION()
 	float CalcAbilityDamageWithCrit(float weight, EActiveAbilities ActiveAbility,float BaseDamage);
+
+	void PauseAbilities();
+
+	void UnPauseAbilities();
 	
 public:
 	// Ability
@@ -173,7 +177,7 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent | Actives")
 	float FireballRadius = 150.0f;
-
+	
 	// Abilities
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "AbilitiesComponent")
 	TMap<EActiveAbilities,int32> ActiveAbilitiesMap;

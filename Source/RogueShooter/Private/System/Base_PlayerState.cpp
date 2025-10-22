@@ -26,6 +26,8 @@ void ABase_PlayerState::OC_GoldPickUp_Implementation(int32 Amount)
 	// For UI
 	GoldCount = GoldCount+Amount;
 
+	if(HasAuthority())
+	
 	// For Save
 	TempGold = TempGold + Amount;
 
@@ -47,6 +49,9 @@ void ABase_PlayerState::OnGoldPickUp_Implementation(int32 Amount)
 {
 	// IInterface_PlayerState::OnGoldPickUp_Implementation(Amount);
 	OC_GoldPickUp(Amount);
+
+	if(HasAuthority())
+		OnRep_GoldCount();
 }
 
 void ABase_PlayerState::OC_Save_Implementation()

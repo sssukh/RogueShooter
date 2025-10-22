@@ -621,7 +621,7 @@ void AGameplay_PlayerController::ProcessLevelUp(EAbilityType Type, EActiveAbilit
 	LevelUpHudUp = false;
 
 	// Reset UI & Unpause
-	if(ChestHudUp)
+	if(!ChestHudUp)
 	{
 		PreparingUI = false;
 

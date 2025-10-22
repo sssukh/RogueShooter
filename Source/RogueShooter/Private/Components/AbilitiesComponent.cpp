@@ -466,7 +466,7 @@ void UAbilitiesComponent::GrantFireball(bool Cast)
 		RS_LOG_ERROR(TEXT("바운드 실패"))
 	}
 	FTimerHandle FireballTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(FireballTimerHandle,FireBallDelegate,CalculateTimerMode(FireballTimer),true);
+	GetWorld()->GetTimerManager().SetTimer(FireballTimerHandle,FireBallDelegate,/*CalculateTimerMode(FireballTimer)*/2.0f,true);
 
 	ActiveTimers.AddUnique(FireballTimerHandle);
 
@@ -518,6 +518,9 @@ void UAbilitiesComponent::PrepareFireball()
 
 	S_ExecuteFireball_Implementation(LocNearestActor,Char,CalculateBonusDamage(FireballDamage),FireballRadius);
 
+	if(!CheckEvoActive(EActiveAbilities::Fireball))
+		return;
+	
 	if(!FireballFlipflop.Flip())
 		return;
 	
@@ -832,6 +835,24 @@ float UAbilitiesComponent::CalcAbilityDamageWithCrit(float weight, EActiveAbilit
 	// 크리 터지면 2배
 
 	return weight>=FMath::FRandRange(0.0f,1.0f)? 2.0f*CalculatedDmg:CalculatedDmg;
+}
+
+void UAbilitiesComponent::PauseAbilities()
+{
+	for(const FTimerHandle& AbilityTimers : ActiveTimers)
+	{
+		if(AbilityTimers.IsValid())
+			GetWorld()->GetTimerManager().PauseTimer(AbilityTimers);
+	}
+}
+
+void UAbilitiesComponent::UnPauseAbilities()
+{
+	for(const FTimerHandle& AbilityTimers : ActiveTimers)
+	{
+		if(AbilityTimers.IsValid())
+			GetWorld()->GetTimerManager().UnPauseTimer(AbilityTimers);
+	}
 }
 
 void UAbilitiesComponent::MC_Hammer_Implementation(float Radius)

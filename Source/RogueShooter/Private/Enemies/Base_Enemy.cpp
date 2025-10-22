@@ -280,7 +280,9 @@ void ABase_Enemy::EnemyDeath()
 		{
 			bIsDead =  true;
 
-			// On Death 호출
+			if(OnDeath.IsBound())
+				OnDeath.Broadcast();
+			
 			SpawnSoul();
 
 			GetCharacterMovement()->StopMovementImmediately();

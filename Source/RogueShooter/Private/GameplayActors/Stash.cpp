@@ -7,6 +7,8 @@
 #include "Components/SphereComponent.h"
 #include "RogueShooter/AssetPath.h"
 #include "GameplayActors/Base_Pickup.h"
+#include "GameplayActors/Gold_Pickup.h"
+#include "GameplayActors/Health_Pickup.h"
 #include "Utility/RSCollisionChannel.h"
 
 
@@ -43,13 +45,24 @@ AStash::AStash()
 	Sphere->SetupAttachment(StaticMesh);
 	
 	DoOnce.Reset();
+
+	static ConstructorHelpers::FClassFinder<AHealth_Pickup> HealthPickupFinder(*AssetPath::Blueprint::BP_HealthPickup_C);
+	if(HealthPickupFinder.Succeeded())
+	{
+		PossibleItemsToSpawn.Add(HealthPickupFinder.Class);
+	}
+
+	static ConstructorHelpers::FClassFinder<AGold_Pickup> GoldPickupFinder(*AssetPath::Blueprint::BP_GoldPickup_C);
+	if(GoldPickupFinder.Succeeded())
+	{
+		PossibleItemsToSpawn.Add(GoldPickupFinder.Class);
+	}
 }
 
 // Called when the game starts or when spawned
 void AStash::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
