@@ -231,7 +231,7 @@ void UAbilitiesComponent::S_ExecuteHammer_Implementation(const TArray<FHitResult
 
 void UAbilitiesComponent::LevelUpFrostBolt()
 {
-	switch(LevelUpActive(EActiveAbilities::Frost_Bolt))
+	switch(LevelUpActive(EActiveAbilities::FrostBolt))
 	{
 	case 1:
 		GrantFrostBolt(true);
@@ -247,7 +247,7 @@ void UAbilitiesComponent::LevelUpFrostBolt()
 		break;
 	case 5:
 		++FBFireCount;
-		EvolutionMap.Add(EActiveAbilities::Frost_Bolt,EPassiveAbilities::Health_Bonus);
+		EvolutionMap.Add(EActiveAbilities::FrostBolt,EPassiveAbilities::Health_Bonus);
 		break;
 	default:
 		break;
@@ -753,7 +753,7 @@ void UAbilitiesComponent::RefreshAbilities()
 		case EActiveAbilities::Hammer:
 			GrantHammer(false);
 			break;
-		case EActiveAbilities::Frost_Bolt:
+		case EActiveAbilities::FrostBolt:
 			GrantFrostBolt(false);
 			break;
 		case EActiveAbilities::Lightning:
@@ -785,7 +785,7 @@ void UAbilitiesComponent::SetStartingAbility()
 	case EActiveAbilities::Hammer:
 		LevelUpHammer();
 		break;
-	case EActiveAbilities::Frost_Bolt:
+	case EActiveAbilities::FrostBolt:
 		LevelUpFrostBolt();
 		break;
 	case EActiveAbilities::Lightning:

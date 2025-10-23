@@ -114,6 +114,7 @@ namespace AssetPath
 		const FString WBP_LobbyMenu_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/UWB_LobbyMenu.UWB_LobbyMenu_C'");
 		const FString WBP_MainMenu_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/UWB_MainMenu.UWB_MainMenu_C'");
 		const FString WBP_AbilityTile_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/UWB_AbilityTile.UWB_AbilityTile_C'");
+		const FString WBP_Debug_C = TEXT("WidgetBlueprint'/Game/RogueShooter/Widgets/UWB_Debug.UWB_Debug_C'");
 	}
 	namespace Montage
 	{

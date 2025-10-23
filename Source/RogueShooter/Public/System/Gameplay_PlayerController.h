@@ -7,6 +7,7 @@
 #include "Interface/Interface_ControllerManager.h"
 #include "Gameplay_PlayerController.generated.h"
 
+class UMyCheatManager;
 class UUW_MatchResults;
 class UUW_PlayerHud;
 class UUW_LevelUpMaster;
@@ -286,4 +287,6 @@ public:
 	TSubclassOf<UUW_MatchResults> MatchResultClass;
 
 	TSubclassOf<UUW_ChestMaster> ChestMasterClass;
+
+	
 };

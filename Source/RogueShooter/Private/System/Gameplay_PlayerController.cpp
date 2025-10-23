@@ -18,6 +18,7 @@
 #include "UI/UW_LevelUpMaster.h"
 #include "UI/UW_PlayerHud.h"
 #include "UI/UW_MatchResults.h"
+#include "Utility/MyCheatManager.h"
 #include "Utility/RSLog.h"
 
 AGameplay_PlayerController::AGameplay_PlayerController()
@@ -62,6 +63,8 @@ AGameplay_PlayerController::AGameplay_PlayerController()
 	static ConstructorHelpers::FClassFinder<UUW_ChestMaster> ChestMasterClassFinder(*AssetPath::Blueprint::WBP_ChestMaster_C);
 	if(ChestMasterClassFinder.Succeeded())
 		ChestMasterClass = ChestMasterClassFinder.Class;
+
+	CheatClass = UMyCheatManager::StaticClass();
 }
 
 void AGameplay_PlayerController::BeginPlay()
@@ -373,17 +376,29 @@ void AGameplay_PlayerController::ExecuteLevelUp()
 		CanAddPassiveAbility = false;
 
 	// Run loop until we hit our desired cards or cannot add passive/active skill
-	while(CardCount<MaxCount && (CanAddActiveAbility || CanAddPassiveAbility))
+	while(CardCount<=MaxCount && (CanAddActiveAbility || CanAddPassiveAbility))
 	{
 		// Random bool to determine active or passive and failsafe incase one is not allowed
-		++CardCount;
+		// ++CardCount;
 
 		// TODO : weight에 따라 active나 passive를 우선적으로 추가하는 순서를 설정하도록 해야겠다.
 		// weight에 따라 Active를 우선적으로 추가할수도 Passive를 우선적으로 추가할수도 있다.
-		// if(0.5f <= FMath::RandRange(0.0f,1.0f))
+		bool ActiveFirst = true;
+
+		float weight = FMath::RandRange(0.0f,1.0f);
+		if(0.5f <= weight)
 		{
-			if(CanAddActiveAbility)
+			// RS_LOG_SCREEN(TEXT("weight is %f"),weight)
+			ActiveFirst = false;
+		}
+		// else
+		// {
+		// 	RS_LOG_SCREEN(TEXT("weight is %f"),weight)
+		// }
+		{
+			if(CanAddActiveAbility && ActiveFirst)
 			{
+				
 				// Remove from local array so we do not have duplicate
 				EActiveAbilities ActiveAbility = AvailableActiveAbilities[FMath::RandRange(0,AvailableActiveAbilities.Num()-1)];
 
@@ -402,13 +417,15 @@ void AGameplay_PlayerController::ExecuteLevelUp()
 						level = *findLevel;
 
 					++level;
-					
-					const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE,TEXT("EActiveAbilities"), true);
 					FString NameString;
-					if(EnumPtr)
+					
+					// const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE,TEXT("EActiveAbilities"), true);
+					if(const UEnum* EnumPtr = StaticEnum<EActiveAbilities>())
 					{
 						NameString = EnumPtr->GetNameStringByValue(static_cast<int64>(ActiveAbility));
 					}
+					RS_LOG_SCREEN(TEXT("Name : %s,  NameString : %s"),*Name.ToString(),*NameString)
+
 					if(Name.ToString() == NameString.Append(FString::Printf(TEXT("%d"),level)))
 					{
 						FAbilityLevelUp* AbilityLevelUp = DT_ActiveAbilities->FindRow<FAbilityLevelUp>(Name,TEXT("DT_ActiveAbilities"));
@@ -420,13 +437,16 @@ void AGameplay_PlayerController::ExecuteLevelUp()
 								UFunctionLibrary_Helper::FindActiveIcon(GetWorld(),ActiveAbility),
 								ActiveAbility,EPassiveAbilities::Ability_Bonus_Damage,EAbilityType::Active);
 
+							++CardCount;
+
 							break;
 						}
 					}
 				}
 			}
-			else
+			else if(CanAddPassiveAbility && ActiveFirst)
 			{
+				
 				EPassiveAbilities PassiveAbility = AvailablePassiveAbilities[FMath::RandRange(0,AvailablePassiveAbilities.Num()-1)];
 
 				AvailablePassiveAbilities.Remove(PassiveAbility);
@@ -437,13 +457,16 @@ void AGameplay_PlayerController::ExecuteLevelUp()
 
 				for(const FName& Name : PAbilityNames)
 				{
-					const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE,TEXT("EPassiveAbilities"), true);
-					FString NameString;
-					if(EnumPtr)
+					FString NameString; 
+					
+					// const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE,TEXT("EPassiveAbilities"), true);
+
+					if(const UEnum* EnumPtr = StaticEnum<EPassiveAbilities>())
 					{
 						NameString = EnumPtr->GetNameStringByValue(static_cast<int64>(PassiveAbility));
 					}
-
+					
+					RS_LOG_SCREEN(TEXT("Name : %s,  NameString : %s"),*Name.ToString(),*NameString)
 					if(Name.ToString() == NameString)
 					{
 						FAbilityLevelUp* AbilityLevelUp = DT_PassiveAbilities->FindRow<FAbilityLevelUp>(Name,TEXT("DT_PassiveAbilities"));
@@ -459,6 +482,8 @@ void AGameplay_PlayerController::ExecuteLevelUp()
 
 							LevelUpUI->AddSelection(FText::FromString(NameString),level,AbilityLevelUp->LevelUpText,
 								UFunctionLibrary_Helper::FindPassiveIcon(GetWorld(),PassiveAbility),EActiveAbilities::Hammer,PassiveAbility,EAbilityType::Passive);
+
+							++CardCount;
 
 							break;
 						}
@@ -913,7 +938,7 @@ void AGameplay_PlayerController::ActivateEvolution(EActiveAbilities Evo)
 	AbilityComponent->EvolutionTracker[(int32)Evo] = true;
 
 	// Do Specific logic here that can't be handled in ability preparation
-	if(Evo == EActiveAbilities::Frost_Bolt)
+	if(Evo == EActiveAbilities::FrostBolt)
 	{
 		AbilityComponent->FBTimer = 0.2f;
 	}
@@ -935,7 +960,7 @@ void AGameplay_PlayerController::AssignAbility(EAbilityType Type, EPassiveAbilit
 		case EActiveAbilities::Lightning:
 			AbilityComponent->LevelUpLightning();
 			break;
-		case EActiveAbilities::Frost_Bolt:
+		case EActiveAbilities::FrostBolt:
 			AbilityComponent->LevelUpFrostBolt();
 			break;
 	default :

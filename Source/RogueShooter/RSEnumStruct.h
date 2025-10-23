@@ -12,7 +12,7 @@ UENUM(BlueprintType)
 enum class EActiveAbilities : uint8
 {
 	Hammer,
-	Frost_Bolt,
+	FrostBolt,
 	Lightning,
 	Fireball,
 	MAX
