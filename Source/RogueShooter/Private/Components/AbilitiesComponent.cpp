@@ -95,6 +95,8 @@ UAbilitiesComponent::UAbilitiesComponent(const FObjectInitializer& ObjectInitial
 	{
 		FireballClass = FireballClassFinder.Class;
 	}
+
+	EvolutionTracker.SetNum((int32)EActiveAbilities::MAX);
 }
 
 
@@ -125,6 +127,7 @@ void UAbilitiesComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+	time += DeltaTime;
 }
 
 void UAbilitiesComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -186,13 +189,15 @@ void UAbilitiesComponent::GrantHammer(bool Cast)
 	{
 		RS_LOG_ERROR(TEXT("바운드 실패"))
 	}
+
+	int32 NewHandleIndex = ActiveTimers.Add(FTimerHandle());
 	
-	FTimerHandle HammerTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(HammerTimerHandle, HammerDelegate,CalculateTimerMode(HammerTimer),true);
+	// FTimerHandle HammerTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(ActiveTimers[NewHandleIndex], HammerDelegate,CalculateTimerMode(HammerTimer),true);
 
 	
 	
-	ActiveTimers.AddUnique(HammerTimerHandle);
+	// ActiveTimers.AddUnique(HammerTimerHandle);
 
 	if(Cast)
 		PrepareHammer();
@@ -200,6 +205,8 @@ void UAbilitiesComponent::GrantHammer(bool Cast)
 
 void UAbilitiesComponent::PrepareHammer()
 {
+	RS_LOG_SCREEN(TEXT("Hammer activated %f"),time)
+	
 	TArray<FHitResult> OutHits;
 	
 	FVector ActorLocation = GetOwner()->GetActorLocation();
@@ -741,6 +748,10 @@ void UAbilitiesComponent::LevelUpSpeedBonus(bool PowerUp)
 
 void UAbilitiesComponent::RefreshAbilities()
 {
+	for(FTimerHandle TimerHandle : ActiveTimers)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+	}
 	ActiveTimers.Empty();
 
 	TArray<EActiveAbilities> ActiveAbilities;

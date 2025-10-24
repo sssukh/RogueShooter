@@ -376,7 +376,7 @@ void AGameplay_PlayerController::ExecuteLevelUp()
 		CanAddPassiveAbility = false;
 
 	// Run loop until we hit our desired cards or cannot add passive/active skill
-	while(CardCount<=MaxCount && (CanAddActiveAbility || CanAddPassiveAbility))
+	while(CardCount<MaxCount && (CanAddActiveAbility || CanAddPassiveAbility))
 	{
 		// Random bool to determine active or passive and failsafe incase one is not allowed
 		// ++CardCount;
@@ -388,13 +388,9 @@ void AGameplay_PlayerController::ExecuteLevelUp()
 		float weight = FMath::RandRange(0.0f,1.0f);
 		if(0.5f <= weight)
 		{
-			// RS_LOG_SCREEN(TEXT("weight is %f"),weight)
 			ActiveFirst = false;
 		}
-		// else
-		// {
-		// 	RS_LOG_SCREEN(TEXT("weight is %f"),weight)
-		// }
+		
 		{
 			if(CanAddActiveAbility && ActiveFirst)
 			{
@@ -424,7 +420,7 @@ void AGameplay_PlayerController::ExecuteLevelUp()
 					{
 						NameString = EnumPtr->GetNameStringByValue(static_cast<int64>(ActiveAbility));
 					}
-					RS_LOG_SCREEN(TEXT("Name : %s,  NameString : %s"),*Name.ToString(),*NameString)
+					// RS_LOG_SCREEN(TEXT("Name : %s,  NameString : %s"),*Name.ToString(),*NameString)
 
 					if(Name.ToString() == NameString.Append(FString::Printf(TEXT("%d"),level)))
 					{
@@ -444,7 +440,7 @@ void AGameplay_PlayerController::ExecuteLevelUp()
 					}
 				}
 			}
-			else if(CanAddPassiveAbility && ActiveFirst)
+			else if(CanAddPassiveAbility && !ActiveFirst)
 			{
 				
 				EPassiveAbilities PassiveAbility = AvailablePassiveAbilities[FMath::RandRange(0,AvailablePassiveAbilities.Num()-1)];
@@ -466,7 +462,7 @@ void AGameplay_PlayerController::ExecuteLevelUp()
 						NameString = EnumPtr->GetNameStringByValue(static_cast<int64>(PassiveAbility));
 					}
 					
-					RS_LOG_SCREEN(TEXT("Name : %s,  NameString : %s"),*Name.ToString(),*NameString)
+					// RS_LOG_SCREEN(TEXT("Name : %s,  NameString : %s"),*Name.ToString(),*NameString)
 					if(Name.ToString() == NameString)
 					{
 						FAbilityLevelUp* AbilityLevelUp = DT_PassiveAbilities->FindRow<FAbilityLevelUp>(Name,TEXT("DT_PassiveAbilities"));

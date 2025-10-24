@@ -8,6 +8,10 @@
 #include "EnvironmentQuery/EnvQueryTypes.h"
 #include "MyGameManager.generated.h"
 
+struct FEnemySpawns;
+struct FEnemySpawnType;
+class AGameplay_PlayerController;
+class ABase_Character;
 class UEnvQueryInstanceBlueprintWrapper;
 /**
  * 

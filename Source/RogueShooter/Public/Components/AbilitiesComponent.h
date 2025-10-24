@@ -253,5 +253,5 @@ public:
 
 	FFlipflop FireballFlipflop;
 
-	
+	float time = 0;
 };

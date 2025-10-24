@@ -3,6 +3,7 @@
 
 #include "Utility/MyCheatManager.h"
 
+#include "Kismet/GameplayStatics.h"
 #include "System/GameManager.h"
 #include "Utility/RSLog.h"
 
@@ -10,7 +11,8 @@
 
 void UMyCheatManager::Debug_Levelup()
 {
-	if(GameManager)
+	
+	if(AGameManager* GameManager = Cast<AGameManager>(UGameplayStatics::GetActorOfClass(GetWorld(),AGameManager::StaticClass())))
 	{
 		RS_LOG_SCREEN(TEXT("Cheat Manager : LevelUp"))
 		GameManager->PrepareLevelUp();

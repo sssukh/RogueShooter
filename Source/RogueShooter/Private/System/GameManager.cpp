@@ -601,7 +601,7 @@ void AGameManager::OnRep_GameTime()
 	APlayerController* Controller = UGameplayStatics::GetPlayerController(GetWorld(),0);
 	if(Controller->GetClass()->ImplementsInterface(UInterface_ControllerManager::StaticClass()))
 	{
-		RS_LOG_SCREEN(TEXT("OnRep_GameTime Called. Value is %s"),*GameTime.ToString());
+		// RS_LOG_SCREEN(TEXT("OnRep_GameTime Called. Value is %s"),*GameTime.ToString());
 		IInterface_ControllerManager::Execute_UpdateTime(Controller,GameTime);
 	}
 	else

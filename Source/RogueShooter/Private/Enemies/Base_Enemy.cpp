@@ -190,8 +190,9 @@ void ABase_Enemy::AttackSphereBeginOverlap(UPrimitiveComponent* OverlappedCompon
 		DamagePlayerTimerReference,
 		DamageSphereOverlapDelegate,
 		1.0f,
-		false);
-	
+		true);
+
+	DamagePlayer();
 }
 
 void ABase_Enemy::AttackSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -291,7 +292,7 @@ void ABase_Enemy::EnemyDeath()
 
 			if(AIController)
 			{
-				RS_LOG_SCREEN(TEXT("%s is Dead on Server"),*GetName())
+				// RS_LOG_SCREEN(TEXT("%s is Dead on Server"),*GetName())
 				
 				AIController->StopMovement();
 

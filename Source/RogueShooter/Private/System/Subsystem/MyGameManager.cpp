@@ -14,38 +14,42 @@
 #include "System/Base_GameMode.h"
 #include "System/Gameplay_PlayerController.h"
 #include "Utility/RSLog.h"
+#include "Character/Base_Character.h"
+#include "Components/AbilitiesComponent.h"
+#include "GameFramework/GameStateBase.h"
+#include "GameFramework/PlayerState.h"
 
 UMyGameManager::UMyGameManager()
 {
-	static ConstructorHelpers::FObjectFinder<UDataTable> EnemySpawnDTFinder(*AssetPath::DataTable::DT_EnemySpawns);
-	if(EnemySpawnDTFinder.Succeeded())
-		EnemySpawnDT = EnemySpawnDTFinder.Object;
+	// static ConstructorHelpers::FObjectFinder<UDataTable> EnemySpawnDTFinder(*AssetPath::DataTable::DT_EnemySpawns);
+	// if(EnemySpawnDTFinder.Succeeded())
+	// 	EnemySpawnDT = EnemySpawnDTFinder.Object;
+	//
+	// static ConstructorHelpers::FObjectFinder<UDataTable> EnemyEliteSpawnDTFinder(*AssetPath::DataTable::DT_EnemyEliteSpawns);
+	// if(EnemyEliteSpawnDTFinder.Succeeded())
+	// 	EnemyEliteSpawnDT = EnemyEliteSpawnDTFinder.Object;
 
-	static ConstructorHelpers::FObjectFinder<UDataTable> EnemyEliteSpawnDTFinder(*AssetPath::DataTable::DT_EnemyEliteSpawns);
-	if(EnemyEliteSpawnDTFinder.Succeeded())
-		EnemyEliteSpawnDT = EnemyEliteSpawnDTFinder.Object;
+	// static ConstructorHelpers::FObjectFinder<UEnvQuery> EQS_FSPFinder(*AssetPath::AI::EQS_FSP);
+	// if(EQS_FSPFinder.Succeeded())
+	// 	EQS_FindSpawnPoint = EQS_FSPFinder.Object;
 
-	static ConstructorHelpers::FObjectFinder<UEnvQuery> EQS_FSPFinder(*AssetPath::AI::EQS_FSP);
-	if(EQS_FSPFinder.Succeeded())
-		EQS_FindSpawnPoint = EQS_FSPFinder.Object;
-
-	bReplicates = true;
+	// bReplicates = true;
 }
 
 void UMyGameManager::Initialize()
 {
-	if(HasAuthority())
-	{
-		FTimerHandle Delay;
-		GetWorldTimerManager().SetTimer(Delay,FTimerDelegate::CreateLambda([&]()
-		{
-			GameSetup();
-
-			SpawnSetup();
-		}),
-		2.0f,
-		false);
-	}
+	// if(HasAuthority())
+	// {
+	// 	FTimerHandle Delay;
+	// 	GetWorld()->GetTimerManager().SetTimer(Delay,FTimerDelegate::CreateLambda([&]()
+	// 	{
+	// 		GameSetup();
+	//
+	// 		SpawnSetup();
+	// 	}),
+	// 	2.0f,
+	// 	false);
+	// }
 }
 
 void UMyGameManager::UpdateCharactersXP(float pPercent, int32 pLevel)
@@ -252,6 +256,7 @@ void UMyGameManager::SpawnSetup()
 
 	PrepareWaveEnemies();
 
+	// 월드가 시작되고 난 후 시작해야함.
 	GetWorld()->GetTimerManager().SetTimer(SpawnTimerReference,FTimerDelegate::CreateLambda([&]()
 	{
 		SpawnWave();
@@ -291,6 +296,7 @@ void UMyGameManager::BuildPlayerArray()
 	AGameStateBase* GameState = UGameplayStatics::GetGameState(GetWorld());
 	TArray<APlayerState*> PlayerArray = GameState->PlayerArray;
 
+	// Player의 GM_Interface 캐싱
 	for(APlayerState* PS : PlayerArray)
 	{
 		ABase_Character* Character = Cast<ABase_Character>(PS->GetPawn());
@@ -422,7 +428,7 @@ void UMyGameManager::FindSpawnLocation()
 
 	if(QueryInstance)
 	{
-		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this,&AGameManager::SpawnEnemy);
+		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this,&UMyGameManager::SpawnEnemy);
 	}
 }
 
@@ -576,6 +582,7 @@ void UMyGameManager::UpdateEnemyWave()
 
 void UMyGameManager::OnRep_GameTime()
 {
+	
 }
 
 void UMyGameManager::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -585,12 +592,12 @@ void UMyGameManager::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>&
 
 void UMyGameManager::SetGameTimeOnServer(FString& pSecond)
 {
-	if(!HasAuthority())
-	{
-		return;
-	}
-
-	GameTime = FText::FromString(FString::Printf(TEXT("%d:%s"),Minutes,*pSecond));
-	
-	OnRep_GameTime();
+	// if(!HasAuthority())
+	// {
+	// 	return;
+	// }
+	//
+	// GameTime = FText::FromString(FString::Printf(TEXT("%d:%s"),Minutes,*pSecond));
+	//
+	// OnRep_GameTime();
 }
