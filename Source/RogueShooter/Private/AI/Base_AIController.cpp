@@ -72,14 +72,14 @@ void ABase_AIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	RS_LOG_ERROR(TEXT("%s has called EndPlay"),*this->GetName())
+	// RS_LOG_ERROR(TEXT("%s has called EndPlay"),*this->GetName())
 }
 
 void ABase_AIController::OnUnPossess()
 {
 	Super::OnUnPossess();
 
-	RS_LOG_ERROR(TEXT("%s has called OnUnPossess"),*this->GetName())
+	// RS_LOG_ERROR(TEXT("%s has called OnUnPossess"),*this->GetName())
 }
 
 void ABase_AIController::BeginAI()

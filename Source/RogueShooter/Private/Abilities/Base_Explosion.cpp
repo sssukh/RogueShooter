@@ -36,7 +36,7 @@ void ABase_Explosion::BeginPlay()
 {
 	Super::BeginPlay();
 
-	MC_VFX_Implementation();
+	MC_VFX();
 
 	if(!HasAuthority())
 	{
@@ -52,10 +52,11 @@ void ABase_Explosion::BeginPlay()
 	
 	GetWorld()->SweepMultiByObjectType(HitResults,ActorLocation,ActorLocation,FQuat::Identity,ObjectQueryParams,FCollisionShape::MakeSphere(Radius));
 
+	/*
 #if ENABLE_DRAW_DEBUG
 	DrawDebugSphere(GetWorld(),ActorLocation,Radius,32,FColor::Blue,false,2.0f);
 #endif
-
+*/
 	UFunctionLibrary_Helper::DamageEnemiesOnce(GetWorld(),HitResults,Damage,GetInstigator()->GetInstigatorController(),this);
 
 	SetLifeSpan(0.5f);

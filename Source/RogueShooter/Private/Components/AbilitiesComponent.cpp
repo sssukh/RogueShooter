@@ -97,6 +97,12 @@ UAbilitiesComponent::UAbilitiesComponent(const FObjectInitializer& ObjectInitial
 	}
 
 	EvolutionTracker.SetNum((int32)EActiveAbilities::MAX);
+
+	// TODO : component 생성할 때 set해야한다고 한다.
+	SetIsReplicatedByDefault(true);
+
+	
+	// bReplicates = true;
 }
 
 
@@ -105,8 +111,7 @@ void UAbilitiesComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// TODO : component 생성할 때 set해야한다고 한다.
-	SetIsReplicated(true);
+	
 	// ...
 
 	if (GetClass()->FindFunctionByName(FName("PrepareHammer")) == nullptr) {
@@ -205,7 +210,7 @@ void UAbilitiesComponent::GrantHammer(bool Cast)
 
 void UAbilitiesComponent::PrepareHammer()
 {
-	RS_LOG_SCREEN(TEXT("Hammer activated %f"),time)
+	// RS_LOG_SCREEN(TEXT("Hammer activated %f"),time)
 	
 	TArray<FHitResult> OutHits;
 	
@@ -219,19 +224,19 @@ void UAbilitiesComponent::PrepareHammer()
 	
 	
 	bool bHit = GetWorld()->SweepMultiByObjectType(OutHits,ActorLocation,ActorLocation,FQuat::Identity,ObjectQueryParams,FCollisionShape::MakeSphere(HammerRadius),params);
-
+/*
 #if ENABLE_DRAW_DEBUG
 	DrawDebugSphere(GetWorld(),ActorLocation,HammerRadius,32,FColor::Red,false,2.0f);
 #endif
-
+*/
 	float damage = CalcAbilityDamageWithCrit(0.15f,EActiveAbilities::Hammer,HammerDamage);
-	S_ExecuteHammer_Implementation(OutHits,damage,HammerRadius,UGameplayStatics::GetPlayerController(GetWorld(),0));
+	S_ExecuteHammer(OutHits,damage,HammerRadius,UGameplayStatics::GetPlayerController(GetWorld(),0));
 }
 
 void UAbilitiesComponent::S_ExecuteHammer_Implementation(const TArray<FHitResult>& Hits, float Damage, float Radius,
 	APlayerController* Controller)
 {
-	MC_Hammer_Implementation(Radius);
+	MC_Hammer(Radius);
 
 	UFunctionLibrary_Helper::DamageEnemiesOnce(this,Hits,Damage,Controller,GetOwner());
 }
@@ -323,7 +328,7 @@ void UAbilitiesComponent::PrepareFrostBolt()
 
 	AActor* LocNearestActor = UGameplayStatics::FindNearestActor(GetOwner()->GetActorLocation(),Actors,distance);
 
-	S_ExecuteFrostBolt_Implementation(LocNearestActor,Char,CalculateBonusDamage(FBDamage));
+	S_ExecuteFrostBolt(LocNearestActor,Char,CalculateBonusDamage(FBDamage));
 
 	// ExecuteFrostBolt 호출 후 0.05초 delay
 	FTimerHandle DelayTimer;
@@ -332,7 +337,7 @@ void UAbilitiesComponent::PrepareFrostBolt()
 		if(FBFireIndex<=FBFireCount)
 		{
 			++FBFireIndex;
-			S_ExecuteFrostBolt_Implementation(LocNearestActor,Char,CalculateBonusDamage(FBDamage));
+			S_ExecuteFrostBolt(LocNearestActor,Char,CalculateBonusDamage(FBDamage));
 		}
 	}),
 	0.05f,
@@ -523,7 +528,7 @@ void UAbilitiesComponent::PrepareFireball()
 
 	AActor* LocNearestActor = UGameplayStatics::FindNearestActor(GetOwner()->GetActorLocation(),Actors,distance);
 
-	S_ExecuteFireball_Implementation(LocNearestActor,Char,CalculateBonusDamage(FireballDamage),FireballRadius);
+	S_ExecuteFireball(LocNearestActor,Char,CalculateBonusDamage(FireballDamage),FireballRadius);
 
 	if(!CheckEvoActive(EActiveAbilities::Fireball))
 		return;
@@ -566,7 +571,7 @@ void UAbilitiesComponent::S_ExecuteFireball_Implementation(AActor* Target, ABase
 		Fireball->FinishSpawning(FireballTransform);
 	}
 
-	MC_Fireball_Implementation();
+	MC_Fireball();
 }
 
 void UAbilitiesComponent::S_ExecuteLightning_Implementation(const FVector& TargetLocation, ABase_Character* Instigator,
@@ -607,7 +612,7 @@ void UAbilitiesComponent::S_ExecuteFrostBolt_Implementation(AActor* Target, ABas
 		projectile->FinishSpawning(transform);
 	}
 
-	MC_Frostbolt_Implementation();
+	MC_Frostbolt();
 }
 
 
@@ -868,6 +873,11 @@ void UAbilitiesComponent::UnPauseAbilities()
 
 void UAbilitiesComponent::MC_Hammer_Implementation(float Radius)
 {
+	if(!HammerEffect)
+	{
+		RS_LOG_SCREEN(TEXT("Hammer Effect is NULL on this Machine"))
+		return;
+	}
 	UGameplayStatics::SpawnEmitterAttached(HammerEffect,GetOwner()->GetRootComponent(),NAME_None,FVector(),FRotator(),
 		FVector(Radius/100.0f,Radius/100.0f,1.5f) );
 

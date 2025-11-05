@@ -108,7 +108,7 @@ void AStash::ResetStash()
 	}
 	else
 	{
-		HideStash_Implementation(false);
+		HideStash(false);
 
 		ResetActivation(true);
 	}
@@ -150,7 +150,7 @@ bool AStash::CheckForItems()
 float AStash::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
                          class AController* EventInstigator, AActor* DamageCauser)
 {
-	HideStash_Implementation(true);
+	HideStash(true);
 
 	if(HasAuthority())
 	{
