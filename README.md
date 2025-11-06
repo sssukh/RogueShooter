@@ -49,9 +49,6 @@
 ![vamPlayEV](https://github.com/user-attachments/assets/52739822-9411-4977-b3be-4708558e2a29)
 <br>[일정 조건을 충족하면 능력 진화]
 
-
-- 콤보 공격을 위한 어빌리티 태그(Tag) 및 몽타주(Montage) 시스템 연동
-- (선택) [관련 핵심 코드 링크 (GitHub 내의 파일 링크)](https://github.com/YourID/YourRepo/blob/main/Source/Project/Player/MyPlayerCharacter.cpp#L150)
 ----
 
 ### 2. [핵심 기능 2: 비헤비어 트리와 Eqs를 이용한 몬스터 스폰 및 움직임]
