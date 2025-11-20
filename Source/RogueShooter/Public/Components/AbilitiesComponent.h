@@ -28,6 +28,7 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
@@ -216,6 +217,9 @@ public:
 	FTimerDelegate FireBallDelegate;
 	FTimerDelegate FrostBoltDelegate;
 	FTimerDelegate LightningDelegate;
+
+	// Active Ability Loop TimerHandle
+	FTimerHandle FrostBoltHandle;
 
 	// Emitter
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

@@ -165,9 +165,9 @@ void ABase_Enemy::Tick(float DeltaTime)
 	if (TimeAccum > LogInterval)
 	{
 		TimeAccum = 0.0f;
-		UE_LOG(LogTemp, Warning, TEXT("Tick: Enemy %s Controller: %s"),
-			*GetName(),
-			GetController() ? *GetController()->GetName() : TEXT("NULL"));
+		// UE_LOG(LogTemp, Warning, TEXT("Tick: Enemy %s Controller: %s"),
+		// 	*GetName(),
+		// 	GetController() ? *GetController()->GetName() : TEXT("NULL"));
 	}
 }
 

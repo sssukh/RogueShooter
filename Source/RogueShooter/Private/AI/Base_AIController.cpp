@@ -53,7 +53,7 @@ void ABase_AIController::OnPossess(APawn* InPawn)
 	{
 		AsBaseEnemy = Enemy;
 		
-		RS_LOG_ERROR(TEXT("%s has been set to %s"),*this->GetName(), *Enemy->GetName())
+		// RS_LOG_ERROR(TEXT("%s has been set to %s"),*this->GetName(), *Enemy->GetName())
 
 		PlayerArray = AsBaseEnemy->PlayerArray;
 
@@ -121,6 +121,13 @@ void ABase_AIController::FindTarget()
 	for(ABase_Character* bc : PlayerArray)
 	{
 		ActorArray.Add(bc);
+	}
+
+	// 플레이어 사망 시
+	if(ActorArray.IsEmpty())
+	{
+		EndAI();
+		return;
 	}
 	
 	AActor* NearestActor = UGameplayStatics::FindNearestActor(GetPawn()->GetActorLocation(),ActorArray,Distance);

@@ -124,6 +124,16 @@ void UAbilitiesComponent::BeginPlay()
 	
 }
 
+void UAbilitiesComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	if(GetWorld())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(FrostBoltHandle);
+	}
+}
+
 
 // Called every frame
 void UAbilitiesComponent::TickComponent(float DeltaTime, ELevelTick TickType,
@@ -288,8 +298,11 @@ void UAbilitiesComponent::GrantFrostBolt(bool Cast)
 
 void UAbilitiesComponent::PrepareFrostBolt()
 {
+	// 발사 횟수 및 기존에 돌고있던 연사 타이머 명시적으로 해제
 	FBFireIndex = 0;
 
+	GetWorld()->GetTimerManager().ClearTimer(FrostBoltHandle);
+	
 	// IInterface 상속 검증 
 	if(!GetOwner()->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
 	{
@@ -306,8 +319,7 @@ void UAbilitiesComponent::PrepareFrostBolt()
 	
 	bool bAnyHit = GetWorld()->OverlapMultiByObjectType(OverlapResults,GetOwner()->GetActorLocation(),
 		FQuat::Identity,ObjectQueryParams,FCollisionShape::MakeSphere(AbilitySphere->GetScaledSphereRadius()));
-
-	// 여기부터
+	
 
 	if(!bAnyHit)
 	{
@@ -324,26 +336,48 @@ void UAbilitiesComponent::PrepareFrostBolt()
 		Actors.AddUnique(overlap.GetActor());
 	}
 	
-	ABase_Character* Char = IInterface_CharacterManager::Execute_GetCharacter(GetOwner());
+	// ABase_Character* Char = IInterface_CharacterManager::Execute_GetCharacter(GetOwner());
+	//
+	// AActor* LocNearestActor = UGameplayStatics::FindNearestActor(GetOwner()->GetActorLocation(),Actors,distance);
 
-	AActor* LocNearestActor = UGameplayStatics::FindNearestActor(GetOwner()->GetActorLocation(),Actors,distance);
+	TWeakObjectPtr<ABase_Character> WeakChar = IInterface_CharacterManager::Execute_GetCharacter(GetOwner());
+	TWeakObjectPtr<AActor> WeakTarget = UGameplayStatics::FindNearestActor(GetOwner()->GetActorLocation(),Actors,distance);
 
-	S_ExecuteFrostBolt(LocNearestActor,Char,CalculateBonusDamage(FBDamage));
+	if(!WeakChar.IsValid() || !WeakTarget.IsValid())
+	{
+		RS_LOG_ERROR(TEXT("Frost Bolt의 char와 Target 중 유효하지 않은 Actor가 있습니다"))
+		return;
+	}
+	
+	S_ExecuteFrostBolt(WeakTarget.Get(),WeakChar.Get(),CalculateBonusDamage(FBDamage));
 
 	// ExecuteFrostBolt 호출 후 0.05초 delay
-	FTimerHandle DelayTimer;
-	GetWorld()->GetTimerManager().SetTimer(DelayTimer,FTimerDelegate::CreateLambda([&]()
+	
+	GetWorld()->GetTimerManager().SetTimer(FrostBoltHandle,FTimerDelegate::CreateLambda([this,WeakTarget,WeakChar]()
 	{
+		// 유효성 검사 (타겟이나 캐릭터가 죽었으면 타이머 중단)
+		if(!IsValid(this) || !WeakTarget.IsValid() || !WeakChar.IsValid())
+		{
+			GetWorld()->GetTimerManager().ClearTimer(FrostBoltHandle);
+			return;
+		}
+		
 		if(FBFireIndex<=FBFireCount)
 		{
 			++FBFireIndex;
-			S_ExecuteFrostBolt(LocNearestActor,Char,CalculateBonusDamage(FBDamage));
+			S_ExecuteFrostBolt(WeakTarget.Get(),WeakChar.Get(),CalculateBonusDamage(FBDamage));
+		}
+		else
+		{
+			GetWorld()->GetTimerManager().ClearTimer(FrostBoltHandle);
 		}
 	}),
 	0.05f,
 	true
 	);
 }
+
+
 
 void UAbilitiesComponent::LevelUpLightning()
 {
@@ -590,7 +624,8 @@ void UAbilitiesComponent::S_ExecuteLightning_Implementation(const FVector& Targe
 	}
 }
 
-void UAbilitiesComponent::S_ExecuteFrostBolt_Implementation(AActor* Target, ABase_Character* Character, float Damage)
+void UAbilitiesComponent::S_ExecuteFrostBolt_Implementation(AActor* Target,
+	ABase_Character* Character, float Damage)
 {
 	if(!IsValid(Target))
 	{

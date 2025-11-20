@@ -14,7 +14,7 @@ void UMyCheatManager::Debug_Levelup()
 	
 	if(AGameManager* GameManager = Cast<AGameManager>(UGameplayStatics::GetActorOfClass(GetWorld(),AGameManager::StaticClass())))
 	{
-		RS_LOG_SCREEN(TEXT("Cheat Manager : LevelUp"))
+		// RS_LOG_SCREEN(TEXT("Cheat Manager : LevelUp"))
 		GameManager->PrepareLevelUp();
 	}
 }
