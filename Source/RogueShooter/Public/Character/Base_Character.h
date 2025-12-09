@@ -119,7 +119,7 @@ public:
 	UFUNCTION(NetMulticast,Unreliable)
 	void MC_Death();
 
-	
+	void CharacterDead();
 
 	// server 
 	UFUNCTION(Server,Unreliable)

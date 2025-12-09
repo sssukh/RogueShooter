@@ -18,5 +18,6 @@ public:
 	UFUNCTION(Exec)
 	void Debug_Levelup();
 
-
+	UFUNCTION(Exec)
+	void Debug_Kill();
 };

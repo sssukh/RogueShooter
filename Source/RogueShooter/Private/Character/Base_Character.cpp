@@ -212,28 +212,33 @@ float ABase_Character::TakeDamage(float DamageAmount, struct FDamageEvent const&
 
 	if(CurrentHealth<=0)
 	{
-		if(DeathDoOnce.Execute())
-		{
-			IsDead = true;
-
-			Death();
-
-			MC_Death();
-
-			if(!GM_Interface.GetClass()->ImplementsInterface(UInterface_GameManager::StaticClass()))
-			{
-				RS_LOG_ERROR(TEXT("GM_Interface 변수가 IInterface_GameManager를 상속받지 않았습니다."))
-			}
-			else
-			{
-				IInterface_GameManager::Execute_OnPlayerDeath(GM_Interface);
-				
-				AbilityComponent->InvalidateTimers();
-			}
-		}
+		CharacterDead();
 	}
 	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}
+
+void ABase_Character::CharacterDead()
+{
+	if(DeathDoOnce.Execute())
+	{
+		IsDead = true;
+
+		Death();
+
+		MC_Death();
+
+		if(!GM_Interface.GetClass()->ImplementsInterface(UInterface_GameManager::StaticClass()))
+		{
+			RS_LOG_ERROR(TEXT("GM_Interface 변수가 IInterface_GameManager를 상속받지 않았습니다."))
+		}
+		else
+		{
+			IInterface_GameManager::Execute_OnPlayerDeath(GM_Interface);
+				
+			AbilityComponent->InvalidateTimers();
+		}
+	}
 }
 
 void ABase_Character::Death_Implementation()

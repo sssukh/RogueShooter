@@ -14,16 +14,19 @@
 
 UUW_HostMenu::UUW_HostMenu(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	static ConstructorHelpers::FClassFinder<UUW_LoadingScreen> LoadingScreen(*AssetPath::Blueprint::WBP_LoadingScreen_C);
 	
+	if (LoadingScreen.Succeeded())
+		LoadingScreenClass = LoadingScreen.Class;
 }
 
 void UUW_HostMenu::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	Button_Host->OnClicked.AddDynamic(this,&UUW_HostMenu::OnButtonCloseClicked);
+	Button_Host->OnClicked.AddDynamic(this,&UUW_HostMenu::OnButtonHostClicked);
 
-	Button_Close->OnClicked.AddDynamic(this,&UUW_HostMenu::OnButtonHostClicked);
+	Button_Close->OnClicked.AddDynamic(this,&UUW_HostMenu::OnButtonCloseClicked);
 
 	ComboBoxString_LaN->OnSelectionChanged.AddDynamic(this,&UUW_HostMenu::UUW_HostMenu::OnLanSelectionChanged);
 

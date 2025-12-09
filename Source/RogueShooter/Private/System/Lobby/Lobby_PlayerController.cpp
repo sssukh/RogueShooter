@@ -71,4 +71,6 @@ void ALobby_PlayerController::CreateUI()
 	InputModeGameAndUI.SetHideCursorDuringCapture(false);
 	
 	SetInputMode(InputModeGameAndUI);
+	
+	bShowMouseCursor = true;
 }

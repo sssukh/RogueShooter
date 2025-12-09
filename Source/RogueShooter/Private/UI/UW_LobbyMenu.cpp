@@ -17,6 +17,7 @@
 #include "System/Base_GameInstance.h"
 #include "System/Base_GameMode.h"
 #include "UI/UW_CharacterSelectionItem.h"
+#include "UI/UW_LoadingScreen.h"
 #include "Utility/HelperFunctions.h"
 #include "Utility/RSLog.h"
 
@@ -32,6 +33,25 @@ UUW_LobbyMenu::UUW_LobbyMenu(const FObjectInitializer& ObjectInitializer) : Supe
 	if(AMDataTableFinder.Succeeded())
 		DT_AvailableMaps = AMDataTableFinder.Object;
 	
+	static ConstructorHelpers::FClassFinder<UUW_CharacterSelectionItem> SelectionItemClass(*AssetPath::Blueprint::WBP_CharacterSelectionItem_C);
+	
+	if (SelectionItemClass.Succeeded())
+		CharacterSelectionItemClass = SelectionItemClass.Class;
+	else
+	{
+		RS_LOG_ERROR(TEXT("CharacterSelectionItem Class가 설정되지 않았습니다."))
+	}
+	
+	static ConstructorHelpers::FClassFinder<UUW_LoadingScreen> LoadingScreen(*AssetPath::Blueprint::WBP_LoadingScreen_C);
+	
+	if (LoadingScreen.Succeeded())
+		LoadingScreenClass = LoadingScreen.Class;
+	else
+	{
+		RS_LOG_ERROR(TEXT("LoadingScreenClass가 설정되지 않았습니다."))
+
+	}
+		
 }
 
 void UUW_LobbyMenu::NativeConstruct()
@@ -49,14 +69,34 @@ void UUW_LobbyMenu::NativeConstruct()
 
 void UUW_LobbyMenu::OnButtonLaunchClicked()
 {
+	
+	// 1. 소유자 확인
+	if (GetOwningPlayer() == nullptr)
+	{
+		RS_LOG_ERROR(TEXT("이 위젯은 소유자(PlayerController)가 없습니다! CreateWidget을 확인하세요."));
+	}
+	else
+	{
+		RS_LOG_ERROR(TEXT("소유자 확인됨: %s"), *GetOwningPlayer()->GetName());
+	}
+
+	// 2. 월드 확인
+	if (GetWorld() == nullptr)
+	{
+		RS_LOG_ERROR(TEXT("이 위젯은 월드를 찾을 수 없습니다!"));
+	}
+	
 	UFunctionLibrary_Helper::CreateLoadingScreen(GetWorld(),
 		FText::FromString(TEXT("Seamless travel  does not work in editor, must launch standalone or compiled game to travel between lobby and game play maps"))
 		,LoadingScreenClass);
 
-	UBase_GameInstance* GameInstance = Cast<UBase_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	// UBase_GameInstance* GameInstance = Cast<UBase_GameInstance>(GetGameInstance());
 
+	UBase_GameInstance* GameInstance = Cast<UBase_GameInstance>(GetOwningPlayer()->GetGameInstance());	
+	
 	ABase_GameMode* GameMode = Cast<ABase_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
+	
 	GameMode->ServerTravel_GamePlay(GameInstance->CurrentMap);
 }
 
@@ -96,10 +136,10 @@ void UUW_LobbyMenu::CreateCharacterList()
 
 	TArray<FString> UnlockedCharacterStrings;
 
-	for(FText Name : UnlockedCharacters)
-	{
-		UnlockedCharacterStrings.AddUnique(Name.ToString());
-	}
+	// for(FText Name : UnlockedCharacters)
+	// {
+	// 	UnlockedCharacterStrings.AddUnique(Name.ToString());
+	// }
 	
 	for(FName Name : RowNames)
 	{

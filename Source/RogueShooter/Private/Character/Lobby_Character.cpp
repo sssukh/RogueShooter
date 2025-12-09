@@ -49,7 +49,7 @@ void ALobby_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 void ALobby_Character::UpdateClassName_Implementation()
 {
-	Super::UpdateClassName_Implementation();
+	// Super::UpdateClassName_Implementation();
 
 	S_SetName(Character.CharacterName.ToString());
 }

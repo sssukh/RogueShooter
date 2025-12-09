@@ -56,7 +56,7 @@ int32 ABase_GameMode::GetAlivePlayers()
 // TODO command
 void ABase_GameMode::ServerTravel_Lobby()
 {
-	FString cmd = "/Game/SurvivorsTemplate/Maps/M_Lobby";
+	FString cmd = "/Game/RogueShooter/Maps/M_Lobby";
 	
 	GetWorld()->ServerTravel(cmd);
 	
@@ -65,7 +65,7 @@ void ABase_GameMode::ServerTravel_Lobby()
 // TODO command
 void ABase_GameMode::ServerTravel_GamePlay(FName Map)
 {
-	FString cmd = FString::Printf(TEXT("/Game/SurvivorsTemplate/Maps/%s"),*Map.ToString());
+	FString cmd = FString::Printf(TEXT("/Game/RogueShooter/Maps/%s"),*Map.ToString());
 
 	GetWorld()->ServerTravel(cmd);
 }

@@ -11,7 +11,10 @@
 
 UUW_MainMenu::UUW_MainMenu(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-
+	static ConstructorHelpers::FClassFinder<UUW_HostMenu> HostMenu(*AssetPath::Blueprint::WBP_HostMenu_C);
+	
+	if (HostMenu.Succeeded())
+		HostMenuClass = HostMenu.Class;
 }
 
 void UUW_MainMenu::NativeConstruct()

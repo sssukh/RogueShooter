@@ -50,7 +50,10 @@ void ALobby_GameMode::UpdateClassNames()
 
 	for(APlayerState* PS : PlayerStates)
 	{
-		if(PS->GetPawn()->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
+		
+		APawn* PlayerPawn = PS->GetPawn();
+		
+		if(PlayerPawn->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
 		{
 			IInterface_CharacterManager::Execute_UpdateClassName(PS->GetPawn());
 		}

@@ -18,3 +18,11 @@ void UMyCheatManager::Debug_Levelup()
 		GameManager->PrepareLevelUp();
 	}
 }
+
+void UMyCheatManager::Debug_Kill()
+{
+	if (ABase_Character* Character = Cast<ABase_Character>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0)))
+	{
+		Character->CharacterDead();
+	}
+}
