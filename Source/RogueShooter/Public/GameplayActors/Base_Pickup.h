@@ -45,4 +45,5 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<USoundBase> PickupSound;
+	
 };

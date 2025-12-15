@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "ParticleHelper.h"
+#include "Data/Item/ItemData.h"
 #include "RSEnumStruct.generated.h"
 
 class ABase_Enemy;
@@ -158,6 +159,38 @@ struct FEnemySpawns
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Enemy Spawns")
 	TArray<FEnemySpawnType> Spawns;
 	
+};
+
+USTRUCT(BlueprintType)
+struct FInventorySlot
+{
+	GENERATED_BODY()
+	
+public:
+	FInventorySlot(){};
+	
+	FInventorySlot(UItemData* Item)
+	{
+		ItemData = Item;
+		Count = 1;
+	}
+	
+	FInventorySlot(UItemData* Item, int32 ItemAmount)
+	{
+		ItemData = Item;
+		Count = ItemAmount;
+	}
+	
+	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UItemData* ItemData = nullptr; // 어떤 아이템인지 (DataAsset 포인터)
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Count = 0; // 몇 개인지 (상태 값)
+
+	// 빈 슬롯인지 확인하는 헬퍼 함수
+	bool IsEmpty() const { return ItemData == nullptr || Count <= 0; }
 };
 
 

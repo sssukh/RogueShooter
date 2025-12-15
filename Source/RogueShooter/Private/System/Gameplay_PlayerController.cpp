@@ -5,6 +5,7 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Components/AbilitiesComponent.h"
+#include "Components/InventoryComponent.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "GameFramework/PlayerState.h"
@@ -20,6 +21,7 @@
 #include "UI/UW_MatchResults.h"
 #include "Utility/MyCheatManager.h"
 #include "Utility/RSLog.h"
+#include "UI/UW_InventoryMain.h"
 
 AGameplay_PlayerController::AGameplay_PlayerController()
 {
@@ -65,6 +67,10 @@ AGameplay_PlayerController::AGameplay_PlayerController()
 		ChestMasterClass = ChestMasterClassFinder.Class;
 
 	CheatClass = UMyCheatManager::StaticClass();
+	
+	static ConstructorHelpers::FClassFinder<UUW_InventoryMain> InventoryClassFinder(*AssetPath::Blueprint::WBP_InventoryMain_C);
+	if (InventoryClassFinder.Succeeded())
+		InventoryMainClass = InventoryClassFinder.Class;
 }
 
 void AGameplay_PlayerController::BeginPlay()
@@ -284,6 +290,39 @@ void AGameplay_PlayerController::ShowEndMatchScreen(bool Victory, int32 EnemiesK
 			UGameplayStatics::PlaySound2D(GetWorld(),LoseSound);
 		}
 	}
+}
+
+void AGameplay_PlayerController::ToggleInventory()
+{
+	// 위젯이 존재하지 않으면 새로 생성 
+	if (!InventoryMainWidget)
+	{
+		if (InventoryMainClass)
+			InventoryMainWidget = CreateWidget<UUW_InventoryMain>(this,InventoryMainClass);
+		else
+		{
+			RS_LOG_ERROR(TEXT("Inventory Main Class가 설정되지 않았습니다."))
+			return;
+		}
+	}
+	
+	if (InventoryMainWidget)
+	{
+		if (!InventoryMainWidget->IsInViewport())
+		{
+			UInventoryComponent* MyInventory = GetPawn()->FindComponentByClass<UInventoryComponent>();
+			
+			InventoryMainWidget->InitInventory(MyInventory);
+			
+			InventoryMainWidget->AddToViewport();
+		}
+		else
+		{
+			InventoryMainWidget->RemoveFromParent();
+		}
+	}
+	
+	
 }
 
 void AGameplay_PlayerController::PrepareLevelUp()

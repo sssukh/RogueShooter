@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/AbilitiesComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/InventoryComponent.h"
 #include "Components/ProgressBar.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -111,6 +112,10 @@ ABase_Character::ABase_Character()
 	AbilityComponent->bEditableWhenInherited=true;
 
 	AbilityComponent->MaxAbilityLevel = 5;
+	
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
+	
+	InventoryComponent->bEditableWhenInherited = true;
 }
 
 // Called when the game starts or when spawned

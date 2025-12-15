@@ -7,6 +7,7 @@
 #include "Interface/Interface_ControllerManager.h"
 #include "Gameplay_PlayerController.generated.h"
 
+class UUW_InventoryMain;
 class UMyCheatManager;
 class UUW_MatchResults;
 class UUW_PlayerHud;
@@ -178,6 +179,9 @@ public:
 	 */
 	void ShowEndMatchScreen(bool Victory, int32 EnemiesKilled);
 	
+	UFUNCTION(BlueprintCallable)
+	void ToggleInventory();
+	
 	// LevelUp
 
 	void PrepareLevelUp();
@@ -288,5 +292,8 @@ public:
 
 	TSubclassOf<UUW_ChestMaster> ChestMasterClass;
 
+	TSubclassOf<UUW_InventoryMain> InventoryMainClass;
 	
+	UPROPERTY()
+	TObjectPtr<UUW_InventoryMain> InventoryMainWidget;
 };

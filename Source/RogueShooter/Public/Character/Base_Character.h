@@ -9,6 +9,7 @@
 #include "RogueShooter/RSEnumStruct.h"
 #include "Base_Character.generated.h"
 
+class UInventoryComponent;
 class AGameplay_PlayerController;
 class UWidgetComponent;
 class UUW_HealthBar;
@@ -256,4 +257,7 @@ public:
 	TObjectPtr<UAnimInstance> CharacterAnimInstance;
 
 	TSubclassOf<UUW_HealthBar> HealthBarClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UInventoryComponent> InventoryComponent;
 };
