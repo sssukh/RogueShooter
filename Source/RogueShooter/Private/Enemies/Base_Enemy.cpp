@@ -145,8 +145,9 @@ void ABase_Enemy::BeginPlay()
 {
 	Super::BeginPlay();
 
-	DamageSphereOverlapDelegate.BindUFunction(this,FName("DamagePlayer"));
-	RetriggerDelegate.BindUFunction(this,FName("ResetDoOnce"));
+	
+	DamageSphereOverlapDelegate.BindUObject(this,&ABase_Enemy::DamagePlayer);
+	RetriggerDelegate.BindUObject(this,&ABase_Enemy::ResetDoOnce);
 
 	UE_LOG(LogTemp, Warning, TEXT("Enemy %s BeginPlay, Controller: %s"),
 		*GetName(),

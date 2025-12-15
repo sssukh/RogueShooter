@@ -199,7 +199,7 @@ void UAbilitiesComponent::LevelUpHammer()
 
 void UAbilitiesComponent::GrantHammer(bool Cast)
 {
-	HammerDelegate.BindUFunction(this,FName("PrepareHammer"));
+	HammerDelegate.BindUObject(this,&UAbilitiesComponent::PrepareHammer);
 	if(!HammerDelegate.IsBound())
 	{
 		RS_LOG_ERROR(TEXT("바운드 실패"))
@@ -280,7 +280,7 @@ void UAbilitiesComponent::LevelUpFrostBolt()
 
 void UAbilitiesComponent::GrantFrostBolt(bool Cast)
 {
-	FrostBoltDelegate.BindUFunction(this,FName("PrepareFrostbolt"));
+	FrostBoltDelegate.BindUObject(this,&UAbilitiesComponent::PrepareFrostBolt);
 	if(!FrostBoltDelegate.IsBound())
 	{
 		RS_LOG_ERROR(TEXT("바운드 실패"))
@@ -404,7 +404,7 @@ void UAbilitiesComponent::LevelUpLightning()
 
 void UAbilitiesComponent::GrantLightning(bool Cast)
 {
-	LightningDelegate.BindUFunction(this,FName("PrepareLightning"));
+	LightningDelegate.BindUObject(this,&UAbilitiesComponent::PrepareLightning);
 	if(!LightningDelegate.IsBound())
 	{
 		RS_LOG_ERROR(TEXT("바운드 실패"))
@@ -506,7 +506,7 @@ void UAbilitiesComponent::LevelUpFireball()
 
 void UAbilitiesComponent::GrantFireball(bool Cast)
 {
-	FireBallDelegate.BindUFunction(this,FName("PrepareFireball"));
+	FireBallDelegate.BindUObject(this,&UAbilitiesComponent::PrepareFireball);
 	if(!FireBallDelegate.IsBound())
 	{
 		RS_LOG_ERROR(TEXT("바운드 실패"))

@@ -85,7 +85,6 @@ void AFloatingTextActor::BeginPlay()
 	FOnTimelineEvent FinishedFunction;
 
 	FinishedFunction.BindUFunction(this,FName("DestroyActor"));
-
 	Movement.AddInterpFloat(MovementCurve,MovementFunction);
 
 	Movement.SetTimelineFinishedFunc(FinishedFunction);
