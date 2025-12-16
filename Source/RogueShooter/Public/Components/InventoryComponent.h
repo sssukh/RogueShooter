@@ -47,6 +47,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int32 FindItemIndex(const UItemData* TargetItem);
 
+	// 아이템 GAS 이펙트 갱신 및 적용
+	void UpdateSlotEffect(int32 slotIndex);
+	
+	// 아이템 GAS 어빌리티 갱신 및 적용 
+	void UpdateSlotAbility(int32 slotIndex);
 public:
 	// 실제 저장소 (DataAsset의 포인터를 저장)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

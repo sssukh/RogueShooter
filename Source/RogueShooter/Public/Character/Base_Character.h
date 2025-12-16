@@ -7,6 +7,8 @@
 #include "Interface/Interface_CharacterManager.h"
 #include "RogueShooter/FlowControlLIbrary.h"
 #include "RogueShooter/RSEnumStruct.h"
+#include "AbilitySystemInterface.h"
+#include "GameplayTagContainer.h"
 #include "Base_Character.generated.h"
 
 class UInventoryComponent;
@@ -20,11 +22,13 @@ class USpringArmComponent;
 class UCameraComponent;
 class USphereComponent;
 class IInterface_CharacterManager;
+class UAbilitySystemComponent;
+class UCharAttributeSet;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoad);
 
 UCLASS()
-class ROGUESHOOTER_API ABase_Character : public ACharacter, public IInterface_CharacterManager
+class ROGUESHOOTER_API ABase_Character : public ACharacter, public IInterface_CharacterManager, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -40,6 +44,29 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	
+/**
+ *	GAS
+ */
+	
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	
+protected:
+	// 1. GAS 엔진
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComp;
+
+	// 2. 스탯 정보
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
+	TObjectPtr<UCharAttributeSet> Attributes;
+
+	// 초기화 함수 (아래 설명 참조)
+	virtual void PossessedBy(AController* NewController) override;
+	
+	
+	
+	
+public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 

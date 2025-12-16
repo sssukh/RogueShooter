@@ -10,8 +10,11 @@ public class RogueShooter : ModuleRules
 	
 		PublicDependencyModuleNames.AddRange(new string[]
 		{
-			"Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "Slate","SlateCore", "UMG", "AIModule", "GameplayTasks"
+			"Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "Slate","SlateCore", "UMG", "AIModule"
+			// Multiplay
 			,"MultiplayerSessions","OnlineSubsystem"
+			// GAS
+			,"GameplayAbilities", "GameplayTags", "GameplayTasks"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

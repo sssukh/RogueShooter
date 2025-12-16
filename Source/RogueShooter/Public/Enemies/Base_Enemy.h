@@ -69,6 +69,8 @@ public:
 	UFUNCTION(NetMulticast,Unreliable)
 	void MC_Enemy_Death();
 	
+	void SendDeathEvent(AActor* Killer);
+	
 	void SetTimerWithDelay(float Time, bool bLoop);
 
 	UFUNCTION()

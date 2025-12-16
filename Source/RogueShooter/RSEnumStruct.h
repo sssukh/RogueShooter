@@ -1,6 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ActiveGameplayEffectHandle.h"
+#include "GameplayAbilitySpecHandle.h"
 #include "GameplayTagContainer.h"
 #include "ParticleHelper.h"
 #include "Data/Item/ItemData.h"
@@ -169,13 +171,13 @@ struct FInventorySlot
 public:
 	FInventorySlot(){};
 	
-	FInventorySlot(UItemData* Item)
+	explicit FInventorySlot(UItemData* Item)
 	{
 		ItemData = Item;
 		Count = 1;
 	}
 	
-	FInventorySlot(UItemData* Item, int32 ItemAmount)
+	explicit FInventorySlot(UItemData* Item, int32 ItemAmount)
 	{
 		ItemData = Item;
 		Count = ItemAmount;
@@ -189,8 +191,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Count = 0; // 몇 개인지 (상태 값)
 
+	// 스탯 효과 GAS 이펙트 핸들
+	FActiveGameplayEffectHandle ActivePassiveEffectHandle;
+	
+	// 로직 능력 핸들
+	FGameplayAbilitySpecHandle ActiveAbilitySpecHandle;
+	
 	// 빈 슬롯인지 확인하는 헬퍼 함수
-	bool IsEmpty() const { return ItemData == nullptr || Count <= 0; }
+	bool IsEmpty() const { return !ItemData || Count <= 0; }
 };
-
 

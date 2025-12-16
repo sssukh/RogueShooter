@@ -3,6 +3,7 @@
 
 #include "Character/Base_Character.h"
 
+#include "AbilitySystemComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
 #include "Components/AbilitiesComponent.h"
@@ -10,6 +11,7 @@
 #include "Components/InventoryComponent.h"
 #include "Components/ProgressBar.h"
 #include "Components/WidgetComponent.h"
+#include "Data/CharAttributeSet.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerState.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -107,15 +109,21 @@ ABase_Character::ABase_Character()
 		HealthWidget->SetupAttachment(RootComponent);
 	}
 
+	// AbilitiesComponent 세팅
 	AbilityComponent = CreateDefaultSubobject<UAbilitiesComponent>(TEXT("AbilitiesComponent"));
 
 	AbilityComponent->bEditableWhenInherited=true;
 
 	AbilityComponent->MaxAbilityLevel = 5;
 	
+	// InventoryComponent 세팅
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 	
 	InventoryComponent->bEditableWhenInherited = true;
+	
+	// AbilitySystemComponent 세팅
+	AbilitySystemComp = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComp"));
+	Attributes = CreateDefaultSubobject<UCharAttributeSet>(TEXT("Attributes"));
 }
 
 // Called when the game starts or when spawned
@@ -141,6 +149,22 @@ void ABase_Character::BeginPlay()
 void ABase_Character::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+class UAbilitySystemComponent* ABase_Character::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComp;
+}
+
+void ABase_Character::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	
+	// [중요] 서버 쪽 초기화: 여기서 Init을 해줘야 ASC가 작동을 시작합니다.
+	if (AbilitySystemComp)
+	{
+		AbilitySystemComp->InitAbilityActorInfo(this, this);
+	}
 }
 
 // Called to bind functionality to input

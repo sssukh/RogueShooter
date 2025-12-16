@@ -3,7 +3,10 @@
 
 #include "Enemies/Base_Enemy.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemInterface.h"
 #include "AudioDevice.h"
+#include "Abilities/GameplayAbilityTypes.h"
 #include "AI/Base_AIController.h"
 #include "AssetTypeActions/AssetDefinition_SoundBase.h"
 #include "Components/CapsuleComponent.h"
@@ -268,6 +271,8 @@ float ABase_Enemy::TakeDamage(float DamageAmount, struct FDamageEvent const& Dam
 
 	if(Health<=0)
 	{
+		// Event.Kill 전송
+		SendDeathEvent(DamageCauser);
 		EnemyDeath();
 	}
 	
@@ -284,6 +289,7 @@ void ABase_Enemy::EnemyDeath()
 
 			if(OnDeath.IsBound())
 				OnDeath.Broadcast();
+			
 			
 			SpawnSoul();
 
@@ -348,6 +354,26 @@ void ABase_Enemy::MC_Enemy_Death_Implementation()
 }
 
 
+void ABase_Enemy::SendDeathEvent(AActor* Killer)
+{
+	IAbilitySystemInterface* ASCInterface = Cast<IAbilitySystemInterface>(Killer);
+	if (ASCInterface)
+	{
+		UAbilitySystemComponent* KillerASC = ASCInterface->GetAbilitySystemComponent();
+		if (KillerASC)
+		{
+			// 이벤트 데이터 포장
+			FGameplayEventData Payload;
+			Payload.EventTag = FGameplayTag::RequestGameplayTag(FName("Event.Kill"));
+			Payload.Instigator = this;
+			Payload.Target = this;
+
+			// [핵심] 킬러에게 이벤트를 쏘다!
+			// Killer가 "Event.Kill"을 기다리는 GA(WaitGameplayEvent)를 켜놓고 있다면 반응함.
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Killer, Payload.EventTag, Payload);
+		}
+	}
+}
 
 void ABase_Enemy::SetTimerWithDelay(float Time, bool bLoop)
 {
