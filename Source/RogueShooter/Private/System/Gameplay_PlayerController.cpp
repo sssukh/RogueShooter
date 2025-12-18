@@ -315,10 +315,22 @@ void AGameplay_PlayerController::ToggleInventory()
 			InventoryMainWidget->InitInventory(MyInventory);
 			
 			InventoryMainWidget->AddToViewport();
+			
+			FInputModeUIOnly InputModeUIOnly;
+			InputModeUIOnly.SetWidgetToFocus(InventoryMainWidget->TakeWidget());
+			InputModeUIOnly.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+			SetInputMode(InputModeUIOnly);
+			
+			SetShowMouseCursor(true);
 		}
 		else
 		{
 			InventoryMainWidget->RemoveFromParent();
+			
+			FInputModeGameOnly InputModeGameOnly;
+			SetInputMode(InputModeGameOnly);
+			SetShowMouseCursor(false);
+			
 		}
 	}
 	

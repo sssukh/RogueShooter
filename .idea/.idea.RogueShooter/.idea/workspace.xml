@@ -13,19 +13,16 @@
   <component name="ChangeListManager">
     <list default="true" id="8deb027d-5a9e-424c-a7bd-f766f82ad3c0" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.RogueShooter/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.RogueShooter/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayActors/BP_PickupTest.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayActors/BP_PickupTest.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Maps/M_Demo.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Maps/M_Demo.umap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RogueShooter.uproject" beforeDir="false" afterPath="$PROJECT_DIR$/RogueShooter.uproject" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/Character/Base_Character.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/Character/Base_Character.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/Components/InventoryComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/Components/InventoryComponent.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/Enemies/Base_Enemy.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/Enemies/Base_Enemy.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/Character/Base_Character.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/Character/Base_Character.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/Components/InventoryComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/Components/InventoryComponent.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/Data/Item/ItemData.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/Data/Item/ItemData.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/Enemies/Base_Enemy.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/Enemies/Base_Enemy.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/System/BP_GamePlayPlayerController.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/System/BP_GamePlayPlayerController.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Data/Items/DA_PotionTest.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Data/Items/DA_PotionTest.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Widgets/UWB_InventoryMain.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Widgets/UWB_InventoryMain.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RogueShooter.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/RogueShooter.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/System/Gameplay_PlayerController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/System/Gameplay_PlayerController.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/UI/UW_InventoryMain.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/UI/UW_InventoryMain.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/UI/UW_ItemIcon.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/UI/UW_ItemIcon.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/UI/UW_InventoryMain.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/UI/UW_InventoryMain.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/UI/UW_ItemIcon.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/UI/UW_ItemIcon.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/RogueShooter/RSEnumStruct.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/RSEnumStruct.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/RogueShooter.Build.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/RogueShooter.Build.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,7 +36,6 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="cidr-memory-view://4" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/AI/MLAdapter/Source/MLAdapter/Private/Sensors/MLAdapterSensor_Attribute.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Developer/DerivedDataCache/Private/DerivedDataCacheStats.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Developer/Profiler/Private/ProfilerSession.h" root0="FORCE_HIGHLIGHTING" />
@@ -50,11 +46,14 @@
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Programs/Shared/EpicGames.OIDC/MacOSTokenStore.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/Core/Public/Containers/Array.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/Core/Public/Delegates/DelegateSignatureImpl.inl" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/Core/Public/Internationalization/Text.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/Core/Public/Templates/RefCounting.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/Core/Public/UObject/ScriptDelegates.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/CoreUObject/Private/UObject/Class.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectHandle.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectPtr.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectBase.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/CoreUObject/Public/UObject/WeakObjectPtr.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/Engine/Classes/Components/TimelineComponent.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/Engine/Classes/GameFramework/PlayerState.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/Experimental/Chaos/Public/GeometryCollection/Facades/CollectionMeshFacade.h" root0="FORCE_HIGHLIGHTING" />
@@ -64,12 +63,16 @@
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Private/GameplayActors/PickupItem.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Private/UI/UW_InventoryMain.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Private/UI/UW_ItemIcon.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Private/UI/UW_ItemTooltip.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Private/UI/UW_StatRow.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Public/Components/InventoryComponent.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Public/Data/CharAttributeSet.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Public/Data/Item/ItemData.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Public/GameplayActors/PickupItem.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Public/UI/UW_InventoryMain.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Public/UI/UW_ItemIcon.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Public/UI/UW_ItemTooltip.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Public/UI/UW_StatRow.h" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="Toolset" />
@@ -83,23 +86,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "C/C++ 프로젝트.RogueShooter.executor": "Debug",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "git-widget-placeholder": "GAS",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "SolutionBuilderGeneralOptionsPage",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;C/C++ 프로젝트.RogueShooter.executor&quot;: &quot;Debug&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;GAS&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;SolutionBuilderGeneralOptionsPage&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="C/C++ 프로젝트.RogueShooter">
     <configuration name="RogueShooter" type="CppProject" factoryName="C++ Project">
       <configuration_1 setup="1">
@@ -210,6 +213,8 @@
       <workItem from="1765816404867" duration="191000" />
       <workItem from="1765862711017" duration="3410000" />
       <workItem from="1765869486757" duration="12651000" />
+      <workItem from="1765955882619" duration="6453000" />
+      <workItem from="1766039656399" duration="14425000" />
     </task>
     <servers />
   </component>

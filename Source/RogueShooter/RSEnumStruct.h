@@ -201,3 +201,25 @@ public:
 	bool IsEmpty() const { return !ItemData || Count <= 0; }
 };
 
+USTRUCT(BlueprintType)
+struct FStatUIData : public FTableRowBase
+{
+	GENERATED_BODY()
+
+public:
+	// [키] 이 UI 정보가 어떤 태그에 대한 것인가? (예: Stat.Attack)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FGameplayTag StatTag;
+
+	// [이름] 화면에 표시할 이름 (예: "공격력")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FText DisplayName;
+
+	// [아이콘] 스탯 아이콘 (옵션)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UTexture2D* Icon = nullptr;
+
+	// [서식] 표시 형식 (예: "{0} +{1}")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FText FormatString; // 기본값: NSLOCTEXT("UI", "DefaultStat", "{0}: {1}")
+};

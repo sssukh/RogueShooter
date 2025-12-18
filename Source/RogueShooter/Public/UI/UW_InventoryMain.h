@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "UW_InventoryMain.generated.h"
 
+class UItemData;
+class UUW_ItemTooltip;
 class UUW_ItemIcon;
 class UInventoryComponent;
 class UUniformGridPanel;
@@ -25,6 +27,10 @@ public:
 	void RefreshInventory();
 	
 	void InitInventory(UInventoryComponent* InventoryComponent);
+	
+	void ShowItemTooltip(const UItemData* ItemData);
+	
+	void HideItemTooltip();
 public:
 	UPROPERTY(BlueprintReadWrite,Category = "Inventory Main | Designer", meta = (BindWidget))
 	TObjectPtr<UUniformGridPanel> GridPanel;
@@ -33,5 +39,11 @@ public:
 	TWeakObjectPtr<UInventoryComponent> PlayerInventoryComponent;
 	
 	UPROPERTY()
+	TObjectPtr<UUW_ItemTooltip> ItemTooltip;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	TSubclassOf<UUW_ItemIcon> ItemIconClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
+	TSubclassOf<UUW_ItemTooltip> ItemTooltipClass;
 };

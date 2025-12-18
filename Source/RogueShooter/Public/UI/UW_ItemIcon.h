@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "UW_ItemIcon.generated.h"
 
+class UUW_InventoryMain;
 struct FInventorySlot;
 class UTextBlock;
 class UItemData;
@@ -22,10 +23,20 @@ public:
 	
 	// Refresh Inventory를 할 때 슬롯의 데이터인 이미지와 개수를 적용. 
 	void SetItemData(const FInventorySlot& InItemData);
+	
+	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	
+	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
 public:
 	UPROPERTY(BlueprintReadWrite,Category = "Item Icon | Designer", meta = (BindWidget))
 	TObjectPtr<UImage> Icon;
 	
 	UPROPERTY(BlueprintReadWrite,Category = "Item Icon | Designer", meta = (BindWidget))
 	TObjectPtr<UTextBlock> CountText;
+	
+	UPROPERTY()
+	TObjectPtr<UUW_InventoryMain> InventoryMain;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Data")
+	TObjectPtr<UItemData> CachedItemData;
 };
