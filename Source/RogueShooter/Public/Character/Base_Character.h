@@ -11,6 +11,8 @@
 #include "GameplayTagContainer.h"
 #include "Base_Character.generated.h"
 
+class UHealthSet;
+class UCombatSet;
 class UInventoryComponent;
 class AGameplay_PlayerController;
 class UWidgetComponent;
@@ -51,15 +53,24 @@ public:
 	
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
+	void AddCharacterAbilities();
+	
 protected:
 	// 1. GAS 엔진
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComp;
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
 	// 2. 스탯 정보
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
-	TObjectPtr<UCharAttributeSet> Attributes;
+	TObjectPtr<UHealthSet> HealthAttributes;
+	
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "GAS")
+	TObjectPtr<UCombatSet> CombatAttributes;
 
+	// 부여할 어빌리티 목록
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category =  "GAS | Config")
+	TArray<TSubclassOf<UGameplayAbility>> DefaultAbilities;
+	
 	// 초기화 함수 (아래 설명 참조)
 	virtual void PossessedBy(AController* NewController) override;
 	
@@ -147,7 +158,9 @@ public:
 	UFUNCTION(NetMulticast,Unreliable)
 	void MC_Death();
 
-	void CharacterDead();
+	
+	// Interface
+	virtual void CharDie_Implementation(AActor* Causer) override;
 
 	// server 
 	UFUNCTION(Server,Unreliable)

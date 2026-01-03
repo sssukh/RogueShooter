@@ -28,9 +28,11 @@ public:
 	
 	void InitInventory(UInventoryComponent* InventoryComponent);
 	
-	void ShowItemTooltip(const UItemData* ItemData);
+	void ShowItemTooltip(const UItemData* ItemData, int32 ItemCount);
 	
 	void HideItemTooltip();
+	
+	void UpdateMousePosition();
 public:
 	UPROPERTY(BlueprintReadWrite,Category = "Inventory Main | Designer", meta = (BindWidget))
 	TObjectPtr<UUniformGridPanel> GridPanel;
@@ -46,4 +48,7 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	TSubclassOf<UUW_ItemTooltip> ItemTooltipClass;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Config")
+	FVector2D mMouseOffset;
 };

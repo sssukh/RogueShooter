@@ -298,7 +298,15 @@ void AGameplay_PlayerController::ToggleInventory()
 	if (!InventoryMainWidget)
 	{
 		if (InventoryMainClass)
+		{
 			InventoryMainWidget = CreateWidget<UUW_InventoryMain>(this,InventoryMainClass);
+			
+			UInventoryComponent* MyInventory = GetPawn()->FindComponentByClass<UInventoryComponent>();
+			
+			InventoryMainWidget->InitInventory(MyInventory);
+			
+			InventoryMainWidget->AddToViewport();
+		}
 		else
 		{
 			RS_LOG_ERROR(TEXT("Inventory Main Class가 설정되지 않았습니다."))
@@ -308,24 +316,20 @@ void AGameplay_PlayerController::ToggleInventory()
 	
 	if (InventoryMainWidget)
 	{
-		if (!InventoryMainWidget->IsInViewport())
+		if (!InventoryMainWidget->IsVisible())
 		{
-			UInventoryComponent* MyInventory = GetPawn()->FindComponentByClass<UInventoryComponent>();
-			
-			InventoryMainWidget->InitInventory(MyInventory);
-			
-			InventoryMainWidget->AddToViewport();
-			
+			InventoryMainWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 			FInputModeUIOnly InputModeUIOnly;
 			InputModeUIOnly.SetWidgetToFocus(InventoryMainWidget->TakeWidget());
 			InputModeUIOnly.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 			SetInputMode(InputModeUIOnly);
-			
+				
 			SetShowMouseCursor(true);
 		}
 		else
 		{
-			InventoryMainWidget->RemoveFromParent();
+			// InventoryMainWidget->RemoveFromParent();
+			InventoryMainWidget->SetVisibility(ESlateVisibility::Hidden);
 			
 			FInputModeGameOnly InputModeGameOnly;
 			SetInputMode(InputModeGameOnly);

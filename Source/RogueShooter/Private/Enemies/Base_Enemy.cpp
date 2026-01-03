@@ -4,6 +4,7 @@
 #include "Enemies/Base_Enemy.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
 #include "AudioDevice.h"
 #include "Abilities/GameplayAbilityTypes.h"
@@ -11,6 +12,8 @@
 #include "AssetTypeActions/AssetDefinition_SoundBase.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
+#include "Data/CombatSet.h"
+#include "Data/HealthSet.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameplayActors/Base_Chest.h"
@@ -19,6 +22,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "RogueShooter/AssetPath.h"
+#include "Utility/FRsGameplayTags.h"
 #include "Utility/RSCollisionChannel.h"
 #include "Utility/RSLog.h"
 
@@ -141,6 +145,14 @@ ABase_Enemy::ABase_Enemy()
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	
 	ScaleHP();
+	
+	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	HealthAttributes = CreateDefaultSubobject<UHealthSet>(TEXT("HeathAttributes"));
+	CombatAttributes = CreateDefaultSubobject<UCombatSet>(TEXT("CombatAttributes"));
+	
+	AbilitySystemComponent->SetIsReplicated(true);
+	// 예측없이 서버가 시키는 대로
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 }
 
 // Called when the game starts or when spawned
@@ -155,6 +167,14 @@ void ABase_Enemy::BeginPlay()
 	UE_LOG(LogTemp, Warning, TEXT("Enemy %s BeginPlay, Controller: %s"),
 		*GetName(),
 		GetController() ? *GetController()->GetName() : TEXT("NULL"));
+	
+	// AbilitySystem 초기화 
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->InitAbilityActorInfo(this,this);
+		
+		AddCharacterAbilities();
+	}
 }
 
 // Called every frame
@@ -184,6 +204,7 @@ void ABase_Enemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 void ABase_Enemy::AttackSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	// TODO : 적의 공격 우선순위를 정하는 알고리즘이 수정 필요 
 	if(!OtherActor)
 		return;
 	
@@ -226,9 +247,41 @@ void ABase_Enemy::DamagePlayer()
 
 	PlayerToDamage->TakeDamage(Damage, DamageEvent, nullptr, this);
 
+	// TODO : GA를 이용한 attack
+	DamageWithGameplayTag();
+	
 	MC_EnemyAttack();
 
 	SetTimerWithDelay(0.9f,false);
+}
+
+void ABase_Enemy::DamageWithGameplayTag()
+{
+	// 대상 유효성 체크
+	if (!PlayerToDamage)
+	{
+		RS_LOG_ERROR(TEXT("Target Player is not set"))
+		return;
+	}
+	
+	IAbilitySystemInterface* ASCInterface = Cast<IAbilitySystemInterface>(PlayerToDamage);
+	if (ASCInterface)
+	{
+		UAbilitySystemComponent* TargetASC = ASCInterface->GetAbilitySystemComponent();
+		if (TargetASC)
+		{
+			RS_LOG_ERROR(TEXT("Event Hit Occur"))
+			
+			// 이벤트 데이터 포장
+			FGameplayEventData Payload;
+			Payload.EventTag = FRsGameplayTags::Get().Event_Hit;
+			Payload.Instigator = this;
+			Payload.Target = PlayerToDamage;
+
+			// Enemy가 "Event.Hit"을 기다리는 GA(WaitGameplayEvent)를 켜놓고 있다면 반응함.
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, Payload.EventTag, Payload);
+		}
+	}
 }
 
 void ABase_Enemy::MC_EnemyAttack_Implementation()
@@ -269,22 +322,29 @@ float ABase_Enemy::TakeDamage(float DamageAmount, struct FDamageEvent const& Dam
 
 	Health = Health - DamageAmount;
 
-	if(Health<=0)
-	{
-		// Event.Kill 전송
-		SendDeathEvent(DamageCauser);
-		EnemyDeath();
-	}
+	// if(Health<=0)
+	// {
+	// 	// Event.Kill 전송
+	// 	SendDeathEvent(DamageCauser);
+	// 	// Interface TODO : 지금은 코드로 하지만 GAS로 하게되면 거기로 옮겨야됨 
+	// 	CharDie();
+	// }
 	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
-void ABase_Enemy::EnemyDeath()
+
+void ABase_Enemy::CharDie_Implementation(AActor* Causer)
 {
 	if(HasAuthority())
 	{
+		if (!Causer)
+			return;
 		if(TakeDamageDoOnce.Execute())
 		{
+			// Event.Combat.Kill 전송
+			SendDeathEvent(Causer);
+			
 			bIsDead =  true;
 
 			if(OnDeath.IsBound())
@@ -362,9 +422,11 @@ void ABase_Enemy::SendDeathEvent(AActor* Killer)
 		UAbilitySystemComponent* KillerASC = ASCInterface->GetAbilitySystemComponent();
 		if (KillerASC)
 		{
+			RS_LOG_ERROR(TEXT("Event Death Occur"))
+			
 			// 이벤트 데이터 포장
 			FGameplayEventData Payload;
-			Payload.EventTag = FGameplayTag::RequestGameplayTag(FName("Event.Kill"));
+			Payload.EventTag = FRsGameplayTags::Get().Event_Death;
 			Payload.Instigator = this;
 			Payload.Target = this;
 
@@ -441,6 +503,39 @@ bool ABase_Enemy::IsAlive_Implementation()
 	// return IInterface_CharacterManager::IsAlive_Implementation();
 	return !bIsDead;
 }
+
+void ABase_Enemy::AddCharacterAbilities()
+{
+	// 1. 서버 권한 확인 (중요: 클라이언트에서 실행하면 안 됨)
+	if (GetLocalRole() != ROLE_Authority || !IsValid(AbilitySystemComponent))
+	{
+		return;
+	}
+
+	// 2. 어빌리티 순회하며 부여
+	for (TSubclassOf<UGameplayAbility>& AbilityClass : DefaultAbilities)
+	{
+		if (AbilityClass)
+		{
+			// 3. Spec 생성 (클래스, 레벨, 입력ID, 소스)
+			// 예시: 레벨 1, 입력 ID는 -1 (없음) 또는 Enum 값
+			FGameplayAbilitySpec Spec(AbilityClass, 1, -1, this);
+
+			// 4. 어빌리티 부여 (GiveAbility)
+			// 리턴받은 Handle은 나중에 필요하면 저장해둡니다.
+			FGameplayAbilitySpecHandle Handle = AbilitySystemComponent->GiveAbility(Spec);
+			
+			AbilitySystemComponent->TryActivateAbility(Handle);
+		}
+	}
+}
+
+UAbilitySystemComponent* ABase_Enemy::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+
+
 
 
 

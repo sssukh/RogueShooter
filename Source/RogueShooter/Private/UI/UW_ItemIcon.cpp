@@ -16,11 +16,13 @@ UUW_ItemIcon::UUW_ItemIcon(const FObjectInitializer& ObjectInitializer) : Super(
 
 void UUW_ItemIcon::SetItemData(const FInventorySlot& InInventorySlot)
 {
+	CachedItemData = InInventorySlot.ItemData;
+	
+	ItemCount = InInventorySlot.Count;
+	
 	Icon->SetBrushFromTexture(InInventorySlot.ItemData->Icon);
 	
 	CountText->SetText(FText::FromString(FString::Printf(TEXT("%d"),InInventorySlot.Count)));
-	
-	CachedItemData = InInventorySlot.ItemData;
 }
 
 
@@ -30,7 +32,7 @@ void UUW_ItemIcon::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointe
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
 	
 	if (CachedItemData)
-		InventoryMain->ShowItemTooltip(CachedItemData);
+		InventoryMain->ShowItemTooltip(CachedItemData, ItemCount);
 }
 
 void UUW_ItemIcon::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)

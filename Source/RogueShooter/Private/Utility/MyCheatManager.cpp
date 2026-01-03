@@ -23,6 +23,6 @@ void UMyCheatManager::Debug_Kill()
 {
 	if (ABase_Character* Character = Cast<ABase_Character>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0)))
 	{
-		Character->CharacterDead();
+		IInterface_CharacterManager::Execute_CharDie(GetWorld(),nullptr);
 	}
 }

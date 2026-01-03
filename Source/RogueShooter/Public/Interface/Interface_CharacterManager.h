@@ -34,7 +34,6 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
 	USphereComponent* GetAbilitySphere();
-
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
 	ABase_Character* GetCharacter();
@@ -56,4 +55,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
 	void SetupHealthWidget();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable,Category = "RS|Interface|Character Manager")
+	void CharDie(AActor* Causer);
 };

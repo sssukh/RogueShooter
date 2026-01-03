@@ -39,4 +39,6 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Data")
 	TObjectPtr<UItemData> CachedItemData;
+	
+	int32 ItemCount = 0;
 };

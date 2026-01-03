@@ -23,7 +23,7 @@ public:
 	UUW_ItemTooltip(const FObjectInitializer& ObjectInitializer);
 	
 	
-	void UpdateTooltip(const UItemData* ItemData);
+	void UpdateTooltip(const UItemData* ItemData, int32 ItemCount);
 
 	/**
 	 * 

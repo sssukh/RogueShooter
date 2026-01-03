@@ -13,7 +13,7 @@ UUW_ItemTooltip::UUW_ItemTooltip(const FObjectInitializer& ObjectInitializer) : 
 {
 }
 
-void UUW_ItemTooltip::UpdateTooltip(const UItemData* ItemData)
+void UUW_ItemTooltip::UpdateTooltip(const UItemData* ItemData, const int32 ItemCount)
 {
 	if (!ItemData || !StatDataTable) return;
 	
@@ -36,9 +36,9 @@ void UUW_ItemTooltip::UpdateTooltip(const UItemData* ItemData)
 		if (FoundRow)
 		{
 			// 5. 스탯 한 줄 위젯 생성 및 추가
-						UUW_StatRow* RowWidget = CreateWidget<UUW_StatRow>(this,StatRowWidgetClass);
+			UUW_StatRow* RowWidget = CreateWidget<UUW_StatRow>(this,StatRowWidgetClass);
 			
-			RowWidget->UpdateRow(*FoundRow,Value);
+			RowWidget->UpdateRow(*FoundRow,Value * ItemCount);
 			Statlist->AddChild(RowWidget);
 		}
 		

@@ -3,6 +3,7 @@
 
 #include "UI/UW_InventoryMain.h"
 
+#include "Blueprint/SlateBlueprintLibrary.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/InventoryComponent.h"
 #include "Components/UniformGridPanel.h"
@@ -29,7 +30,7 @@ void UUW_InventoryMain::NativeConstruct()
 	
 	ItemTooltip = CreateWidget<UUW_ItemTooltip>(this,ItemTooltipClass);
 	
-	ItemTooltip->AddToViewport();
+	ItemTooltip->AddToViewport(1);
 	
 	ItemTooltip->SetVisibility(ESlateVisibility::Hidden);
 }
@@ -65,7 +66,7 @@ void UUW_InventoryMain::InitInventory(UInventoryComponent* InventoryComponent)
 	RefreshInventory();
 }
 
-void UUW_InventoryMain::ShowItemTooltip(const UItemData* ItemData)
+void UUW_InventoryMain::ShowItemTooltip(const UItemData* ItemData, const int32 ItemCount)
 {
 	if (!ItemData) return;
 	
@@ -74,40 +75,17 @@ void UUW_InventoryMain::ShowItemTooltip(const UItemData* ItemData)
 	{
 		ItemTooltip = CreateWidget<UUW_ItemTooltip>(this,ItemTooltipClass);
 		
-		ItemTooltip->UpdateTooltip(ItemData);
+		ItemTooltip->UpdateTooltip(ItemData, ItemCount);
 		
-		ItemTooltip->AddToViewport();
+		ItemTooltip->AddToViewport(1);
 	}
 	else
 	{
-		ItemTooltip->UpdateTooltip(ItemData);
+		ItemTooltip->UpdateTooltip(ItemData, ItemCount);
 		ItemTooltip->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 	}
 	
-	// 마우스 위치 구하기
-	FVector2D MousePos = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld());
-	
-	float ViewportScale = UWidgetLayoutLibrary::GetViewportScale(GetWorld());
-	
-	MousePos = MousePos*	ViewportScale;
-	
-	// 툴팁 크기 구하기
-	FVector2D TooltipSize = ItemTooltip->GetDesiredSize();
-	
-	// 화면 크기 구하기
-	FVector2D ViewportSize = UWidgetLayoutLibrary::GetViewportSize(GetWorld());
-	
-	// 위치 보정
-	if (MousePos.X + TooltipSize.X > ViewportSize.X)
-	{
-		MousePos.X -= TooltipSize.X;
-	}
-	if (MousePos.Y + TooltipSize.Y > ViewportSize.Y)
-	{
-		MousePos.Y -= TooltipSize.Y;
-	}
-	
-		ItemTooltip->SetPositionInViewport(MousePos + FVector2D(20,0));
+	UpdateMousePosition();		
 }
 
 void UUW_InventoryMain::HideItemTooltip()
@@ -115,4 +93,57 @@ void UUW_InventoryMain::HideItemTooltip()
 	if (!ItemTooltip) return;
 	
 	ItemTooltip->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UUW_InventoryMain::UpdateMousePosition()
+{
+	if (!ItemTooltip || !ItemTooltip->IsVisible()) return;
+	
+	// 마우스의 절대 좌표 가져오기
+	// GetMousePositionOnViewport와 GetMousePosition은 다르다.
+	APlayerController* PC = GetOwningPlayer();		
+	if (!PC) return;
+	
+	// DPI scale 값 가져오기
+	float DPI_Scale = UWidgetLayoutLibrary::GetViewportScale(GetWorld());
+	
+	// 마우스 물리 좌표(픽셀)
+	float MouseX,MouseY;
+	if (!PC->GetMousePosition(MouseX,MouseY)) return;
+	FVector2D MousePixelPos(MouseX,MouseY);
+	
+	// 마우스를 '논리 좌표'로 변환
+	// 공식 : 논리좌표 = 물리좌표/Scale
+	FVector2D LogicalMousePos = FVector2D::ZeroVector;
+	if (DPI_Scale>0.0f)
+	{
+		LogicalMousePos = MousePixelPos / DPI_Scale;
+	}
+	
+	
+	// 논리단위
+	
+	// 툴팁의 현재 크기
+	FVector2D LogicalTooltipSize = ItemTooltip->GetDesiredSize();
+	
+	FVector2D LogicalViewportSize = UWidgetLayoutLibrary::GetViewportSize(GetWorld());
+	
+	FVector2D TargetPos = LogicalMousePos + mMouseOffset;
+	
+	// X축 보정
+	if (TargetPos.X + LogicalTooltipSize.X > LogicalViewportSize.X)
+	{
+		TargetPos.X -= LogicalTooltipSize.X;
+	}
+	
+	// Y축 보정
+	if (TargetPos.Y + LogicalTooltipSize.Y > LogicalViewportSize.Y)
+	{
+		TargetPos.Y -= LogicalTooltipSize.Y;
+	}
+	
+	// RenderTranslation으로 위치이동
+	// SetPositionInViewport대신 쓰면 레이아웃 재계산을 안해서 훨씬 가볍다.
+	// ItemTooltip->SetRenderTranslation(TargetPos);
+	ItemTooltip->SetPositionInViewport(TargetPos,false);
 }

@@ -3,13 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "Interface/Interface_CharacterManager.h"
 #include "RogueShooter/FlowControlLIbrary.h"
 #include "Base_Enemy.generated.h"
 
 
-
+class UCombatSet;
+class UHealthSet;
 class AFloatingTextActor;
 class ABase_AIController;
 class UInterface_GameManager;
@@ -20,7 +22,7 @@ class ABase_Character;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeath);
 
 UCLASS()
-class ROGUESHOOTER_API ABase_Enemy : public ACharacter, public IInterface_CharacterManager
+class ROGUESHOOTER_API ABase_Enemy : public ACharacter, public IInterface_CharacterManager, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -50,6 +52,7 @@ public:
 	UFUNCTION()
 	void DamagePlayer();
 
+	void DamageWithGameplayTag();
 	
 	UFUNCTION(NetMulticast,Unreliable)
 	void MC_EnemyAttack();
@@ -63,8 +66,9 @@ public:
 	// Life and Death
 	UFUNCTION()
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
-
-	void EnemyDeath();
+	
+	// Interface
+	virtual void CharDie_Implementation(AActor* Causer) override;
 	
 	UFUNCTION(NetMulticast,Unreliable)
 	void MC_Enemy_Death();
@@ -168,6 +172,23 @@ public:
 
 	UPROPERTY()
 	TSubclassOf<AFloatingTextActor> FTActorClass;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY()
+	TObjectPtr<UHealthSet> HealthAttributes;
+	
+	UPROPERTY()
+	TObjectPtr<UCombatSet> CombatAttributes;
+	
+	void AddCharacterAbilities();
+	
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;;
+	
+	// 부여할 어빌리티 목록
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category =  "GAS | Config")
+	TArray<TSubclassOf<UGameplayAbility>> DefaultAbilities;
 	
 	// Delegate
 public:

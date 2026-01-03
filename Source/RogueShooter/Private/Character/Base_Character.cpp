@@ -11,7 +11,8 @@
 #include "Components/InventoryComponent.h"
 #include "Components/ProgressBar.h"
 #include "Components/WidgetComponent.h"
-#include "Data/CharAttributeSet.h"
+#include "Data/CombatSet.h"
+#include "Data/HealthSet.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerState.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -122,8 +123,9 @@ ABase_Character::ABase_Character()
 	InventoryComponent->bEditableWhenInherited = true;
 	
 	// AbilitySystemComponent 세팅
-	AbilitySystemComp = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComp"));
-	Attributes = CreateDefaultSubobject<UCharAttributeSet>(TEXT("Attributes"));
+	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	HealthAttributes = CreateDefaultSubobject<UHealthSet>(TEXT("HeathAttributes"));
+	CombatAttributes = CreateDefaultSubobject<UCombatSet>(TEXT("CombatAttributes"));
 }
 
 // Called when the game starts or when spawned
@@ -134,7 +136,14 @@ void ABase_Character::BeginPlay()
 	SetupReference();
 
 	LoadLastCharacterClass();
-
+	
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->InitAbilityActorInfo(this,this);
+		
+		AddCharacterAbilities();
+	}
+	
 	FTimerHandle BeginTimer;
 	GetWorld()->GetTimerManager().SetTimer(BeginTimer,FTimerDelegate::CreateLambda([this]()
 	{
@@ -151,9 +160,33 @@ void ABase_Character::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-class UAbilitySystemComponent* ABase_Character::GetAbilitySystemComponent() const
+void ABase_Character::AddCharacterAbilities()
 {
-	return AbilitySystemComp;
+	// 1. 서버 권한 확인 (중요: 클라이언트에서 실행하면 안 됨)
+	if (GetLocalRole() != ROLE_Authority || !IsValid(AbilitySystemComponent))
+	{
+		return;
+	}
+
+	// 2. 어빌리티 순회하며 부여
+	for (TSubclassOf<UGameplayAbility>& AbilityClass : DefaultAbilities)
+	{
+		if (AbilityClass)
+		{
+			// 3. Spec 생성 (클래스, 레벨, 입력ID, 소스)
+			// 예시: 레벨 1, 입력 ID는 -1 (없음) 또는 Enum 값
+			FGameplayAbilitySpec Spec(AbilityClass, 1, -1, this);
+
+			// 4. 어빌리티 부여 (GiveAbility)
+			// 리턴받은 Handle은 나중에 필요하면 저장해둡니다.
+			FGameplayAbilitySpecHandle Handle = AbilitySystemComponent->GiveAbility(Spec);
+		}
+	}
+}
+
+UAbilitySystemComponent* ABase_Character::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
 }
 
 void ABase_Character::PossessedBy(AController* NewController)
@@ -161,9 +194,9 @@ void ABase_Character::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 	
 	// [중요] 서버 쪽 초기화: 여기서 Init을 해줘야 ASC가 작동을 시작합니다.
-	if (AbilitySystemComp)
+	if (AbilitySystemComponent)
 	{
-		AbilitySystemComp->InitAbilityActorInfo(this, this);
+		AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	}
 }
 
@@ -239,15 +272,17 @@ float ABase_Character::TakeDamage(float DamageAmount, struct FDamageEvent const&
 
 	MC_UpdateHealthBar(CurrentHealth/MaxHealth);
 
-	if(CurrentHealth<=0)
-	{
-		CharacterDead();
-	}
+	// if(CurrentHealth<=0)
+	// {
+	// 	// TODO : 지금은 코드로 하지만 GAS로 하게되면 거기로 옮겨야됨 
+	// 	CharDie();
+	// }
 	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
-void ABase_Character::CharacterDead()
+
+void ABase_Character::CharDie_Implementation(AActor* Causer)
 {
 	if(DeathDoOnce.Execute())
 	{
