@@ -8,7 +8,9 @@
 #include "Utility/FRsGameplayTags.h"
 
 UHealthSet::UHealthSet()
+	:MaxHealth(100.0f)
 {
+	InitHealth(GetMaxHealth());
 }
 
 void UHealthSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
@@ -46,6 +48,32 @@ void UHealthSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& Out
 	
 	DOREPLIFETIME_CONDITION_NOTIFY(UHealthSet,Health,COND_None,REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UHealthSet,MaxHealth,COND_None,REPNOTIFY_Always);
+}
+
+void UHealthSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
+{
+	// 최대 체력은 1이상으로 설정
+	if (Attribute == GetMaxHealthAttribute())
+	{
+		NewValue = FMath::Max(1.0f,NewValue);
+	}
+	// 현재 체력은 0이상 최대체력 이하
+	else if (Attribute == GetHealthAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue,0.0f,GetMaxHealth());
+	}
+}
+
+void UHealthSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
+{
+	if (Attribute == GetMaxHealthAttribute())
+	{
+		OnMaxHealthChanged.Broadcast(OldValue,NewValue);
+	}
+	else if (Attribute == GetHealthAttribute())
+	{
+		OnCurrentHealthChanged.Broadcast(OldValue,NewValue);
+	}
 }
 
 void UHealthSet::OnRep_Health(const FGameplayAttributeData& OldHealth)

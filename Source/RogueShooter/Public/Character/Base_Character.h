@@ -46,7 +46,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	
+	virtual void PostInitializeComponents() override;	
 /**
  *	GAS
  */
@@ -173,11 +173,15 @@ public:
 	UFUNCTION(Client,Unreliable)
 	void OC_SetupWidgets();
 	
+	// TODO :: GAS에서 delegate를 통해 호출됨. 삭제 필요 
+	// UFUNCTION(NetMulticast,Unreliable)
+	// void MC_UpdateHealthBar(float percent);
+	
 	UFUNCTION(NetMulticast,Unreliable)
-	void MC_UpdateHealthBar(float percent);
-	
-	
+	void MC_UpdateCurrentHealth(float pOldCurrentHp, float pNewCurrentHp);
 
+	UFUNCTION(NetMulticast,Unreliable)
+	void MC_UpdateMaxHealth(float pOldMaxHp, float pNewMaxHp);
 	//*****************************************
 	// Pause Logic
 	//*****************************************

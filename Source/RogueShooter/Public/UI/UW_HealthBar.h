@@ -16,8 +16,14 @@ class ROGUESHOOTER_API UUW_HealthBar : public UUserWidget
 	GENERATED_BODY()
 public:
 	UUW_HealthBar(const FObjectInitializer& ObjectInitializer);
-
+	
+	void RefreshHpBar();
+	
 public:
 	UPROPERTY(VisibleDefaultsOnly,BlueprintReadWrite,meta = (BindWidget))
 	TObjectPtr<UProgressBar> ProgressBar;
+	
+	float CurrentHp;
+	
+	float MaxHp;
 };

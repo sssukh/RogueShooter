@@ -126,6 +126,9 @@ ABase_Character::ABase_Character()
 	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	HealthAttributes = CreateDefaultSubobject<UHealthSet>(TEXT("HeathAttributes"));
 	CombatAttributes = CreateDefaultSubobject<UCombatSet>(TEXT("CombatAttributes"));
+	// ASC에 AttributeSet 등록
+	AbilitySystemComponent->AddAttributeSetSubobject<UHealthSet>(HealthAttributes);
+	AbilitySystemComponent->AddAttributeSetSubobject<UCombatSet>(CombatAttributes);
 }
 
 // Called when the game starts or when spawned
@@ -142,8 +145,12 @@ void ABase_Character::BeginPlay()
 		AbilitySystemComponent->InitAbilityActorInfo(this,this);
 		
 		AddCharacterAbilities();
+		
+		AbilitySystemComponent->SetNumericAttributeBase(HealthAttributes->GetMaxHealthAttribute(),200.0f);
+		AbilitySystemComponent->SetNumericAttributeBase(HealthAttributes->GetHealthAttribute(),200.0f);
 	}
 	
+	// 위젯 세팅
 	FTimerHandle BeginTimer;
 	GetWorld()->GetTimerManager().SetTimer(BeginTimer,FTimerDelegate::CreateLambda([this]()
 	{
@@ -152,12 +159,21 @@ void ABase_Character::BeginPlay()
 	1.0f,
 	false
 	);
+	
+	
 }
 
 // Called every frame
 void ABase_Character::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void ABase_Character::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	
+	
 }
 
 void ABase_Character::AddCharacterAbilities()
@@ -180,6 +196,8 @@ void ABase_Character::AddCharacterAbilities()
 			// 4. 어빌리티 부여 (GiveAbility)
 			// 리턴받은 Handle은 나중에 필요하면 저장해둡니다.
 			FGameplayAbilitySpecHandle Handle = AbilitySystemComponent->GiveAbility(Spec);
+			
+			AbilitySystemComponent->TryActivateAbility(Handle);
 		}
 	}
 }
@@ -239,9 +257,14 @@ void ABase_Character::CreateHealthWidget()
 
 	HealthWidget->SetWidget(HealthBarWidgetReference);
 
-	MC_UpdateHealthBar(CurrentHealth/MaxHealth);
+	HealthBarWidgetReference->CurrentHp = HealthAttributes->GetHealth();
+	HealthBarWidgetReference->MaxHp = HealthAttributes->GetMaxHealth();
+	HealthBarWidgetReference->RefreshHpBar();
+	// MC_UpdateHealthBar(CurrentHealth,MaxHealth);
+	
+	HealthAttributes->OnCurrentHealthChanged.AddDynamic(this,&ABase_Character::MC_UpdateCurrentHealth);
+	HealthAttributes->OnMaxHealthChanged.AddDynamic(this,&ABase_Character::MC_UpdateMaxHealth);
 }
-
 void ABase_Character::SetupReference()
 {
 	if(AGameplay_PlayerController* Gameplay_PlayerController = Cast<AGameplay_PlayerController>(GetController()))
@@ -270,7 +293,8 @@ float ABase_Character::TakeDamage(float DamageAmount, struct FDamageEvent const&
 {
 	CurrentHealth = CurrentHealth-DamageAmount;
 
-	MC_UpdateHealthBar(CurrentHealth/MaxHealth);
+	// TODO : AttributeSet을 이용해서 값이 변하면 델리게이트를 호출해 자동으로 업데이트하도록 함.
+	// MC_UpdateHealthBar(CurrentHealth/MaxHealth);
 
 	// if(CurrentHealth<=0)
 	// {
@@ -304,6 +328,31 @@ void ABase_Character::CharDie_Implementation(AActor* Causer)
 		}
 	}
 }
+
+void ABase_Character::MC_UpdateMaxHealth_Implementation(float pOldMaxHp, float pNewMaxHp)
+{
+	if (!HealthBarWidgetReference)
+	{
+		RS_LOG_ERROR(TEXT("Hp Bar Widget is NULL"))
+		return;
+	}
+	
+	HealthBarWidgetReference->MaxHp = pNewMaxHp;
+	HealthBarWidgetReference->RefreshHpBar();
+}
+
+void ABase_Character::MC_UpdateCurrentHealth_Implementation(float pOldCurrentHp, float pNewCurrentHp)
+{
+	if (!HealthBarWidgetReference)
+	{
+		RS_LOG_ERROR(TEXT("Hp Bar Widget is NULL"))
+		return;
+	}
+	
+	HealthBarWidgetReference->CurrentHp = pNewCurrentHp;
+	HealthBarWidgetReference->RefreshHpBar();
+}
+
 
 void ABase_Character::Death_Implementation()
 {
@@ -344,6 +393,11 @@ USphereComponent* ABase_Character::GetAbilitySphere_Implementation()
 	return AbilitySphere;
 }
 
+// 어디서 호출되는지?
+// 안됐으면 위젯이 왜 있는지?
+// BeginPlay에서 OC_SetupWidgets()를 호출한다.
+// 이 함수가 왜 있는건가?
+// 그냥 인터페이스 용으로 남겨둔건가
 void ABase_Character::SetupHealthWidget_Implementation()
 {
 	// IInterface_CharacterManager::SetupHealthWidget_Implementation();
@@ -359,16 +413,11 @@ void ABase_Character::S_RestoreHealth_Implementation(float amount)
 {
 	CurrentHealth = FMath::Clamp(CurrentHealth+amount,0.0f,MaxHealth);
 
-	MC_UpdateHealthBar(CurrentHealth/MaxHealth);
+	// TODO : AttributeSet을 이용해서 값이 변하면 델리게이트를 호출해 자동으로 업데이트하도록 함.
+	// MC_UpdateHealthBar(CurrentHealth/MaxHealth);
 }
 
-void ABase_Character::MC_UpdateHealthBar_Implementation(float percent)
-{
-	if(IsValid(HealthBarWidgetReference))
-	{
-		HealthBarWidgetReference->ProgressBar->SetPercent(percent);
-	}
-}
+
 
 // TODO : 블루프린트 식 pause가 구현되어 있다.
 // TODO : C++식 Pause를 구현해서 대체하자.

@@ -3,6 +3,15 @@
 
 #include "UI/UW_HealthBar.h"
 
+#include "Components/ProgressBar.h"
+
 UUW_HealthBar::UUW_HealthBar(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+}
+
+
+
+void UUW_HealthBar::RefreshHpBar()
+{
+	ProgressBar->SetPercent(CurrentHp/MaxHp);
 }
