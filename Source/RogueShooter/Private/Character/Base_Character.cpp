@@ -16,6 +16,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerState.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameplayActors/FloatingTextActor.h"
 #include "Interface/Interface_GameManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Library/FunctionLibrary_Helper.h"
@@ -148,6 +149,8 @@ void ABase_Character::BeginPlay()
 		
 		AbilitySystemComponent->SetNumericAttributeBase(HealthAttributes->GetMaxHealthAttribute(),200.0f);
 		AbilitySystemComponent->SetNumericAttributeBase(HealthAttributes->GetHealthAttribute(),200.0f);
+		HealthAttributes->OnHealthDamaged.AddDynamic(this,&ABase_Character::SpawnFloatingText);
+		HealthAttributes->OnShieldDamaged.AddDynamic(this,&ABase_Character::SpawnFloatingText);
 	}
 	
 	// 위젯 세팅
@@ -197,7 +200,7 @@ void ABase_Character::AddCharacterAbilities()
 			// 리턴받은 Handle은 나중에 필요하면 저장해둡니다.
 			FGameplayAbilitySpecHandle Handle = AbilitySystemComponent->GiveAbility(Spec);
 			
-			AbilitySystemComponent->TryActivateAbility(Handle);
+			// AbilitySystemComponent->TryActivateAbility(Handle);
 		}
 	}
 }
@@ -329,7 +332,24 @@ void ABase_Character::CharDie_Implementation(AActor* Causer)
 	}
 }
 
-void ABase_Character::MC_UpdateMaxHealth_Implementation(float pOldMaxHp, float pNewMaxHp)
+void ABase_Character::SpawnFloatingText(float InDamage, EDamageReceiveType DamageType)
+{
+	// FVector SpawnLocation = GetActorLocation();
+	// SpawnLocation.X+=FMath::RandRange(-10.0f,10.0f);
+	// SpawnLocation.Y+=FMath::RandRange(-10.0f,10.0f);
+	// SpawnLocation.Z+=FMath::RandRange(-10.0f,10.0f);
+	//
+	// if(AFloatingTextActor* FloatingTextActor = GetWorld()->SpawnActorDeferred<AFloatingTextActor>(FloatingActorClass,FTransform(SpawnLocation)))
+	// {
+	// 	FloatingTextActor->Damage = InDamage;
+	// 	FloatingTextActor->DamageType = DamageType;
+	// 	FloatingTextActor->FinishSpawning(FTransform(SpawnLocation));
+	// }
+}
+
+
+
+void ABase_Character::MC_UpdateMaxHealth_Implementation(float pNewMaxHp)
 {
 	if (!HealthBarWidgetReference)
 	{
@@ -341,7 +361,7 @@ void ABase_Character::MC_UpdateMaxHealth_Implementation(float pOldMaxHp, float p
 	HealthBarWidgetReference->RefreshHpBar();
 }
 
-void ABase_Character::MC_UpdateCurrentHealth_Implementation(float pOldCurrentHp, float pNewCurrentHp)
+void ABase_Character::MC_UpdateCurrentHealth_Implementation(float pNewCurrentHp)
 {
 	if (!HealthBarWidgetReference)
 	{

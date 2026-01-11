@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/TimelineComponent.h"
 #include "GameFramework/Actor.h"
+#include "RogueShooter/RSEnumStruct.h"
 #include "FloatingTextActor.generated.h"
 
 class UUW_FloatingTextWidget;
@@ -36,10 +37,32 @@ public:
 
 	UFUNCTION()
 	void DestroyActor();
+	
+	UFUNCTION()
+	void SetTextColor();
 
 public:
-	UPROPERTY()
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta = (ExposeOnSpawn))
 	float Damage;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta = (ExposeOnSpawn))
+	EDamageReceiveType DamageType;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta = (ExposeOnSpawn))
+	FLinearColor TextColor;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Config")
+	float XRandMax;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Config")
+	float YRandMax;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Config")
+	float ZRandMax;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Config")
+	float DesLengthMax;
+	
 	
 private:
 	UPROPERTY()
@@ -67,4 +90,7 @@ private:
 	TObjectPtr<UTextBlock> TextBlock;
 
 	TSubclassOf<UUW_FloatingTextWidget> FloatingTextClass;
+	
+	
+	
 };

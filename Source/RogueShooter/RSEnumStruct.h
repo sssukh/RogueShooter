@@ -223,3 +223,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText FormatString; // 기본값: NSLOCTEXT("UI", "DefaultStat", "{0}: {1}")
 };
+
+UENUM(BlueprintType)
+enum class EDamageReceiveType : uint8
+{
+	Default,
+	Health,
+	Shield
+};

@@ -150,6 +150,9 @@ ABase_Enemy::ABase_Enemy()
 	HealthAttributes = CreateDefaultSubobject<UHealthSet>(TEXT("HeathAttributes"));
 	CombatAttributes = CreateDefaultSubobject<UCombatSet>(TEXT("CombatAttributes"));
 	
+	AbilitySystemComponent->AddAttributeSetSubobject<UHealthSet>(HealthAttributes);
+	AbilitySystemComponent->AddAttributeSetSubobject<UCombatSet>(CombatAttributes);
+
 	AbilitySystemComponent->SetIsReplicated(true);
 	// 예측없이 서버가 시키는 대로
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
@@ -450,16 +453,16 @@ void ABase_Enemy::ResetDoOnce()
 
 void ABase_Enemy::SpawnFloatingText(float InDamage)
 {
-	FVector SpawnLocation = GetActorLocation();
-	SpawnLocation.X+=FMath::RandRange(-10.0f,10.0f);
-	SpawnLocation.Y+=FMath::RandRange(-10.0f,10.0f);
-	SpawnLocation.Z+=FMath::RandRange(-10.0f,10.0f);
-
-	if(AFloatingTextActor* FloatingTextActor = GetWorld()->SpawnActorDeferred<AFloatingTextActor>(FTActorClass,FTransform(SpawnLocation)))
-	{
-		FloatingTextActor->Damage = InDamage;
-		FloatingTextActor->FinishSpawning(FTransform(SpawnLocation));
-	}
+	// FVector SpawnLocation = GetActorLocation();
+	// SpawnLocation.X+=FMath::RandRange(-10.0f,10.0f);
+	// SpawnLocation.Y+=FMath::RandRange(-10.0f,10.0f);
+	// SpawnLocation.Z+=FMath::RandRange(-10.0f,10.0f);
+	//
+	// if(AFloatingTextActor* FloatingTextActor = GetWorld()->SpawnActorDeferred<AFloatingTextActor>(FTActorClass,FTransform(SpawnLocation)))
+	// {
+	// 	FloatingTextActor->Damage = InDamage;
+	// 	FloatingTextActor->FinishSpawning(FTransform(SpawnLocation));
+	// }
 }
 
 void ABase_Enemy::SpawnSoul()
@@ -525,7 +528,7 @@ void ABase_Enemy::AddCharacterAbilities()
 			// 리턴받은 Handle은 나중에 필요하면 저장해둡니다.
 			FGameplayAbilitySpecHandle Handle = AbilitySystemComponent->GiveAbility(Spec);
 			
-			AbilitySystemComponent->TryActivateAbility(Handle);
+			// AbilitySystemComponent->TryActivateAbility(Handle);
 		}
 	}
 }

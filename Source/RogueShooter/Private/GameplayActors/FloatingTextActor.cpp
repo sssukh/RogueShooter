@@ -63,7 +63,11 @@ void AFloatingTextActor::BeginPlay()
 	FloatingText->TextBlock_Damage->SetText(FText::FromString(FString::SanitizeFloat(Damage)));
 
 	TextBlock = FloatingText->TextBlock_Damage;
-
+	
+	// SetTextColor();
+	
+	TextBlock->SetColorAndOpacity(TextColor);
+	
 	// fade curve 값에 따라 fadeout됨.
 	FOnTimelineFloat FadeFunction;
 
@@ -74,9 +78,13 @@ void AFloatingTextActor::BeginPlay()
 	Fade.PlayFromStart();
 	// Move Up
 
-	InitialLocation =  GetActorLocation();
-
-	Destination = InitialLocation + FVector(0.0f,0.0f,150.0f);
+	FVector RandVec = FVector( FMath::RandRange(0.0f,XRandMax),FMath::RandRange(0.0f,YRandMax),FMath::RandRange(0.0f,ZRandMax));
+	
+	InitialLocation =  GetActorLocation() + RandVec;
+	
+	RandVec.Normalize();
+	
+	Destination = InitialLocation + FMath::RandRange(0.0f,DesLengthMax) * RandVec;
 	
 	FOnTimelineFloat MovementFunction;
 
@@ -115,6 +123,22 @@ void AFloatingTextActor::MoveWidget(float alpha)
 void AFloatingTextActor::DestroyActor()
 {
 	Destroy();
+}
+
+void AFloatingTextActor::SetTextColor()
+{
+	switch (DamageType)
+	{
+	case EDamageReceiveType::Health:
+		TextBlock->SetColorAndOpacity(FSlateColor(FColor::Red));
+		break;
+	case EDamageReceiveType::Shield:
+		TextBlock->SetColorAndOpacity(FSlateColor(FColor::Silver));
+		break;
+	default:
+		TextBlock->SetColorAndOpacity(FSlateColor(FColor::White));
+		break;
+	}
 }
 
 

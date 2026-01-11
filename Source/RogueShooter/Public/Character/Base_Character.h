@@ -11,6 +11,7 @@
 #include "GameplayTagContainer.h"
 #include "Base_Character.generated.h"
 
+class AFloatingTextActor;
 class UHealthSet;
 class UCombatSet;
 class UInventoryComponent;
@@ -165,6 +166,9 @@ public:
 	// server 
 	UFUNCTION(Server,Unreliable)
 	void S_RestoreHealth(float amount);
+	
+	UFUNCTION(BlueprintCallable)
+	void SpawnFloatingText(float InDamage, EDamageReceiveType DamageType);
 
 	//*****************************************
 	// Widgets
@@ -178,10 +182,10 @@ public:
 	// void MC_UpdateHealthBar(float percent);
 	
 	UFUNCTION(NetMulticast,Unreliable)
-	void MC_UpdateCurrentHealth(float pOldCurrentHp, float pNewCurrentHp);
+	void MC_UpdateCurrentHealth(float pNewCurrentHp);
 
 	UFUNCTION(NetMulticast,Unreliable)
-	void MC_UpdateMaxHealth(float pOldMaxHp, float pNewMaxHp);
+	void MC_UpdateMaxHealth( float pNewMaxHp);
 	//*****************************************
 	// Pause Logic
 	//*****************************************
@@ -304,4 +308,7 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UInventoryComponent> InventoryComponent;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Config")
+	TSubclassOf<AFloatingTextActor> FloatingActorClass;
 };

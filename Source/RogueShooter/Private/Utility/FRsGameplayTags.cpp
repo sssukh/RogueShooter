@@ -29,4 +29,9 @@ void FRsGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	Event_Death = Manager.AddNativeGameplayTag(FName("Event.Death"),TEXT("죽음"));
 	Event_Equip = Manager.AddNativeGameplayTag(FName("Event.Equip"),TEXT("아이템 착용"));
 	Event_Hit = Manager.AddNativeGameplayTag(FName("Event.Hit"),TEXT("피격"));
+	
+	GC_Combat_Damage = Manager.AddNativeGameplayTag(FName("GameplayCue.Combat.Damage"),TEXT("데미지"));
+	GC_Combat_Damage_Health = Manager.AddNativeGameplayTag(FName("GameplayCue.Combat.Damage.Health"),TEXT("체력에 데미지"));
+	GC_Combat_Damage_Shield = Manager.AddNativeGameplayTag(FName("GameplayCue.Combat.Damage.Shield"),TEXT("실드에 데미지"));
+	
 }

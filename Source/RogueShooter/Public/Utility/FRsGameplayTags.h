@@ -32,6 +32,11 @@ public:
 	FGameplayTag Event_Equip;
 	FGameplayTag Event_Hit;
 	
+	FGameplayTag GC_Combat_Damage;
+	FGameplayTag GC_Combat_Damage_Shield;
+	FGameplayTag GC_Combat_Damage_Health;
+	
+	
 protected:
 	void AddAllTags(UGameplayTagsManager& Manager);
 private:

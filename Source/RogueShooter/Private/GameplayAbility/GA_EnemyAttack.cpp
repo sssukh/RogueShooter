@@ -7,6 +7,7 @@
 #include "AbilitySystemComponent.h"
 #include "UObject/FastReferenceCollector.h"
 #include "Utility/FRsGameplayTags.h"
+#include "GameplayEffectExtension.h"
 
 UGA_EnemyAttack::UGA_EnemyAttack()
 {
@@ -16,7 +17,7 @@ void UGA_EnemyAttack::OnHitPlayer(AActor* TargetActor)
 {
 	// 필요한 정보 가져오기 
 	UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo(); // 이 GA를 발동시킨 적 ASC
-	UAbilitySystemComponent* TargetASC  = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+	UAbilitySystemComponent* TargetASC  = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);// 이 GA를 적용시킬 타겟 ASC
 	
 	if (!SourceASC || !TargetActor) return;
 	
@@ -31,9 +32,11 @@ void UGA_EnemyAttack::OnHitPlayer(AActor* TargetActor)
 	{
 		// 데미지 수치 주입 (SetByCaller)
 		// 적의 공격력이 50이라고 가정. 음수로 변환하여 전달
-		float AttackDamage = -50.0f;
+		float AttackDamage = 10.0f;
+		
 		
 		// AttributeSet에서 직접 가져오려면 GetNumericAttribute 사용
+		// TODO : SetbyCaller 대신 다른 magnitude 및 calc 적용해야함.
 		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(
 			SpecHandle,
 			FRsGameplayTags::Get().Data_AttackPower,

@@ -18,10 +18,57 @@ void UHealthSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData&
 	Super::PostGameplayEffectExecute(Data);
 	
 	// 변경된 어트리뷰트가 health인지 확인
-	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
 	{
-		// 체력이 0보다 작아지지 않게 clamp
-		SetHealth(FMath::Clamp(GetHealth(),0.0f,GetMaxHealth()));
+		float LocalIncomingDamage = GetIncomingDamage();
+		
+		// meta attribute 초기화
+		SetIncomingDamage(0.0f);
+		
+		if (GetCurrentShield()>0.0f)
+		{
+			float IncomingShieldDamage = LocalIncomingDamage>GetCurrentShield()?GetCurrentShield():LocalIncomingDamage;
+			
+			// 쉴드를 넘어서는 대미지 (0 이상)
+			LocalIncomingDamage = FMath::Max(0.0f,LocalIncomingDamage-GetCurrentShield());
+			
+			float OldShield = GetCurrentShield();
+			
+			SetCurrentShield(OldShield-IncomingShieldDamage);
+			
+			OnShieldDamaged.Broadcast(IncomingShieldDamage,EDamageReceiveType::Shield);
+			
+			// GameplayCue로 shield 피격시 이펙트 발동
+			FGameplayCueParameters CueParams;
+			CueParams.RawMagnitude = IncomingShieldDamage;
+			CueParams.Location = Data.Target.GetAvatarActor()->GetActorLocation();
+			CueParams.EffectCauser = Data.EffectSpec.GetEffectContext().GetEffectCauser();
+			
+			// 타겟에게 GC를 실행하라고 명령 
+			Data.Target.AbilityActorInfo->AbilitySystemComponent->ExecuteGameplayCue(
+				FRsGameplayTags::Get().GC_Combat_Damage_Shield,CueParams);
+		}
+		
+		if (LocalIncomingDamage>0.0f)
+		{
+			const float FinalDamage = LocalIncomingDamage;
+			
+			const float NewHealth = GetHealth() - FinalDamage;
+			
+			SetHealth(NewHealth);
+			
+			OnHealthDamaged.Broadcast(LocalIncomingDamage,EDamageReceiveType::Health);
+			
+			// GameplayCue로 health 피격시 이펙트 발동
+			FGameplayCueParameters CueParams;
+			CueParams.RawMagnitude = FinalDamage;
+			CueParams.Location = Data.Target.GetAvatarActor()->GetActorLocation();
+			CueParams.EffectCauser = Data.EffectSpec.GetEffectContext().GetEffectCauser();
+			
+			// 타겟에게 GC를 실행하라고 명령 
+			Data.Target.AbilityActorInfo->AbilitySystemComponent->ExecuteGameplayCue(
+				FRsGameplayTags::Get().GC_Combat_Damage_Health,CueParams);
+		}
 		
 		// 사망 체크
 		if (GetHealth() <=0.0f)
@@ -48,6 +95,7 @@ void UHealthSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& Out
 	
 	DOREPLIFETIME_CONDITION_NOTIFY(UHealthSet,Health,COND_None,REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UHealthSet,MaxHealth,COND_None,REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UHealthSet,CurrentShield,COND_None,REPNOTIFY_Always);
 }
 
 void UHealthSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -62,17 +110,25 @@ void UHealthSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& 
 	{
 		NewValue = FMath::Clamp(NewValue,0.0f,GetMaxHealth());
 	}
+	else if (Attribute == GetCurrentShieldAttribute())
+	{
+		NewValue = FMath::Max(0.0f,NewValue);
+	}
 }
 
 void UHealthSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
 {
 	if (Attribute == GetMaxHealthAttribute())
 	{
-		OnMaxHealthChanged.Broadcast(OldValue,NewValue);
+		OnMaxHealthChanged.Broadcast(NewValue);
 	}
 	else if (Attribute == GetHealthAttribute())
 	{
-		OnCurrentHealthChanged.Broadcast(OldValue,NewValue);
+		OnCurrentHealthChanged.Broadcast(NewValue);
+	}
+	else if (Attribute == GetCurrentShieldAttribute())
+	{
+		OnCurrentShieldDamaged.Broadcast(NewValue);
 	}
 }
 
@@ -84,4 +140,10 @@ void UHealthSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
 void UHealthSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UHealthSet,MaxHealth,OldMaxHealth);
+}
+
+void UHealthSet::OnRep_Shield(const FGameplayAttributeData& OldShield)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UHealthSet,CurrentShield,OldShield);
+	
 }
