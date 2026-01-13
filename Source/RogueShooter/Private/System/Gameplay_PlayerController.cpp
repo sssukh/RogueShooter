@@ -260,9 +260,22 @@ void AGameplay_PlayerController::SetReference()
 
 void AGameplay_PlayerController::UpdateCharacterUI(float Percent, int32 Level)
 {
-	PlayerHud->ProgressBar_XP->SetPercent(Percent);
+	UpdateExpBar(Percent);
+	
+	UpdateLevelUI(Level);
 
+}
+
+void AGameplay_PlayerController::UpdateExpBar(float Percent)
+{
+	PlayerHud->ProgressBar_XP->SetPercent(Percent);
+	
+}
+
+void AGameplay_PlayerController::UpdateLevelUI(int32 Level)
+{
 	PlayerHud->TextBlock_Level->SetText(FText::FromString(FString::Printf(TEXT("Level %d"),Level)));
+	
 }
 
 void AGameplay_PlayerController::UpdateHotbar()

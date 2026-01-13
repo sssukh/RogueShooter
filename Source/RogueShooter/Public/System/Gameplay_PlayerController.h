@@ -124,6 +124,8 @@ public:
 	UFUNCTION(Client,Reliable)
 	void OC_UpdateCharUI(float Percent, int32 Level);
 
+	
+	
 	// 본 블루프린트에는 replicate 설정이 안되어있는데 함수 이름이 OC라서 일단 replicate 설정 해둠
 	// Timer
 	UFUNCTION(Client,Reliable)
@@ -167,6 +169,10 @@ public:
 	 */
 	void UpdateCharacterUI(float Percent, int32 Level);
 
+	void UpdateExpBar(float Percent);
+	
+	void UpdateLevelUI(int32 Level);
+	
 	/**
 	 * Refresh Hotbar with active and passive skills
 	 */

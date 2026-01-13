@@ -25,6 +25,9 @@
 #include "Utility/FRsGameplayTags.h"
 #include "Utility/RSCollisionChannel.h"
 #include "Utility/RSLog.h"
+#include "GameplayAbilitiesModule.h"
+#include "AbilitySystemGlobals.h"
+#include "Data/ExpSet.h"
 
 
 // Sets default values
@@ -152,7 +155,7 @@ ABase_Enemy::ABase_Enemy()
 	
 	AbilitySystemComponent->AddAttributeSetSubobject<UHealthSet>(HealthAttributes);
 	AbilitySystemComponent->AddAttributeSetSubobject<UCombatSet>(CombatAttributes);
-
+	
 	AbilitySystemComponent->SetIsReplicated(true);
 	// 예측없이 서버가 시키는 대로
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
@@ -177,6 +180,9 @@ void ABase_Enemy::BeginPlay()
 		AbilitySystemComponent->InitAbilityActorInfo(this,this);
 		
 		AddCharacterAbilities();
+		
+		
+		IGameplayAbilitiesModule::Get().GetAbilitySystemGlobals()->GetAttributeSetInitter()->InitAttributeSetDefaults(AbilitySystemComponent,TEXT("Enemy"),CharLevel,true);
 	}
 }
 
@@ -506,6 +512,8 @@ bool ABase_Enemy::IsAlive_Implementation()
 	// return IInterface_CharacterManager::IsAlive_Implementation();
 	return !bIsDead;
 }
+
+
 
 void ABase_Enemy::AddCharacterAbilities()
 {

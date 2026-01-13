@@ -11,6 +11,7 @@
 #include "GameplayTagContainer.h"
 #include "Base_Character.generated.h"
 
+class UExpSet;
 class AFloatingTextActor;
 class UHealthSet;
 class UCombatSet;
@@ -48,6 +49,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void PostInitializeComponents() override;	
+	
+	
 /**
  *	GAS
  */
@@ -68,6 +71,9 @@ protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "GAS")
 	TObjectPtr<UCombatSet> CombatAttributes;
 
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "GAS")
+	TObjectPtr<UExpSet> ExpAttributes;
+	
 	// 부여할 어빌리티 목록
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category =  "GAS | Config")
 	TArray<TSubclassOf<UGameplayAbility>> DefaultAbilities;
@@ -75,10 +81,24 @@ protected:
 	// 초기화 함수 (아래 설명 참조)
 	virtual void PossessedBy(AController* NewController) override;
 	
+	UFUNCTION()
+	void OnLevelup(float NewLevel);
+	
+	UFUNCTION()
+	void OnExpChange(float NewExp);
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "GAS|Config")
+	TSubclassOf<UGameplayEffect> DefaultCurveEffectClass;
 	
 	
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Attribute")
+	FCurveTableRowHandle MaxXpCurve;
 	
 public:
+	float GetMaxXpForLevel(float pLevel) const;
+	
+	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -294,7 +314,6 @@ public:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
 	bool IsDead = false;
 
-	
 	//
 	FDoOnce DeathDoOnce;
 
@@ -311,4 +330,8 @@ public:
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Config")
 	TSubclassOf<AFloatingTextActor> FloatingActorClass;
+	
+	UPROPERTY()
+	int32 StartLevel = 1;
+
 };

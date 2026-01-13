@@ -48,4 +48,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Stats")
 	FGameplayAttributeData Speed;
 	ATTRIBUTE_ACCESSORS(UCombatSet, Speed);
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Stats")
+	FGameplayAttributeData Defense;
+	ATTRIBUTE_ACCESSORS(UCombatSet, Defense);
 };

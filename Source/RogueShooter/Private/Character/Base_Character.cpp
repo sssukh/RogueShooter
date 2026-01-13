@@ -30,6 +30,12 @@
 #include "Utility/RSLog.h"
 #include "UI/UW_HealthBar.h"
 
+#include "GameplayAbilitiesModule.h"
+#include "AbilitySystemGlobals.h"
+#include "Components/TextBlock.h"
+#include "Data/ExpSet.h"
+#include "UI/UW_PlayerHud.h"
+
 
 // Sets default values
 ABase_Character::ABase_Character()
@@ -127,9 +133,14 @@ ABase_Character::ABase_Character()
 	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	HealthAttributes = CreateDefaultSubobject<UHealthSet>(TEXT("HeathAttributes"));
 	CombatAttributes = CreateDefaultSubobject<UCombatSet>(TEXT("CombatAttributes"));
+	ExpAttributes = CreateDefaultSubobject<UExpSet>(TEXT("ExpAttributes"));
+	
 	// ASC에 AttributeSet 등록
 	AbilitySystemComponent->AddAttributeSetSubobject<UHealthSet>(HealthAttributes);
 	AbilitySystemComponent->AddAttributeSetSubobject<UCombatSet>(CombatAttributes);
+	AbilitySystemComponent->AddAttributeSetSubobject<UExpSet>(ExpAttributes);
+	
+	StartLevel = 1;
 }
 
 // Called when the game starts or when spawned
@@ -146,11 +157,11 @@ void ABase_Character::BeginPlay()
 		AbilitySystemComponent->InitAbilityActorInfo(this,this);
 		
 		AddCharacterAbilities();
-		
-		AbilitySystemComponent->SetNumericAttributeBase(HealthAttributes->GetMaxHealthAttribute(),200.0f);
-		AbilitySystemComponent->SetNumericAttributeBase(HealthAttributes->GetHealthAttribute(),200.0f);
+	
 		HealthAttributes->OnHealthDamaged.AddDynamic(this,&ABase_Character::SpawnFloatingText);
 		HealthAttributes->OnShieldDamaged.AddDynamic(this,&ABase_Character::SpawnFloatingText);
+		ExpAttributes->OnLevelUp.AddDynamic(this,&ABase_Character::OnLevelup);
+		ExpAttributes->OnExpChange.AddDynamic(this,&ABase_Character::OnExpChange);
 	}
 	
 	// 위젯 세팅
@@ -176,6 +187,8 @@ void ABase_Character::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 	
+	//TODO : 지금은 여기있지만 ASC를 PlayerState로 옮기고 이 부분도 옮겨야함
+	IGameplayAbilitiesModule::Get().GetAbilitySystemGlobals()->GetAttributeSetInitter()->InitAttributeSetDefaults(AbilitySystemComponent,TEXT("BaseCharacter"),StartLevel,true);
 	
 }
 
@@ -219,6 +232,49 @@ void ABase_Character::PossessedBy(AController* NewController)
 	{
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	}
+}
+
+void ABase_Character::OnLevelup( float NewLevel)
+{
+	FGameplayEffectContextHandle Context = AbilitySystemComponent->MakeEffectContext();
+	Context.AddSourceObject(this);
+	
+	FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultCurveEffectClass,NewLevel,Context);
+	
+	if (SpecHandle.IsValid())
+	{
+		AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+	}
+	
+	// TODO : 레벨 UI 갱신 필요 
+	// TODO : 임시로 갱신 시킴
+	AGameplay_PlayerController* PC = Cast<AGameplay_PlayerController>(GetController());
+	
+	float maxXp = ExpAttributes->GetMaxExpGained();
+	float currentXp = ExpAttributes->GetExpGained();
+	
+	PC->UpdateLevelUI((int32)NewLevel);
+	
+}
+
+void ABase_Character::OnExpChange(float NewExp)
+{
+	AGameplay_PlayerController* PC = Cast<AGameplay_PlayerController>(GetController());
+	
+	float maxXp = ExpAttributes->GetMaxExpGained();
+	
+	PC->UpdateExpBar(NewExp/maxXp);
+}
+
+float ABase_Character::GetMaxXpForLevel(float pLevel) const
+{
+	float ResultXp = 100.0f;
+	if (MaxXpCurve.CurveTable)
+	{
+		ResultXp = MaxXpCurve.CurveTable->FindCurve(MaxXpCurve.RowName,TEXT(""))->Eval(pLevel);
+	}
+	
+	return ResultXp;
 }
 
 // Called to bind functionality to input

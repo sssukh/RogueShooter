@@ -32,15 +32,15 @@ void UGA_EnemyAttack::OnHitPlayer(AActor* TargetActor)
 	{
 		// 데미지 수치 주입 (SetByCaller)
 		// 적의 공격력이 50이라고 가정. 음수로 변환하여 전달
-		float AttackDamage = 10.0f;
+		// float AttackDamage = 10.0f;
 		
 		
 		// AttributeSet에서 직접 가져오려면 GetNumericAttribute 사용
 		// TODO : SetbyCaller 대신 다른 magnitude 및 calc 적용해야함.
-		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(
-			SpecHandle,
-			FRsGameplayTags::Get().Data_AttackPower,
-			AttackDamage);
+		// UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(
+		// 	SpecHandle,
+		// 	FRsGameplayTags::Get().Data_AttackPower,
+		// 	AttackDamage);
 		
 		// 플레이어에게 적용 
 		SourceASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(),TargetASC);
