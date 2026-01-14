@@ -162,6 +162,8 @@ void ABase_Character::BeginPlay()
 		HealthAttributes->OnShieldDamaged.AddDynamic(this,&ABase_Character::SpawnFloatingText);
 		ExpAttributes->OnLevelUp.AddDynamic(this,&ABase_Character::OnLevelup);
 		ExpAttributes->OnExpChange.AddDynamic(this,&ABase_Character::OnExpChange);
+		
+		OnLevelup(StartLevel);
 	}
 	
 	// 위젯 세팅
@@ -246,6 +248,8 @@ void ABase_Character::OnLevelup( float NewLevel)
 		AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 	}
 	
+	MC_UpdateCurrentHealth(HealthAttributes->GetHealth());
+	
 	// TODO : 레벨 UI 갱신 필요 
 	// TODO : 임시로 갱신 시킴
 	AGameplay_PlayerController* PC = Cast<AGameplay_PlayerController>(GetController());
@@ -254,6 +258,7 @@ void ABase_Character::OnLevelup( float NewLevel)
 	float currentXp = ExpAttributes->GetExpGained();
 	
 	PC->UpdateLevelUI((int32)NewLevel);
+	
 	
 }
 

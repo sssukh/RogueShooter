@@ -13,18 +13,12 @@
   <component name="ChangeListManager">
     <list default="true" id="8deb027d-5a9e-424c-a7bd-f766f82ad3c0" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.RogueShooter/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.RogueShooter/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Config/DefaultGame.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultGame.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/Character/BP_Base_Character.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/Character/BP_Base_Character.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayAbility/BGA_EnemyAttack.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayAbility/BGA_EnemyAttack.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayEffect/GE_Damage.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayEffect/GE_Damage.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayEffect/GE_CharacterAttributes_Curve.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayEffect/GE_CharacterAttributes_Curve.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/Character/Base_Character.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/Character/Base_Character.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/Enemies/Base_Enemy.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/Enemies/Base_Enemy.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/GameplayAbility/GA_EnemyAttack.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/GameplayAbility/GA_EnemyAttack.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/System/Gameplay_PlayerController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/System/Gameplay_PlayerController.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/Character/Base_Character.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/Character/Base_Character.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/Data/CombatSet.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/Data/CombatSet.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/Data/ExpSet.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/Data/ExpSet.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/Data/CombatSet.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/Data/CombatSet.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/Enemies/Base_Enemy.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/Enemies/Base_Enemy.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/System/Gameplay_PlayerController.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/System/Gameplay_PlayerController.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/Data/ExpSet.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/Data/ExpSet.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,6 +32,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="cidr-memory-view://7" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/AI/MLAdapter/Source/MLAdapter/Private/Sensors/MLAdapterSensor_Attribute.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Private/AttributeSet.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Developer/DerivedDataCache/Private/DerivedDataCacheStats.cpp" root0="FORCE_HIGHLIGHTING" />
@@ -263,6 +258,7 @@
       <workItem from="1768121128979" duration="8997000" />
       <workItem from="1768195155810" duration="18013000" />
       <workItem from="1768269985796" duration="14502000" />
+      <workItem from="1768376228597" duration="11003000" />
     </task>
     <servers />
   </component>

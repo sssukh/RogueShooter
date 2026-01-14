@@ -32,6 +32,8 @@ public:
 	ATTRIBUTE_ACCESSORS(ThisClass,DropExp);
 	ATTRIBUTE_ACCESSORS(ThisClass,IncomingExp);
 	
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	
 	
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
@@ -43,22 +45,39 @@ public:
 	mutable FExpChanged OnExpChange;
 
 	
-protected:
-	UPROPERTY(BlueprintReadOnly,Category = "Attribute")
+public:
+	UPROPERTY(BlueprintReadOnly,Category = "Attribute", Replicated = OnRep_MaxExpLevel)
 	FGameplayAttributeData MaxExpLevel;
 	
-	UPROPERTY(BlueprintReadOnly,Category = "Attribute")
+	UPROPERTY(BlueprintReadOnly,Category = "Attribute", Replicated = OnRep_ExpLevel)
 	FGameplayAttributeData ExpLevel;
 	
-	UPROPERTY(BlueprintReadOnly,Category = "Attribute")
+	UPROPERTY(BlueprintReadOnly,Category = "Attribute", Replicated = OnRep_MaxExpGained)
 	FGameplayAttributeData MaxExpGained;
 	
-	UPROPERTY(BlueprintReadOnly,Category = "Attribute")
+	UPROPERTY(BlueprintReadOnly,Category = "Attribute", Replicated = OnRep_ExpGained)
 	FGameplayAttributeData ExpGained;
 	
-	UPROPERTY(BlueprintReadOnly,Category = "Attribute")
+	UPROPERTY(BlueprintReadOnly,Category = "Attribute", Replicated = OnRep_DropExp)
 	FGameplayAttributeData DropExp;
 	
 	UPROPERTY(BlueprintReadOnly,Category = "Attribute")
 	FGameplayAttributeData IncomingExp;
+	
+public:
+	UFUNCTION()
+	virtual void OnRep_MaxExpLevel(const FGameplayAttributeData& OldMaxExpLevel);
+	
+	UFUNCTION()
+	virtual void OnRep_ExpLevel(const FGameplayAttributeData& OldExpLevel);
+	
+	UFUNCTION()
+	virtual void OnRep_MaxExpGained(const FGameplayAttributeData& OldMaxExpGained);
+	
+	UFUNCTION()
+	virtual void OnRep_ExpGained(const FGameplayAttributeData& OldExpGained);
+	
+	UFUNCTION()
+	virtual void OnRep_DropExp(const FGameplayAttributeData& OldDropExp);
+	
 };
