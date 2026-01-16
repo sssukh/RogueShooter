@@ -29,7 +29,6 @@ public:
 	ATTRIBUTE_ACCESSORS(ThisClass,ExpLevel);
 	ATTRIBUTE_ACCESSORS(ThisClass,MaxExpGained);
 	ATTRIBUTE_ACCESSORS(ThisClass,ExpGained);
-	ATTRIBUTE_ACCESSORS(ThisClass,DropExp);
 	ATTRIBUTE_ACCESSORS(ThisClass,IncomingExp);
 	
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
@@ -58,8 +57,6 @@ public:
 	UPROPERTY(BlueprintReadOnly,Category = "Attribute", Replicated = OnRep_ExpGained)
 	FGameplayAttributeData ExpGained;
 	
-	UPROPERTY(BlueprintReadOnly,Category = "Attribute", Replicated = OnRep_DropExp)
-	FGameplayAttributeData DropExp;
 	
 	UPROPERTY(BlueprintReadOnly,Category = "Attribute")
 	FGameplayAttributeData IncomingExp;
@@ -77,7 +74,5 @@ public:
 	UFUNCTION()
 	virtual void OnRep_ExpGained(const FGameplayAttributeData& OldExpGained);
 	
-	UFUNCTION()
-	virtual void OnRep_DropExp(const FGameplayAttributeData& OldDropExp);
 	
 };

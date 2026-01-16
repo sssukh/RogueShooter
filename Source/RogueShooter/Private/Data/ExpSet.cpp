@@ -14,7 +14,6 @@ UExpSet::UExpSet()
 {
 	InitExpLevel(1.0f);
 	InitExpGained(0.0f);
-	InitDropExp(0.0f);
 }
 
 void UExpSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -25,7 +24,6 @@ void UExpSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLif
 	DOREPLIFETIME_CONDITION_NOTIFY(UExpSet,ExpGained,COND_None,REPNOTIFY_Always)
 	DOREPLIFETIME_CONDITION_NOTIFY(UExpSet,ExpLevel,COND_None,REPNOTIFY_Always)
 	DOREPLIFETIME_CONDITION_NOTIFY(UExpSet,MaxExpLevel,COND_None,REPNOTIFY_Always)
-	DOREPLIFETIME_CONDITION_NOTIFY(UExpSet,DropExp,COND_None,REPNOTIFY_Always)
 }
 
 void UExpSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -121,8 +119,4 @@ void UExpSet::OnRep_ExpGained(const FGameplayAttributeData& OldExpGained)
 	
 }
 
-void UExpSet::OnRep_DropExp(const FGameplayAttributeData& OldDropExp)
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UExpSet,DropExp,OldDropExp);
-	
-}
+

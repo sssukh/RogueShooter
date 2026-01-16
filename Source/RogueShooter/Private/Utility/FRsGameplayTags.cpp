@@ -14,13 +14,14 @@ void FRsGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 {
 	// 변수 = AddNativeGameplayTag("태그.이름", "설명")
 	
-	Data_Health = Manager.AddNativeGameplayTag(FName("Data.Health"),TEXT("체력"));
-	Data_MaxHealth = Manager.AddNativeGameplayTag(FName("Data.MaxHealth"),TEXT("최대 체력"));
-	Data_AttackPower = Manager.AddNativeGameplayTag(FName("Data.AttackPower"),TEXT("공격력"));
-	Data_AttackSpeed = Manager.AddNativeGameplayTag(FName("Data.AttackSpeed"),TEXT("공격속도"));
-	Data_Speed = Manager.AddNativeGameplayTag(FName("Data.Speed"),TEXT("이동속도"));
-	Data_Critical = Manager.AddNativeGameplayTag(FName("Data.Critical"),TEXT("치명타확률"));
-	Data_CriticalDamage = Manager.AddNativeGameplayTag(FName("Data.CriticalDamage"),TEXT("치명타 데미지"));
+	Data_Stat_Health = Manager.AddNativeGameplayTag(FName("Data.Stat.Health"),TEXT("체력"));
+	Data_Stat_MaxHealth = Manager.AddNativeGameplayTag(FName("Data.Stat.MaxHealth"),TEXT("최대 체력"));
+	Data_Stat_AttackPower = Manager.AddNativeGameplayTag(FName("Data.Stat.AttackPower"),TEXT("공격력"));
+	Data_Stat_AttackSpeed = Manager.AddNativeGameplayTag(FName("Data.Stat.AttackSpeed"),TEXT("공격속도"));
+	Data_Stat_Speed = Manager.AddNativeGameplayTag(FName("Data.Stat.Speed"),TEXT("이동속도"));
+	Data_Stat_Critical = Manager.AddNativeGameplayTag(FName("Data.Stat.Critical"),TEXT("치명타확률"));
+	Data_Stat_CriticalDamage = Manager.AddNativeGameplayTag(FName("Data.Stat.CriticalDamage"),TEXT("치명타 데미지"));
+	Data_Stat_Defense = Manager.AddNativeGameplayTag(FName("Data.Stat.Defense"),TEXT("방어력"));
 	
 	Status_Dead = Manager.AddNativeGameplayTag(FName("Status.Dead"),TEXT("죽은 상태"));
 	Status_Debuff = Manager.AddNativeGameplayTag(FName("Status.Debuff"),TEXT("디버프"));

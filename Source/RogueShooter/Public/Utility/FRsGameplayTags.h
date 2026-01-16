@@ -16,13 +16,14 @@ public:
 	static void InitializeNativeGameplayTags();
 	
 	// 태그 변수 선언
-	FGameplayTag Data_Health;
-	FGameplayTag Data_MaxHealth;
-	FGameplayTag Data_AttackPower;
-	FGameplayTag Data_AttackSpeed;
-	FGameplayTag Data_Speed;
-	FGameplayTag Data_Critical;
-	FGameplayTag Data_CriticalDamage;
+	FGameplayTag Data_Stat_Health;
+	FGameplayTag Data_Stat_MaxHealth;
+	FGameplayTag Data_Stat_AttackPower;
+	FGameplayTag Data_Stat_AttackSpeed;
+	FGameplayTag Data_Stat_Speed;
+	FGameplayTag Data_Stat_Critical;
+	FGameplayTag Data_Stat_CriticalDamage;
+	FGameplayTag Data_Stat_Defense;
 	
 	FGameplayTag Status_Dead;
 	FGameplayTag Status_Debuff;

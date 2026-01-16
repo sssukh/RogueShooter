@@ -258,8 +258,6 @@ void ABase_Character::OnLevelup( float NewLevel)
 	float currentXp = ExpAttributes->GetExpGained();
 	
 	PC->UpdateLevelUI((int32)NewLevel);
-	
-	
 }
 
 void ABase_Character::OnExpChange(float NewExp)
