@@ -3,7 +3,6 @@
 
 #include "System/GameManager.h"
 
-#include "Components/AbilitiesComponent.h"
 #include "Enemies/Base_Elite.h"
 #include "Enemies/Base_Enemy.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
@@ -503,9 +502,13 @@ void AGameManager::ProcessEndGame()
 	{
 		if(Character->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
 		{
-			UAbilitiesComponent* AbilitiesComponent = IInterface_CharacterManager::Execute_GetAbilityComponent(Character);
+			// TODO : 삭제
+			
+			UAbilitiesComponent* AbilitiesComponent = nullptr;//IInterface_CharacterManager::Execute_GetAbilityComponent(Character);
 
-			AbilitiesComponent->InvalidateTimers();
+			// TODO : 삭제
+			
+			// AbilitiesComponent->InvalidateTimers();
 
 			Character->GetController()->SetIgnoreMoveInput(true);
 

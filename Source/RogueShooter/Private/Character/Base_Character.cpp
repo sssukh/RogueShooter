@@ -6,7 +6,6 @@
 #include "AbilitySystemComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
-#include "Components/AbilitiesComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InventoryComponent.h"
 #include "Components/ProgressBar.h"
@@ -36,6 +35,9 @@
 #include "Data/ExpSet.h"
 #include "UI/UW_PlayerHud.h"
 
+#include "EnhancedInputComponent.h"
+#include "InputAction.h"
+#include "EnhancedInputSubsystems.h"
 
 // Sets default values
 ABase_Character::ABase_Character()
@@ -58,22 +60,24 @@ ABase_Character::ABase_Character()
 	GetCapsuleComponent()->SetLineThickness(0.0f);
 	GetCapsuleComponent()->SetCapsuleRadius(34.0f);
 
-	AbilitySphere = CreateDefaultSubobject<USphereComponent>("AbilitySphere");
-	AbilitySphere->SetSphereRadius(960.0f);
-	AbilitySphere->SetLineThickness(0.0f);
-	AbilitySphere->SetupAttachment(GetCapsuleComponent());
+	// TODO : 삭제
+	
+	// AbilitySphere = CreateDefaultSubobject<USphereComponent>("AbilitySphere");
+	// AbilitySphere->SetSphereRadius(960.0f);
+	// AbilitySphere->SetLineThickness(0.0f);
+	// AbilitySphere->SetupAttachment(GetCapsuleComponent());
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
-	SpringArm->TargetArmLength = 2500.0f;
-	SpringArm->SetRelativeRotation(FRotator(-35.0f,0.0f,0.0f));
-	SpringArm->bInheritPitch = false;
-	SpringArm->bInheritRoll = false;
-	SpringArm->bInheritYaw = false;
+	// SpringArm->TargetArmLength = 2500.0f;
+	// SpringArm->SetRelativeRotation(FRotator(-35.0f,0.0f,0.0f));
+	// SpringArm->bInheritPitch = false;
+	// SpringArm->bInheritRoll = false;
+	// SpringArm->bInheritYaw = false;
 	SpringArm->SetupAttachment(GetCapsuleComponent());
 
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
-	Camera->SetFieldOfView(45.0f);
-	Camera->SetProjectionMode(ECameraProjectionMode::Perspective);
+	// Camera->SetFieldOfView(45.0f);
+	// Camera->SetProjectionMode(ECameraProjectionMode::Perspective);
 	Camera->SetupAttachment(SpringArm);
 
 	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceFinder(*AssetPath::Animation::BaseCharAnim);
@@ -117,12 +121,7 @@ ABase_Character::ABase_Character()
 		HealthWidget->SetupAttachment(RootComponent);
 	}
 
-	// AbilitiesComponent 세팅
-	AbilityComponent = CreateDefaultSubobject<UAbilitiesComponent>(TEXT("AbilitiesComponent"));
-
-	AbilityComponent->bEditableWhenInherited=true;
-
-	AbilityComponent->MaxAbilityLevel = 5;
+	
 	
 	// InventoryComponent 세팅
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
@@ -151,6 +150,8 @@ void ABase_Character::BeginPlay()
 	SetupReference();
 
 	LoadLastCharacterClass();
+	
+	CharacterInputSetting();
 	
 	if (AbilitySystemComponent)
 	{
@@ -285,6 +286,26 @@ void ABase_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	if (PlayerInputComponent == nullptr)
+	{
+		RS_LOG_SCREEN(TEXT("PlayerInputComponent is null"))
+		return;
+	}
+	
+	// Enhanced Input Component로 캐스팅
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
+        
+		// LookAction이 유효한지 확인 후 바인딩
+		if (LookAction)
+		{
+			EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ABase_Character::Look);
+		}
+		
+		if (MoveAction)
+		{
+			EnhancedInputComponent->BindAction(MoveAction,ETriggerEvent::Triggered,this,&ABase_Character::Move);
+		}
+	}
 	
 }
 
@@ -295,10 +316,12 @@ void ABase_Character::UpdateCharacterClass_Implementation(FAvailableCharacter Av
 	S_SetCharacterData(AvailableCharacter);
 }
 
-UAbilitiesComponent* ABase_Character::GetAbilityComponent_Implementation()
-{
-	return AbilityComponent;
-}
+	// TODO : 삭제
+
+// UAbilitiesComponent* ABase_Character::GetAbilityComponent_Implementation()
+// {
+// 	return AbilityComponent;
+// }
 
 void ABase_Character::S_SetCharacterMesh_Implementation(USkeletalMesh* SK)
 {
@@ -353,7 +376,7 @@ void ABase_Character::SetupDispatchers()
 float ABase_Character::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
                                   class AController* EventInstigator, AActor* DamageCauser)
 {
-	CurrentHealth = CurrentHealth-DamageAmount;
+	// CurrentHealth = CurrentHealth-DamageAmount;
 
 	// TODO : AttributeSet을 이용해서 값이 변하면 델리게이트를 호출해 자동으로 업데이트하도록 함.
 	// MC_UpdateHealthBar(CurrentHealth/MaxHealth);
@@ -367,6 +390,8 @@ float ABase_Character::TakeDamage(float DamageAmount, struct FDamageEvent const&
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
+
+	// TODO : GAS로 옮겨진거 체크 후 삭제 
 
 void ABase_Character::CharDie_Implementation(AActor* Causer)
 {
@@ -386,26 +411,16 @@ void ABase_Character::CharDie_Implementation(AActor* Causer)
 		{
 			IInterface_GameManager::Execute_OnPlayerDeath(GM_Interface);
 				
-			AbilityComponent->InvalidateTimers();
+			// AbilityComponent->InvalidateTimers();
 		}
 	}
 }
-
+	// TODO : 삭제
+	// TODO : 큐로 옮긴거 확인하고 삭제 
 void ABase_Character::SpawnFloatingText(float InDamage, EDamageReceiveType DamageType)
 {
-	// FVector SpawnLocation = GetActorLocation();
-	// SpawnLocation.X+=FMath::RandRange(-10.0f,10.0f);
-	// SpawnLocation.Y+=FMath::RandRange(-10.0f,10.0f);
-	// SpawnLocation.Z+=FMath::RandRange(-10.0f,10.0f);
-	//
-	// if(AFloatingTextActor* FloatingTextActor = GetWorld()->SpawnActorDeferred<AFloatingTextActor>(FloatingActorClass,FTransform(SpawnLocation)))
-	// {
-	// 	FloatingTextActor->Damage = InDamage;
-	// 	FloatingTextActor->DamageType = DamageType;
-	// 	FloatingTextActor->FinishSpawning(FTransform(SpawnLocation));
-	// }
+	
 }
-
 
 
 void ABase_Character::MC_UpdateMaxHealth_Implementation(float pNewMaxHp)
@@ -435,7 +450,9 @@ void ABase_Character::MC_UpdateCurrentHealth_Implementation(float pNewCurrentHp)
 
 void ABase_Character::Death_Implementation()
 {
-	AbilityComponent->InvalidateTimers();
+	// TODO : 삭제
+	
+	// AbilityComponent->InvalidateTimers();
 
 	DisableInput(LocalPlayerController);
 }
@@ -467,10 +484,7 @@ void ABase_Character::RestoreHealth_Implementation(float amount)
 	S_RestoreHealth(amount);
 }
 
-USphereComponent* ABase_Character::GetAbilitySphere_Implementation()
-{
-	return AbilitySphere;
-}
+
 
 // 어디서 호출되는지?
 // 안됐으면 위젯이 왜 있는지?
@@ -490,7 +504,7 @@ void ABase_Character::OC_SetupWidgets_Implementation()
 
 void ABase_Character::S_RestoreHealth_Implementation(float amount)
 {
-	CurrentHealth = FMath::Clamp(CurrentHealth+amount,0.0f,MaxHealth);
+	// CurrentHealth = FMath::Clamp(CurrentHealth+amount,0.0f,MaxHealth);
 
 	// TODO : AttributeSet을 이용해서 값이 변하면 델리게이트를 호출해 자동으로 업데이트하도록 함.
 	// MC_UpdateHealthBar(CurrentHealth/MaxHealth);
@@ -506,7 +520,7 @@ void ABase_Character::S_Pause_Implementation(bool Pause, bool Override)
 	{
 		MC_Pause(Pause);
 
-		AbilityComponent->PauseAbilities();
+		// AbilityComponent->PauseAbilities();
 		
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(),0.0001f);
 
@@ -535,7 +549,7 @@ void ABase_Character::S_Pause_Implementation(bool Pause, bool Override)
 
 		MC_Pause(Pause);
 
-		AbilityComponent->UnPauseAbilities();
+		// AbilityComponent->UnPauseAbilities();
 		
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(),1.0f);
 
@@ -572,9 +586,11 @@ void ABase_Character::Pause_Implementation(bool Pause, bool Override)
 
 void ABase_Character::AdjustPassive_Implementation(EPassiveAbilities Stat, float MultiplicationAmount)
 {
+	// TODO : 삭제
+	
 	// IInterface_CharacterManager::AdjustPassive_Implementation(Stat, MultiplicationAmount);
 
-	S_UpdatePassiveStat(Stat,MultiplicationAmount);
+	// S_UpdatePassiveStat(Stat,MultiplicationAmount);
 }
 
 bool ABase_Character::IsAlive_Implementation()
@@ -605,7 +621,7 @@ void ABase_Character::OnRep_Character()
 {
 	OROnRepCharacterClass();
 	
-	StartingAbility = Character.StartingAbilities;
+	// StartingAbility = Character.StartingAbilities;
 
 	S_SetCharacterMesh(Character.CharacterSK);
 }
@@ -618,21 +634,83 @@ void ABase_Character::OnRep_CharSK()
 	}
 }
 
-void ABase_Character::S_UpdatePassiveStat_Implementation(EPassiveAbilities Stat, float Value)
+void ABase_Character::Look(const FInputActionValue& Value)
 {
-	switch (Stat)
+	// Axis2D 데이터 가져오기 (X, Y)
+	FVector2D LookAxisVector = Value.Get<FVector2D>();
+
+	if (Controller != nullptr)
 	{
-	case EPassiveAbilities::Health_Bonus:
-		MaxHealth = MaxHealth*Value;
-		IInterface_CharacterManager::Execute_RestoreHealth(this,MaxHealth*0.1f);
-		break;
-	case EPassiveAbilities::Speed_Bonus:
-		GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed * Value;
-		break;
-	default:
-		break;
+		// 마우스 X 이동 -> 캐릭터/카메라의 Yaw(좌우) 회전
+		AddControllerYawInput(LookAxisVector.X);
+
+		// 마우스 Y 이동 -> 캐릭터/카메라의 Pitch(상하) 회전
+		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
+
+void ABase_Character::Move(const FInputActionValue& Value)
+{
+	// 입력값 가져오기 (X: 앞뒤, Y: 좌우)
+	FVector2D MovementVector = Value.Get<FVector2D>();
+
+	if (Controller != nullptr)
+	{
+		// A. 컨트롤러의 회전값 가져오기
+		const FRotator Rotation = Controller->GetControlRotation();
+        
+		// B. Pitch(위아래)와 Roll(기울기)은 무시하고, Yaw(좌우)만 남김
+		//    (캐릭터가 하늘로 날아가거나 땅으로 꺼지지 않고, 수평으로만 이동하게 하기 위함)
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+		// C. 회전값으로부터 앞(Forward) 방향과 오른쪽(Right) 방향 벡터 구하기
+		//    (언리얼 내부 수학 함수 이용)
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+		// D. 구한 방향으로 이동 입력 추가
+		//    W/S 입력(X값)은 앞뒤 방향으로 적용
+		AddMovementInput(ForwardDirection, MovementVector.X);
+        
+		//    D/A 입력(Y값)은 좌우 방향으로 적용
+		AddMovementInput(RightDirection, MovementVector.Y);
+	}
+}
+
+void ABase_Character::CharacterInputSetting()
+{
+	// 1. 현재 이 캐릭터를 조종하는 플레이어 컨트롤러를 가져옵니다.
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		// 2. 컨트롤러에서 Enhanced Input Local Player Subsystem을 가져옵니다.
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			// 3. 서브시스템에 매핑 컨텍스트(IMC)를 추가합니다. (우선순위 0)
+			if (DefaultMappingContext)
+			{
+				Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			}
+		}
+	}
+}
+
+// TODO : 삭제
+
+// void ABase_Character::S_UpdatePassiveStat_Implementation(EPassiveAbilities Stat, float Value)
+// {
+// 	switch (Stat)
+// 	{
+// 	case EPassiveAbilities::Health_Bonus:
+// 		MaxHealth = MaxHealth*Value;
+// 		IInterface_CharacterManager::Execute_RestoreHealth(this,MaxHealth*0.1f);
+// 		break;
+// 	case EPassiveAbilities::Speed_Bonus:
+// 		GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed * Value;
+// 		break;
+// 	default:
+// 		break;
+// 	}
+// }
 
 
 

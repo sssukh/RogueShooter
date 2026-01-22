@@ -32,8 +32,8 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
 	void RestoreHealth(float amount);
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
-	USphereComponent* GetAbilitySphere();
+	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
+	// USphereComponent* GetAbilitySphere();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
 	ABase_Character* GetCharacter();
@@ -44,8 +44,8 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
 	void Pause(bool Pause, bool Override);
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
-	UAbilitiesComponent* GetAbilityComponent();
+	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
+	// UAbilitiesComponent* GetAbilityComponent();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
 	void UpdateClassName();

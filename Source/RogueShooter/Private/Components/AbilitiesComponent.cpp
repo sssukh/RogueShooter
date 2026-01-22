@@ -309,8 +309,9 @@ void UAbilitiesComponent::PrepareFrostBolt()
 		RS_LOG_ERROR(TEXT("User Character가 IInterface_CharacterManager를 상속받지 않았습니다."))
 		return;
 	}
+	// TODO : 삭제
 
-	USphereComponent* AbilitySphere = IInterface_CharacterManager::Execute_GetAbilitySphere(GetOwner());
+	 USphereComponent* AbilitySphere = nullptr;//IInterface_CharacterManager::Execute_GetAbilitySphere(GetOwner());
 
 	TArray<FOverlapResult> OverlapResults;
 
@@ -428,8 +429,9 @@ void UAbilitiesComponent::PrepareLightning()
 		RS_LOG_ERROR(TEXT("User Character가 IInterface_CharacterManager를 상속받지 않았습니다."))
 		return;
 	}
+	// TODO : 삭제
 
-	USphereComponent* AbilitySphere = IInterface_CharacterManager::Execute_GetAbilitySphere(GetOwner());
+	USphereComponent* AbilitySphere = nullptr;//IInterface_CharacterManager::Execute_GetAbilitySphere(GetOwner());
 
 	TArray<FOverlapResult> OverlapResults;
 
@@ -531,7 +533,9 @@ void UAbilitiesComponent::PrepareFireball()
 		return;
 	}
 	// null이다? 왜?
-	USphereComponent* AbilitySphere = IInterface_CharacterManager::Execute_GetAbilitySphere(GetOwner());
+	// TODO : 삭제
+	
+	USphereComponent* AbilitySphere = nullptr;//IInterface_CharacterManager::Execute_GetAbilitySphere(GetOwner());
 
 	TArray<FOverlapResult> OverlapResults;
 

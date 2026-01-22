@@ -9,6 +9,7 @@
 #include "RogueShooter/RSEnumStruct.h"
 #include "AbilitySystemInterface.h"
 #include "GameplayTagContainer.h"
+#include "InputActionValue.h"
 #include "Base_Character.generated.h"
 
 class UExpSet;
@@ -119,7 +120,7 @@ public:
 	UFUNCTION()
 	virtual void UpdateCharacterClass_Implementation(FAvailableCharacter Character) override;
 
-	virtual UAbilitiesComponent* GetAbilityComponent_Implementation() override;
+	
 	
 	UFUNCTION()
 	virtual void Pause_Implementation(bool Pause, bool Override) override;
@@ -140,7 +141,6 @@ public:
 	virtual void RestoreHealth_Implementation(float amount) override;
 	
 
-	virtual USphereComponent* GetAbilitySphere_Implementation() override;
 	
 	//*****************************************
 	// Character Setup
@@ -233,8 +233,6 @@ public:
 	
 	
 
-	UFUNCTION(Server,Reliable)
-	void S_UpdatePassiveStat(EPassiveAbilities Stat,float Value);
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -253,13 +251,14 @@ public:
 	UFUNCTION()
 	void OnRep_CharSK();
 	
+	
 	// Components
 public:
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	TObjectPtr<USphereComponent> AbilitySphere;
-
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	TObjectPtr<UAbilitiesComponent> AbilityComponent;
+	// UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	// TObjectPtr<USphereComponent> AbilitySphere;
+	//
+	// UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	// TObjectPtr<UAbilitiesComponent> AbilityComponent;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<UCameraComponent> Camera;
@@ -270,6 +269,27 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<UWidgetComponent> HealthWidget;
 
+	// Input
+protected:
+	/**
+	 * 
+	 */
+	UFUNCTION()
+	void Look(const FInputActionValue& Value);
+	
+	void Move(const FInputActionValue& Value);
+	
+	void CharacterInputSetting();
+	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Config | Input", meta = (AllowPrivateAccess))
+	TObjectPtr<class UInputAction> LookAction;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Config | Input", meta = (AllowPrivateAccess))
+	TObjectPtr<class UInputAction> MoveAction;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Config | Input", meta = (AllowPrivateAccess)) 
+	TObjectPtr<class UInputMappingContext> DefaultMappingContext;
+	
 	// Character Setup
 public:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
@@ -287,29 +307,29 @@ public:
 	UPROPERTY(ReplicatedUsing="OnRep_CharSK",VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
 	TObjectPtr<USkeletalMesh> CharSK;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
-	EActiveAbilities StartingAbility = EActiveAbilities::Hammer;
+	// UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
+	// EActiveAbilities StartingAbility = EActiveAbilities::Hammer;
 
 	// Character
 public:
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
-	int32 NeededXP = 0;
-
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
-	int32 Level = 1;
-
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
-	float CurrentHealth = 100.0f;
-
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
-	float MaxHealth = 100.0f;
+	// UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
+	// int32 NeededXP = 0;
+	//
+	// UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
+	// int32 Level = 1;
+	//
+	// UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
+	// float CurrentHealth = 100.0f;
+	//
+	// UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
+	// float MaxHealth = 100.0f;
 	
 	
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
 	TObjectPtr<UUW_HealthBar> HealthBarWidgetReference;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
-	int32 CurrentXP =0;
+	// UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
+	// int32 CurrentXP =0;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
 	bool IsDead = false;

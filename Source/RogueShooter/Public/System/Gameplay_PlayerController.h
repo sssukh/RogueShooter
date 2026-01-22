@@ -176,7 +176,9 @@ public:
 	/**
 	 * Refresh Hotbar with active and passive skills
 	 */
-	void UpdateHotbar();
+	// TODO : 삭제
+	
+	// void UpdateHotbar();
 
 	/**
 	 * Show UI when match has ended
@@ -189,11 +191,14 @@ public:
 	void ToggleInventory();
 	
 	// LevelUp
+	
+	// TODO : 삭제
+	
 
-	void PrepareLevelUp();
-
-	UFUNCTION()
-	void ExecuteLevelUp();
+	// void PrepareLevelUp();
+	//
+	// UFUNCTION()
+	// void ExecuteLevelUp();
 
 	/**
 	 * Search through evo array to see if pair is found\n
@@ -201,14 +206,17 @@ public:
 	 * @param Ability Ability to Evolute
 	 * @return boolean for Evolution ready
 	 */
-	bool CheckIfEvoReady(EActiveAbilities& Ability);
-
-	TArray<EActiveAbilities> CheckActiveAbilities(TMap<EActiveAbilities,int32> ActiveMap, int32 MaxLevel);
-
-	TArray<EPassiveAbilities> CheckPassiveAbilities(TMap<EPassiveAbilities,int32> PassiveMap, int32 MaxLevel);
+	// TODO : 삭제
 	
-	UFUNCTION()
-	void ProcessLevelUp(EAbilityType Type, EActiveAbilities AAbilities, EPassiveAbilities PAbilities);
+	
+	// bool CheckIfEvoReady(EActiveAbilities& Ability);
+
+	// TArray<EActiveAbilities> CheckActiveAbilities(TMap<EActiveAbilities,int32> ActiveMap, int32 MaxLevel);
+
+	// TArray<EPassiveAbilities> CheckPassiveAbilities(TMap<EPassiveAbilities,int32> PassiveMap, int32 MaxLevel);
+	
+	// UFUNCTION()
+	// void ProcessLevelUp(EAbilityType Type, EActiveAbilities AAbilities, EPassiveAbilities PAbilities);
 
 	// Chest
 
@@ -220,11 +228,11 @@ public:
 	 */
 	int32 DetermineChestCount();
 
-	void BuildAndProcessChest(int32 index);
-
-	TArray<EActiveAbilities> Chest_BuildActiveList(TMap<EActiveAbilities,int32> ActiveMap,int32 MaxLevel);
-
-	TArray<EPassiveAbilities> Chest_BuildPassiveList(TMap<EPassiveAbilities,int32> PassiveMap, int32 MaxLevel);
+	// void BuildAndProcessChest(int32 index);
+	//
+	// TArray<EActiveAbilities> Chest_BuildActiveList(TMap<EActiveAbilities,int32> ActiveMap,int32 MaxLevel);
+	//
+	// TArray<EPassiveAbilities> Chest_BuildPassiveList(TMap<EPassiveAbilities,int32> PassiveMap, int32 MaxLevel);
 	
 	UFUNCTION()
 	void CloseChestUI();
@@ -238,7 +246,7 @@ public:
 	 * Save Evolution information in an array to fetch later
 	 * @param Evo Active Ability to evolute later
 	 */
-	void ActivateEvolution(EActiveAbilities Evo);
+	// void ActivateEvolution(EActiveAbilities Evo);
 	
 	/**
 	 * Based on levelup or chest - level up ability on pawn component
@@ -246,7 +254,7 @@ public:
 	 * @param PAbility passive ability
 	 * @param AAbility active ability
 	 */
-	void AssignAbility(EAbilityType Type, EPassiveAbilities PAbility, EActiveAbilities AAbility);
+	// void AssignAbility(EAbilityType Type, EPassiveAbilities PAbility, EActiveAbilities AAbility);
 	
 public:
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Component")

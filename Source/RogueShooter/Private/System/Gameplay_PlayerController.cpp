@@ -4,7 +4,6 @@
 #include "System/Gameplay_PlayerController.h"
 
 #include "Blueprint/UserWidget.h"
-#include "Components/AbilitiesComponent.h"
 #include "Components/InventoryComponent.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
@@ -90,7 +89,7 @@ void AGameplay_PlayerController::OC_CreateLevelupUI_Implementation()
 
 	SetShowMouseCursor(true);
 
-	PrepareLevelUp();
+	// PrepareLevelUp();
 }
 
 void AGameplay_PlayerController::OC_CreateChestUI_Implementation()
@@ -234,9 +233,11 @@ void AGameplay_PlayerController::SetupPlayer()
 
 	SetReference();
 
-	AbilityComponent->SetStartingAbility();
+	// TODO : 삭제
+	
+	// AbilityComponent->SetStartingAbility();
 
-	UpdateHotbar();
+	// UpdateHotbar();
 }
 
 void AGameplay_PlayerController::CreateGameplayUI()
@@ -252,10 +253,11 @@ void AGameplay_PlayerController::CreateGameplayUI()
 
 void AGameplay_PlayerController::SetReference()
 {
-	if(GetPawn()->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
-	{
-		AbilityComponent = IInterface_CharacterManager::Execute_GetAbilityComponent(GetPawn());
-	}
+	// if(GetPawn()->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
+	// // TODO : 삭제
+	// {
+	// 	AbilityComponent = IInterface_CharacterManager::Execute_GetAbilityComponent(GetPawn());
+	// }
 }
 
 void AGameplay_PlayerController::UpdateCharacterUI(float Percent, int32 Level)
@@ -277,11 +279,12 @@ void AGameplay_PlayerController::UpdateLevelUI(int32 Level)
 	PlayerHud->TextBlock_Level->SetText(FText::FromString(FString::Printf(TEXT("Level %d"),Level)));
 	
 }
+	// TODO : 삭제
 
-void AGameplay_PlayerController::UpdateHotbar()
-{
-	Execute_UpdateHudHotbar(this,AbilityComponent->ActiveAbilitiesMap,AbilityComponent->PassiveAbilitiesMap);
-}
+// void AGameplay_PlayerController::UpdateHotbar()
+// {
+// 	Execute_UpdateHudHotbar(this,AbilityComponent->ActiveAbilitiesMap,AbilityComponent->PassiveAbilitiesMap);
+// }
 
 void AGameplay_PlayerController::ShowEndMatchScreen(bool Victory, int32 EnemiesKilled)
 {
@@ -353,391 +356,403 @@ void AGameplay_PlayerController::ToggleInventory()
 	
 	
 }
-
-void AGameplay_PlayerController::PrepareLevelUp()
-{
-	// Build the level up UI based on current player data
-	if(LevelUpUI == nullptr)
-	{
-		LevelUpUI = CreateWidget<UUW_LevelUpMaster>(this,LevelUpMasterClass);
-
-		ExecuteLevelUp();
-
-		LevelUpUI->OnReady.AddDynamic(this,&AGameplay_PlayerController::ExecuteLevelUp);
-
-		LevelUpUI->OnClose.AddDynamic(this, &AGameplay_PlayerController::ProcessLevelUp);
-	}
-	// If widget already exists, just reset it
-	else
-	{
-		LevelUpUI->ResetUI();
-	}
-
-	LevelUpUI->AddToViewport(1);
-
-	FInputModeUIOnly InputModeUIOnly;
-	InputModeUIOnly.SetWidgetToFocus(LevelUpUI->TakeWidget());
-	InputModeUIOnly.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-	SetInputMode(InputModeUIOnly);
-}
-
-void AGameplay_PlayerController::ExecuteLevelUp()
-{
-	// Prepare local variables
-	TMap<EActiveAbilities,int32> AAbilityMap = AbilityComponent->ActiveAbilitiesMap;
-	TMap<EPassiveAbilities,int32> PAbilityMap = AbilityComponent->PassiveAbilitiesMap;
-	int32 AbilityMaxLevel = AbilityComponent->MaxAbilityLevel;
-
-	
-	
-	// Check if an evolution for ability is ready
-	EActiveAbilities EvoAAbility;
-	bool EvoReady = CheckIfEvoReady(EvoAAbility);
-
-	// Set amount of cards to show
-	int32 MaxCount =4;
-
-	int32 CardCount =0 ;
-
-	// Add Evolution : If Ready
-	if(EvoReady)
-	{
-		++CardCount;
-
-		TArray<FName>ActiveAbilityNames = DT_ActiveAbilities->GetRowNames();
-
-		for(const FName& AAbilityName : ActiveAbilityNames)
-		{
-			const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE,TEXT("EActiveAbilities"), true);
-			FString NameString;
-			if(EnumPtr)
-			{
-				NameString = EnumPtr->GetNameStringByValue(static_cast<int64>(EvoAAbility)).Append(FString::Printf(TEXT("%d"),-1));
-			}
-			
-			if(AAbilityName == FName(NameString))
-			{
-				FAbilityLevelUp* AbilityLevelUp = DT_ActiveAbilities->FindRow<FAbilityLevelUp>(AAbilityName,TEXT("DT_ActiveAbilities"));
-				if(AbilityLevelUp)
-				{
-					LevelUpUI->AddSelection(FText::FromString(NameString),-1,AbilityLevelUp->LevelUpText,
-						UFunctionLibrary_Helper::FindActiveIcon(GetWorld(),EvoAAbility),EvoAAbility,EPassiveAbilities::Ability_Bonus_Damage,
-						EAbilityType::Evolution);
-					break;
-				}
-			}
-		}
-
-	}
-
-	// Get Abilities that are not maxed out
-	TArray<EActiveAbilities> AvailableActiveAbilities = CheckActiveAbilities(AAbilityMap,AbilityMaxLevel);
-
-	bool CanAddActiveAbility = true;
-	if(AvailableActiveAbilities.IsEmpty())
-		CanAddActiveAbility = false;
-
-	TArray<EPassiveAbilities> AvailablePassiveAbilities = CheckPassiveAbilities(PAbilityMap,AbilityMaxLevel);
-
-	bool CanAddPassiveAbility = true;
-	if(AvailablePassiveAbilities.IsEmpty())
-		CanAddPassiveAbility = false;
-
-	// Run loop until we hit our desired cards or cannot add passive/active skill
-	while(CardCount<MaxCount && (CanAddActiveAbility || CanAddPassiveAbility))
-	{
-		// Random bool to determine active or passive and failsafe incase one is not allowed
-		// ++CardCount;
-
-		// TODO : weight에 따라 active나 passive를 우선적으로 추가하는 순서를 설정하도록 해야겠다.
-		// weight에 따라 Active를 우선적으로 추가할수도 Passive를 우선적으로 추가할수도 있다.
-		bool ActiveFirst = true;
-
-		float weight = FMath::RandRange(0.0f,1.0f);
-		if(0.5f <= weight)
-		{
-			ActiveFirst = false;
-		}
-		
-		{
-			if(CanAddActiveAbility && ActiveFirst)
-			{
-				
-				// Remove from local array so we do not have duplicate
-				EActiveAbilities ActiveAbility = AvailableActiveAbilities[FMath::RandRange(0,AvailableActiveAbilities.Num()-1)];
-
-				AvailableActiveAbilities.Remove(ActiveAbility);
-
-				CanAddActiveAbility = !AvailableActiveAbilities.IsEmpty();
-
-				TArray<FName> AAbilityNames = DT_ActiveAbilities->GetRowNames();
-
-				for(const FName& Name : AAbilityNames)
-				{
-					int32 level = 0;
-					int32* findLevel = AAbilityMap.Find(ActiveAbility);
-
-					if(findLevel)
-						level = *findLevel;
-
-					++level;
-					FString NameString;
-					
-					// const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE,TEXT("EActiveAbilities"), true);
-					if(const UEnum* EnumPtr = StaticEnum<EActiveAbilities>())
-					{
-						NameString = EnumPtr->GetNameStringByValue(static_cast<int64>(ActiveAbility));
-					}
-					// RS_LOG_SCREEN(TEXT("Name : %s,  NameString : %s"),*Name.ToString(),*NameString)
-
-					if(Name.ToString() == NameString.Append(FString::Printf(TEXT("%d"),level)))
-					{
-						FAbilityLevelUp* AbilityLevelUp = DT_ActiveAbilities->FindRow<FAbilityLevelUp>(Name,TEXT("DT_ActiveAbilities"));
-
-						if(AbilityLevelUp)
-						{
-							// 왜 aability랑 pability에 직접 값들을 넣어놨을까?
-							LevelUpUI->AddSelection(FText::FromString(NameString),level,AbilityLevelUp->LevelUpText,
-								UFunctionLibrary_Helper::FindActiveIcon(GetWorld(),ActiveAbility),
-								ActiveAbility,EPassiveAbilities::Ability_Bonus_Damage,EAbilityType::Active);
-
-							++CardCount;
-
-							break;
-						}
-					}
-				}
-			}
-			else if(CanAddPassiveAbility && !ActiveFirst)
-			{
-				
-				EPassiveAbilities PassiveAbility = AvailablePassiveAbilities[FMath::RandRange(0,AvailablePassiveAbilities.Num()-1)];
-
-				AvailablePassiveAbilities.Remove(PassiveAbility);
-
-				CanAddPassiveAbility = !AvailablePassiveAbilities.IsEmpty();
-
-				TArray<FName> PAbilityNames = DT_PassiveAbilities->GetRowNames();
-
-				for(const FName& Name : PAbilityNames)
-				{
-					FString NameString; 
-					
-					// const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE,TEXT("EPassiveAbilities"), true);
-
-					if(const UEnum* EnumPtr = StaticEnum<EPassiveAbilities>())
-					{
-						NameString = EnumPtr->GetNameStringByValue(static_cast<int64>(PassiveAbility));
-					}
-					
-					// RS_LOG_SCREEN(TEXT("Name : %s,  NameString : %s"),*Name.ToString(),*NameString)
-					if(Name.ToString() == NameString)
-					{
-						FAbilityLevelUp* AbilityLevelUp = DT_PassiveAbilities->FindRow<FAbilityLevelUp>(Name,TEXT("DT_PassiveAbilities"));
-
-						if(AbilityLevelUp)
-						{
-							int32 level = 0;
-							int32* findLevel = PAbilityMap.Find(PassiveAbility);
-							if(findLevel)
-								level = *findLevel;
-
-							++level;
-
-							LevelUpUI->AddSelection(FText::FromString(NameString),level,AbilityLevelUp->LevelUpText,
-								UFunctionLibrary_Helper::FindPassiveIcon(GetWorld(),PassiveAbility),EActiveAbilities::Hammer,PassiveAbility,EAbilityType::Passive);
-
-							++CardCount;
-
-							break;
-						}
-					}
-				}
-			}
-		}
-	}
-	
-	// If no abilities can be added - give option for health or gold
-	if(CardCount == 0)
-	{
-		LevelUpUI->AddSelection(FText::FromString(TEXT("Health Potion")),0,FText::FromString(TEXT("Recover Health to Full")),
-			HealthPotionIcon,EActiveAbilities::Hammer,EPassiveAbilities::Ability_Bonus_Damage,EAbilityType::Health);
-
-		LevelUpUI->AddSelection(FText::FromString(TEXT("Gold Pile")),0,FText::FromString(TEXT("Add 50 Gold")),
-			CoinIcon,EActiveAbilities::Hammer,EPassiveAbilities::Ability_Bonus_Damage,EAbilityType::Gold);
-	}
-}
-
-bool AGameplay_PlayerController::CheckIfEvoReady(EActiveAbilities& Ability)
-{
-	Ability = EActiveAbilities::Hammer;
-	TArray<EPassiveAbilities> PassiveArray = AbilityComponent->EvolutionPassiveArray;
-
-	TMap<EActiveAbilities,EPassiveAbilities> EvoMap = AbilityComponent->EvolutionMap;
-
-	if(EvoMap.IsEmpty())
-	{
-		Ability = EActiveAbilities::Hammer;
-		return false;
-	}
-
-	TArray<EActiveAbilities> ActiveAbilities;
-	EvoMap.GetKeys(ActiveAbilities);
-
-	for(EActiveAbilities AAbility : ActiveAbilities)
-	{
-		if(EPassiveAbilities* PAbility = EvoMap.Find(AAbility))
-		{
-			if(PassiveArray.Contains(*PAbility))
-			{
-				Ability = AAbility;
-				return true;
-			}
-		}
-	}
-
-	return false;
-}
-
-TArray<EActiveAbilities> AGameplay_PlayerController::CheckActiveAbilities(TMap<EActiveAbilities, int32> ActiveMap,
-	int32 MaxLevel)
-{
-	TArray<EActiveAbilities> Result;
-	
-	int32 MaxAbilityLevel = MaxLevel;
-
-	TMap<EActiveAbilities,int32> TempActiveMap = ActiveMap;
-
-	const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE,TEXT("EActiveAbilities"),true);
-	int32 EnumNum = EnumPtr->NumEnums();
-	// Check against max abount of active abilities
-	if(TempActiveMap.Num()<EnumNum)
-	{
-		for(EActiveAbilities AAbility : TEnumRange<EActiveAbilities>())
-		{
-			Result.Add(AAbility);
-		}
-		
-		// Remove Abilities that are maxed out
-		TArray<EActiveAbilities> AAbilities;
-		TempActiveMap.GetKeys(AAbilities);
-
-		for(EActiveAbilities aability : AAbilities)
-		{
-			if(TempActiveMap[aability]>=MaxAbilityLevel)
-			{
-				Result.Remove(aability);
-			}
-		}
-		// Return any abilities that are not yet learned or maxed out
-		return Result;
-	}
-	else
-	{
-		// Add Abilities that are not maxed out
-		TArray<EActiveAbilities> AAbilities;
-		TempActiveMap.GetKeys(AAbilities);
-
-		for(EActiveAbilities aability : AAbilities)
-		{
-			if(TempActiveMap[aability]<MaxAbilityLevel)
-			{
-				Result.Add(aability);
-			}
-		}
-
-		// return any abilities that are not yet maxed out
-		return Result;
-	}
-}
-
-TArray<EPassiveAbilities> AGameplay_PlayerController::CheckPassiveAbilities(TMap<EPassiveAbilities, int32> PassiveMap,
-	int32 MaxLevel)
-{
-	TArray<EPassiveAbilities> Result;
-	
-	int32 MaxAbilityLevel = MaxLevel;
-
-	TMap<EPassiveAbilities,int32> TempActiveMap = PassiveMap;
-
-	const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE,TEXT("EPassiveAbilities"),true);
-	int32 EnumNum = EnumPtr->NumEnums();
-	
-	// Check against max abount of active abilities
-	if(TempActiveMap.Num()<EnumNum)
-	{
-		for(EPassiveAbilities PAbility : TEnumRange<EPassiveAbilities>())
-		{
-			Result.Add(PAbility);
-		}
-		
-		// Remove Abilities that are maxed out
-		TArray<EPassiveAbilities> PAbilities;
-		TempActiveMap.GetKeys(PAbilities);
-
-		for(EPassiveAbilities pability : PAbilities)
-		{
-			if(TempActiveMap[pability]>=MaxAbilityLevel)
-			{
-				Result.Remove(pability);
-			}
-		}
-		// Return any abilities that are not yet learned or maxed out
-		return Result;
-	}
-	else
-	{
-		// Add Abilities that are not maxed out
-		TArray<EPassiveAbilities> PAbilities;
-		TempActiveMap.GetKeys(PAbilities);
-
-		for(EPassiveAbilities pability : PAbilities)
-		{
-			if(TempActiveMap[pability]<MaxAbilityLevel)
-			{
-				Result.Add(pability);
-			}
-		}
-
-		// return any abilities that are not yet maxed out
-		return Result;
-	}
-}
-
-void AGameplay_PlayerController::ProcessLevelUp(EAbilityType Type, EActiveAbilities AAbilities,
-                                                EPassiveAbilities PAbilities)
-{
-	LevelUpHudUp = false;
-
-	// Reset UI & Unpause
-	if(!ChestHudUp)
-	{
-		PreparingUI = false;
-
-		if(!GetPawn()->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
-		{
-			RS_LOG_ERROR(TEXT("Pawn이 IInterface_CharacterManager를 상속받지 않았습니다."))
-			return;
-		}
-		
-		IInterface_CharacterManager::Execute_Pause(GetPawn(),false,false);
-
-		SetShowMouseCursor(false);
-
-		FInputModeGameOnly InputGameOnly;
-		
-		SetInputMode(InputGameOnly);
-	}
-
-	// Level Up Ability
-	AssignAbility(Type,PAbilities,AAbilities);
-
-	
-	// Refresh after ability is modified
-	UpdateHotbar();
-
-	AbilityComponent->RefreshAbilities();
-}
+	// TODO : 삭제
+
+// void AGameplay_PlayerController::PrepareLevelUp()
+// {
+// 	// Build the level up UI based on current player data
+// 	if(LevelUpUI == nullptr)
+// 	{
+// 		LevelUpUI = CreateWidget<UUW_LevelUpMaster>(this,LevelUpMasterClass);
+//
+// 		ExecuteLevelUp();
+//
+// 		LevelUpUI->OnReady.AddDynamic(this,&AGameplay_PlayerController::ExecuteLevelUp);
+//
+// 		LevelUpUI->OnClose.AddDynamic(this, &AGameplay_PlayerController::ProcessLevelUp);
+// 	}
+// 	// If widget already exists, just reset it
+// 	else
+// 	{
+// 		LevelUpUI->ResetUI();
+// 	}
+//
+// 	LevelUpUI->AddToViewport(1);
+//
+// 	FInputModeUIOnly InputModeUIOnly;
+// 	InputModeUIOnly.SetWidgetToFocus(LevelUpUI->TakeWidget());
+// 	InputModeUIOnly.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+// 	SetInputMode(InputModeUIOnly);
+// }
+
+// void AGameplay_PlayerController::ExecuteLevelUp()
+// {
+// 	// Prepare local variables
+// 	// TMap<EActiveAbilities,int32> AAbilityMap = AbilityComponent->ActiveAbilitiesMap;
+// 	// TMap<EPassiveAbilities,int32> PAbilityMap = AbilityComponent->PassiveAbilitiesMap;
+// 	// int32 AbilityMaxLevel = AbilityComponent->MaxAbilityLevel;
+// 	
+// 	// TODO : 삭제
+// 	// TODO : 로직 흐름만 읽어서 남기고 삭제 
+// 	//
+// 	//
+// 	//
+// 	// // Check if an evolution for ability is ready
+// 	// EActiveAbilities EvoAAbility;
+// 	// bool EvoReady = CheckIfEvoReady(EvoAAbility);
+// 	//
+// 	// // Set amount of cards to show
+// 	// int32 MaxCount =4;
+// 	//
+// 	// int32 CardCount =0 ;
+// 	//
+// 	// // Add Evolution : If Ready
+// 	// if(EvoReady)
+// 	// {
+// 	// 	++CardCount;
+// 	//
+// 	// 	TArray<FName>ActiveAbilityNames = DT_ActiveAbilities->GetRowNames();
+// 	//
+// 	// 	for(const FName& AAbilityName : ActiveAbilityNames)
+// 	// 	{
+// 	// 		const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE,TEXT("EActiveAbilities"), true);
+// 	// 		FString NameString;
+// 	// 		if(EnumPtr)
+// 	// 		{
+// 	// 			NameString = EnumPtr->GetNameStringByValue(static_cast<int64>(EvoAAbility)).Append(FString::Printf(TEXT("%d"),-1));
+// 	// 		}
+// 	// 		
+// 	// 		if(AAbilityName == FName(NameString))
+// 	// 		{
+// 	// 			FAbilityLevelUp* AbilityLevelUp = DT_ActiveAbilities->FindRow<FAbilityLevelUp>(AAbilityName,TEXT("DT_ActiveAbilities"));
+// 	// 			if(AbilityLevelUp)
+// 	// 			{
+// 	// 				LevelUpUI->AddSelection(FText::FromString(NameString),-1,AbilityLevelUp->LevelUpText,
+// 	// 					UFunctionLibrary_Helper::FindActiveIcon(GetWorld(),EvoAAbility),EvoAAbility,EPassiveAbilities::Ability_Bonus_Damage,
+// 	// 					EAbilityType::Evolution);
+// 	// 				break;
+// 	// 			}
+// 	// 		}
+// 	// 	}
+// 	//
+// 	// }
+// 	//
+// 	// // Get Abilities that are not maxed out
+// 	// TArray<EActiveAbilities> AvailableActiveAbilities = CheckActiveAbilities(AAbilityMap,AbilityMaxLevel);
+// 	//
+// 	// bool CanAddActiveAbility = true;
+// 	// if(AvailableActiveAbilities.IsEmpty())
+// 	// 	CanAddActiveAbility = false;
+// 	//
+// 	// TArray<EPassiveAbilities> AvailablePassiveAbilities = CheckPassiveAbilities(PAbilityMap,AbilityMaxLevel);
+// 	//
+// 	// bool CanAddPassiveAbility = true;
+// 	// if(AvailablePassiveAbilities.IsEmpty())
+// 	// 	CanAddPassiveAbility = false;
+// 	//
+// 	// // Run loop until we hit our desired cards or cannot add passive/active skill
+// 	// while(CardCount<MaxCount && (CanAddActiveAbility || CanAddPassiveAbility))
+// 	// {
+// 	// 	// Random bool to determine active or passive and failsafe incase one is not allowed
+// 	// 	// ++CardCount;
+// 	//
+// 	// 	// TODO : weight에 따라 active나 passive를 우선적으로 추가하는 순서를 설정하도록 해야겠다.
+// 	// 	// weight에 따라 Active를 우선적으로 추가할수도 Passive를 우선적으로 추가할수도 있다.
+// 	// 	bool ActiveFirst = true;
+// 	//
+// 	// 	float weight = FMath::RandRange(0.0f,1.0f);
+// 	// 	if(0.5f <= weight)
+// 	// 	{
+// 	// 		ActiveFirst = false;
+// 	// 	}
+// 	// 	
+// 	// 	{
+// 	// 		if(CanAddActiveAbility && ActiveFirst)
+// 	// 		{
+// 	// 			
+// 	// 			// Remove from local array so we do not have duplicate
+// 	// 			EActiveAbilities ActiveAbility = AvailableActiveAbilities[FMath::RandRange(0,AvailableActiveAbilities.Num()-1)];
+// 	//
+// 	// 			AvailableActiveAbilities.Remove(ActiveAbility);
+// 	//
+// 	// 			CanAddActiveAbility = !AvailableActiveAbilities.IsEmpty();
+// 	//
+// 	// 			TArray<FName> AAbilityNames = DT_ActiveAbilities->GetRowNames();
+// 	//
+// 	// 			for(const FName& Name : AAbilityNames)
+// 	// 			{
+// 	// 				int32 level = 0;
+// 	// 				int32* findLevel = AAbilityMap.Find(ActiveAbility);
+// 	//
+// 	// 				if(findLevel)
+// 	// 					level = *findLevel;
+// 	//
+// 	// 				++level;
+// 	// 				FString NameString;
+// 	// 				
+// 	// 				// const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE,TEXT("EActiveAbilities"), true);
+// 	// 				if(const UEnum* EnumPtr = StaticEnum<EActiveAbilities>())
+// 	// 				{
+// 	// 					NameString = EnumPtr->GetNameStringByValue(static_cast<int64>(ActiveAbility));
+// 	// 				}
+// 	// 				// RS_LOG_SCREEN(TEXT("Name : %s,  NameString : %s"),*Name.ToString(),*NameString)
+// 	//
+// 	// 				if(Name.ToString() == NameString.Append(FString::Printf(TEXT("%d"),level)))
+// 	// 				{
+// 	// 					FAbilityLevelUp* AbilityLevelUp = DT_ActiveAbilities->FindRow<FAbilityLevelUp>(Name,TEXT("DT_ActiveAbilities"));
+// 	//
+// 	// 					if(AbilityLevelUp)
+// 	// 					{
+// 	// 						// 왜 aability랑 pability에 직접 값들을 넣어놨을까?
+// 	// 						LevelUpUI->AddSelection(FText::FromString(NameString),level,AbilityLevelUp->LevelUpText,
+// 	// 							UFunctionLibrary_Helper::FindActiveIcon(GetWorld(),ActiveAbility),
+// 	// 							ActiveAbility,EPassiveAbilities::Ability_Bonus_Damage,EAbilityType::Active);
+// 	//
+// 	// 						++CardCount;
+// 	//
+// 	// 						break;
+// 	// 					}
+// 	// 				}
+// 	// 			}
+// 	// 		}
+// 	// 		else if(CanAddPassiveAbility && !ActiveFirst)
+// 	// 		{
+// 	// 			
+// 	// 			EPassiveAbilities PassiveAbility = AvailablePassiveAbilities[FMath::RandRange(0,AvailablePassiveAbilities.Num()-1)];
+// 	//
+// 	// 			AvailablePassiveAbilities.Remove(PassiveAbility);
+// 	//
+// 	// 			CanAddPassiveAbility = !AvailablePassiveAbilities.IsEmpty();
+// 	//
+// 	// 			TArray<FName> PAbilityNames = DT_PassiveAbilities->GetRowNames();
+// 	//
+// 	// 			for(const FName& Name : PAbilityNames)
+// 	// 			{
+// 	// 				FString NameString; 
+// 	// 				
+// 	// 				// const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE,TEXT("EPassiveAbilities"), true);
+// 	//
+// 	// 				if(const UEnum* EnumPtr = StaticEnum<EPassiveAbilities>())
+// 	// 				{
+// 	// 					NameString = EnumPtr->GetNameStringByValue(static_cast<int64>(PassiveAbility));
+// 	// 				}
+// 	// 				
+// 	// 				// RS_LOG_SCREEN(TEXT("Name : %s,  NameString : %s"),*Name.ToString(),*NameString)
+// 	// 				if(Name.ToString() == NameString)
+// 	// 				{
+// 	// 					FAbilityLevelUp* AbilityLevelUp = DT_PassiveAbilities->FindRow<FAbilityLevelUp>(Name,TEXT("DT_PassiveAbilities"));
+// 	//
+// 	// 					if(AbilityLevelUp)
+// 	// 					{
+// 	// 						int32 level = 0;
+// 	// 						int32* findLevel = PAbilityMap.Find(PassiveAbility);
+// 	// 						if(findLevel)
+// 	// 							level = *findLevel;
+// 	//
+// 	// 						++level;
+// 	//
+// 	// 						LevelUpUI->AddSelection(FText::FromString(NameString),level,AbilityLevelUp->LevelUpText,
+// 	// 							UFunctionLibrary_Helper::FindPassiveIcon(GetWorld(),PassiveAbility),EActiveAbilities::Hammer,PassiveAbility,EAbilityType::Passive);
+// 	//
+// 	// 						++CardCount;
+// 	//
+// 	// 						break;
+// 	// 					}
+// 	// 				}
+// 	// 			}
+// 	// 		}
+// 	// 	}
+// 	// }
+// 	//
+// 	// // If no abilities can be added - give option for health or gold
+// 	// if(CardCount == 0)
+// 	// {
+// 	// 	LevelUpUI->AddSelection(FText::FromString(TEXT("Health Potion")),0,FText::FromString(TEXT("Recover Health to Full")),
+// 	// 		HealthPotionIcon,EActiveAbilities::Hammer,EPassiveAbilities::Ability_Bonus_Damage,EAbilityType::Health);
+// 	//
+// 	// 	LevelUpUI->AddSelection(FText::FromString(TEXT("Gold Pile")),0,FText::FromString(TEXT("Add 50 Gold")),
+// 	// 		CoinIcon,EActiveAbilities::Hammer,EPassiveAbilities::Ability_Bonus_Damage,EAbilityType::Gold);
+// 	// }
+// }
+
+// bool AGameplay_PlayerController::CheckIfEvoReady(EActiveAbilities& Ability)
+// {
+// 	// TODO : 삭제
+// 	// TODO : 읽어서 흐름만 남기고 삭제 
+// 	// Ability = EActiveAbilities::Hammer;
+// 	// TArray<EPassiveAbilities> PassiveArray = AbilityComponent->EvolutionPassiveArray;
+// 	//
+// 	// TMap<EActiveAbilities,EPassiveAbilities> EvoMap = AbilityComponent->EvolutionMap;
+// 	//
+// 	// if(EvoMap.IsEmpty())
+// 	// {
+// 	// 	Ability = EActiveAbilities::Hammer;
+// 	// 	return false;
+// 	// }
+// 	//
+// 	// TArray<EActiveAbilities> ActiveAbilities;
+// 	// EvoMap.GetKeys(ActiveAbilities);
+// 	//
+// 	// for(EActiveAbilities AAbility : ActiveAbilities)
+// 	// {
+// 	// 	if(EPassiveAbilities* PAbility = EvoMap.Find(AAbility))
+// 	// 	{
+// 	// 		if(PassiveArray.Contains(*PAbility))
+// 	// 		{
+// 	// 			Ability = AAbility;
+// 	// 			return true;
+// 	// 		}
+// 	// 	}
+// 	// }
+// 	//
+// 	// return false;
+// }
+	// TODO : 삭제
+
+// TArray<EActiveAbilities> AGameplay_PlayerController::CheckActiveAbilities(TMap<EActiveAbilities, int32> ActiveMap,
+// 	int32 MaxLevel)
+// {
+// 	TArray<EActiveAbilities> Result;
+// 	
+// 	int32 MaxAbilityLevel = MaxLevel;
+//
+// 	TMap<EActiveAbilities,int32> TempActiveMap = ActiveMap;
+//
+// 	const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE,TEXT("EActiveAbilities"),true);
+// 	int32 EnumNum = EnumPtr->NumEnums();
+// 	// Check against max abount of active abilities
+// 	if(TempActiveMap.Num()<EnumNum)
+// 	{
+// 		for(EActiveAbilities AAbility : TEnumRange<EActiveAbilities>())
+// 		{
+// 			Result.Add(AAbility);
+// 		}
+// 		
+// 		// Remove Abilities that are maxed out
+// 		TArray<EActiveAbilities> AAbilities;
+// 		TempActiveMap.GetKeys(AAbilities);
+//
+// 		for(EActiveAbilities aability : AAbilities)
+// 		{
+// 			if(TempActiveMap[aability]>=MaxAbilityLevel)
+// 			{
+// 				Result.Remove(aability);
+// 			}
+// 		}
+// 		// Return any abilities that are not yet learned or maxed out
+// 		return Result;
+// 	}
+// 	else
+// 	{
+// 		// Add Abilities that are not maxed out
+// 		TArray<EActiveAbilities> AAbilities;
+// 		TempActiveMap.GetKeys(AAbilities);
+//
+// 		for(EActiveAbilities aability : AAbilities)
+// 		{
+// 			if(TempActiveMap[aability]<MaxAbilityLevel)
+// 			{
+// 				Result.Add(aability);
+// 			}
+// 		}
+//
+// 		// return any abilities that are not yet maxed out
+// 		return Result;
+// 	}
+// }
+	// TODO : 삭제
+
+
+// TArray<EPassiveAbilities> AGameplay_PlayerController::CheckPassiveAbilities(TMap<EPassiveAbilities, int32> PassiveMap,
+// 	int32 MaxLevel)
+// {
+// 	TArray<EPassiveAbilities> Result;
+// 	
+// 	int32 MaxAbilityLevel = MaxLevel;
+//
+// 	TMap<EPassiveAbilities,int32> TempActiveMap = PassiveMap;
+//
+// 	const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE,TEXT("EPassiveAbilities"),true);
+// 	int32 EnumNum = EnumPtr->NumEnums();
+// 	
+// 	// Check against max abount of active abilities
+// 	if(TempActiveMap.Num()<EnumNum)
+// 	{
+// 		for(EPassiveAbilities PAbility : TEnumRange<EPassiveAbilities>())
+// 		{
+// 			Result.Add(PAbility);
+// 		}
+// 		
+// 		// Remove Abilities that are maxed out
+// 		TArray<EPassiveAbilities> PAbilities;
+// 		TempActiveMap.GetKeys(PAbilities);
+//
+// 		for(EPassiveAbilities pability : PAbilities)
+// 		{
+// 			if(TempActiveMap[pability]>=MaxAbilityLevel)
+// 			{
+// 				Result.Remove(pability);
+// 			}
+// 		}
+// 		// Return any abilities that are not yet learned or maxed out
+// 		return Result;
+// 	}
+// 	else
+// 	{
+// 		// Add Abilities that are not maxed out
+// 		TArray<EPassiveAbilities> PAbilities;
+// 		TempActiveMap.GetKeys(PAbilities);
+//
+// 		for(EPassiveAbilities pability : PAbilities)
+// 		{
+// 			if(TempActiveMap[pability]<MaxAbilityLevel)
+// 			{
+// 				Result.Add(pability);
+// 			}
+// 		}
+//
+// 		// return any abilities that are not yet maxed out
+// 		return Result;
+// 	}
+// }
+
+	// TODO : 삭제
+
+
+// void AGameplay_PlayerController::ProcessLevelUp(EAbilityType Type, EActiveAbilities AAbilities,
+//                                                 EPassiveAbilities PAbilities)
+// {
+// 	LevelUpHudUp = false;
+//
+// 	// Reset UI & Unpause
+// 	if(!ChestHudUp)
+// 	{
+// 		PreparingUI = false;
+//
+// 		if(!GetPawn()->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
+// 		{
+// 			RS_LOG_ERROR(TEXT("Pawn이 IInterface_CharacterManager를 상속받지 않았습니다."))
+// 			return;
+// 		}
+// 		
+// 		IInterface_CharacterManager::Execute_Pause(GetPawn(),false,false);
+//
+// 		SetShowMouseCursor(false);
+//
+// 		FInputModeGameOnly InputGameOnly;
+// 		
+// 		SetInputMode(InputGameOnly);
+// 	}
+//
+// 	// Level Up Ability
+// 	AssignAbility(Type,PAbilities,AAbilities);
+//
+// 	
+// 	// Refresh after ability is modified
+// 	// UpdateHotbar();
+//
+// 	AbilityComponent->RefreshAbilities();
+// }
 
 void AGameplay_PlayerController::PrepareChest()
 {
@@ -773,7 +788,7 @@ void AGameplay_PlayerController::PrepareChest()
 
 	for(int i=0;i<ChestCount;++i)
 	{
-		BuildAndProcessChest(i);
+		// BuildAndProcessChest(i);
 	}
 	if(!PlayerState->GetClass()->ImplementsInterface(UInterface_PlayerState::StaticClass()))
 	{
@@ -794,168 +809,171 @@ int32 AGameplay_PlayerController::DetermineChestCount()
 		return 1;
 	return 2;
 }
+	// TODO : 삭제
+	// TODO : 읽어서 흐름만 남기고 삭제 
+// void AGameplay_PlayerController::BuildAndProcessChest(int32 index)
+// {
+// 	int32 Index = index;
+//
+// 	TMap<EActiveAbilities,int32> ActiveAbilityMap = AbilityComponent->ActiveAbilitiesMap;
+// 	TMap<EPassiveAbilities,int32> PassiveAbilityMap = AbilityComponent->PassiveAbilitiesMap;
+// 	int32 AbilityMaxLevel = AbilityComponent->MaxAbilityLevel;
+//
+// 	bool bCanAddActiveAbility = true;
+// 	bool bCanAddPassiveAbility = true;
+// 	
+// 	// Get Abilities that are not maxed out
+// 	TArray<EActiveAbilities> AvailableActiveAbilities = Chest_BuildActiveList(ActiveAbilityMap,AbilityMaxLevel);
+//
+// 	if(AvailableActiveAbilities.IsEmpty())
+// 		bCanAddActiveAbility = false;
+//
+// 	TArray<EPassiveAbilities> AvailablePassiveAbilities = Chest_BuildPassiveList(PassiveAbilityMap,AbilityMaxLevel);
+//
+// 	if(AvailablePassiveAbilities.IsEmpty())
+// 		bCanAddPassiveAbility = false;
+//
+// 	if(bCanAddActiveAbility || bCanAddPassiveAbility)
+// 	{
+// 		if(bCanAddActiveAbility)
+// 			{
+// 				// Remove from local array so we do not have duplicate
+// 				EActiveAbilities ActiveAbility = AvailableActiveAbilities[FMath::RandRange(0,AvailableActiveAbilities.Num()-1)];
+//
+// 				AvailableActiveAbilities.Remove(ActiveAbility);
+//
+// 				bCanAddActiveAbility = !AvailableActiveAbilities.IsEmpty();
+//
+// 				TArray<FName> AAbilityNames = DT_ActiveAbilities->GetRowNames();
+//
+// 				for(const FName& Name : AAbilityNames)
+// 				{
+// 					int32 level = 0;
+// 					int32* findLevel = ActiveAbilityMap.Find(ActiveAbility);
+//
+// 					if(findLevel)
+// 						level = *findLevel;
+//
+// 					++level;
+// 					
+// 					const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE,TEXT("EActiveAbilities"), true);
+// 					FString NameString;
+// 					if(EnumPtr)
+// 					{
+// 						NameString = EnumPtr->GetNameStringByValue(static_cast<int64>(ActiveAbility));
+// 					}
+// 					if(Name.ToString() == NameString.Append(FString::Printf(TEXT("%d"),level)))
+// 					{
+// 						FAbilityLevelUp* AbilityLevelUp = DT_ActiveAbilities->FindRow<FAbilityLevelUp>(Name,TEXT("DT_ActiveAbilities"));
+//
+// 						if(AbilityLevelUp)
+// 						{
+// 							ChestUI->AddSelection(FText::FromString(NameString),level,AbilityLevelUp->LevelUpText,
+// 								UFunctionLibrary_Helper::FindActiveIcon(GetWorld(),ActiveAbility),
+// 								EActiveAbilities::Hammer,EPassiveAbilities::Ability_Bonus_Damage,EAbilityType::Active);
+// 							AssignAbility(EAbilityType::Active,EPassiveAbilities::Ability_Bonus_Damage,ActiveAbility);
+// 							break;
+// 						}
+// 					}
+// 				}
+// 			}
+// 			else
+// 			{
+// 				EPassiveAbilities PassiveAbility = AvailablePassiveAbilities[FMath::RandRange(0,AvailablePassiveAbilities.Num()-1)];
+//
+// 				AvailablePassiveAbilities.Remove(PassiveAbility);
+//
+// 				bCanAddPassiveAbility = !AvailablePassiveAbilities.IsEmpty();
+//
+// 				TArray<FName> PAbilityNames = DT_PassiveAbilities->GetRowNames();
+//
+// 				for(const FName& Name : PAbilityNames)
+// 				{
+// 					const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE,TEXT("EPassiveAbilities"), true);
+// 					FString NameString;
+// 					if(EnumPtr)
+// 					{
+// 						NameString = EnumPtr->GetNameStringByValue(static_cast<int64>(PassiveAbility));
+// 					}
+//
+// 					if(Name.ToString() == NameString)
+// 					{
+// 						FAbilityLevelUp* AbilityLevelUp = DT_PassiveAbilities->FindRow<FAbilityLevelUp>(Name,TEXT("DT_PassiveAbilities"));
+//
+// 						if(AbilityLevelUp)
+// 						{
+// 							int32 level = 0;
+// 							int32* findLevel = PassiveAbilityMap.Find(PassiveAbility);
+// 							if(findLevel)
+// 								level = *findLevel;
+//
+// 							++level;
+//
+// 							ChestUI->AddSelection(FText::FromString(NameString),level,AbilityLevelUp->LevelUpText,
+// 								UFunctionLibrary_Helper::FindPassiveIcon(GetWorld(),PassiveAbility),EActiveAbilities::Hammer,PassiveAbility,EAbilityType::Passive);
+// 							AssignAbility(EAbilityType::Passive,PassiveAbility,EActiveAbilities::Hammer);
+// 							break;
+// 						}
+// 					}
+// 				}
+// 			}
+// 	}
+// 	else
+// 	{
+// 		// If no abilities can be added - give bonus gold
+// 		ChestUI->AddSelection(FText::FromString(TEXT("Bonus")),0,FText::FromString(TEXT("50 Gold")),CoinIcon,
+// 			EActiveAbilities::Hammer,EPassiveAbilities::Ability_Bonus_Damage,EAbilityType::Active);
+// 		AssignAbility(EAbilityType::Gold,EPassiveAbilities::Ability_Bonus_Damage,EActiveAbilities::Hammer);
+// 	}
+// }
 
-void AGameplay_PlayerController::BuildAndProcessChest(int32 index)
-{
-	int32 Index = index;
+	// TODO : 삭제
+	// TODO : 읽어서 흐름만 남기고 삭제 
+// TArray<EActiveAbilities> AGameplay_PlayerController::Chest_BuildActiveList(TMap<EActiveAbilities, int32> ActiveMap,
+// 	int32 MaxLevel)
+// {
+// 	TArray<EActiveAbilities> Result;
+// 	TMap<EActiveAbilities,int32> TempActiveMap = ActiveMap;
+// 	int32 MaxAbilityLevel = MaxLevel;
+//
+// 	// Add Abilities that are not maxed out
+// 	TArray<EActiveAbilities> AAbilities;
+// 	TempActiveMap.GetKeys(AAbilities);
+//
+// 	for(EActiveAbilities aability : AAbilities)
+// 	{
+// 		if(TempActiveMap[aability]<MaxAbilityLevel)
+// 		{
+// 			Result.Add(aability);
+// 		}
+// 	}
+//
+// 	// return any abilities that are not yet maxed out
+// 	return Result;
+// }
 
-	TMap<EActiveAbilities,int32> ActiveAbilityMap = AbilityComponent->ActiveAbilitiesMap;
-	TMap<EPassiveAbilities,int32> PassiveAbilityMap = AbilityComponent->PassiveAbilitiesMap;
-	int32 AbilityMaxLevel = AbilityComponent->MaxAbilityLevel;
-
-	bool bCanAddActiveAbility = true;
-	bool bCanAddPassiveAbility = true;
-	
-	// Get Abilities that are not maxed out
-	TArray<EActiveAbilities> AvailableActiveAbilities = Chest_BuildActiveList(ActiveAbilityMap,AbilityMaxLevel);
-
-	if(AvailableActiveAbilities.IsEmpty())
-		bCanAddActiveAbility = false;
-
-	TArray<EPassiveAbilities> AvailablePassiveAbilities = Chest_BuildPassiveList(PassiveAbilityMap,AbilityMaxLevel);
-
-	if(AvailablePassiveAbilities.IsEmpty())
-		bCanAddPassiveAbility = false;
-
-	if(bCanAddActiveAbility || bCanAddPassiveAbility)
-	{
-		if(bCanAddActiveAbility)
-			{
-				// Remove from local array so we do not have duplicate
-				EActiveAbilities ActiveAbility = AvailableActiveAbilities[FMath::RandRange(0,AvailableActiveAbilities.Num()-1)];
-
-				AvailableActiveAbilities.Remove(ActiveAbility);
-
-				bCanAddActiveAbility = !AvailableActiveAbilities.IsEmpty();
-
-				TArray<FName> AAbilityNames = DT_ActiveAbilities->GetRowNames();
-
-				for(const FName& Name : AAbilityNames)
-				{
-					int32 level = 0;
-					int32* findLevel = ActiveAbilityMap.Find(ActiveAbility);
-
-					if(findLevel)
-						level = *findLevel;
-
-					++level;
-					
-					const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE,TEXT("EActiveAbilities"), true);
-					FString NameString;
-					if(EnumPtr)
-					{
-						NameString = EnumPtr->GetNameStringByValue(static_cast<int64>(ActiveAbility));
-					}
-					if(Name.ToString() == NameString.Append(FString::Printf(TEXT("%d"),level)))
-					{
-						FAbilityLevelUp* AbilityLevelUp = DT_ActiveAbilities->FindRow<FAbilityLevelUp>(Name,TEXT("DT_ActiveAbilities"));
-
-						if(AbilityLevelUp)
-						{
-							ChestUI->AddSelection(FText::FromString(NameString),level,AbilityLevelUp->LevelUpText,
-								UFunctionLibrary_Helper::FindActiveIcon(GetWorld(),ActiveAbility),
-								EActiveAbilities::Hammer,EPassiveAbilities::Ability_Bonus_Damage,EAbilityType::Active);
-							AssignAbility(EAbilityType::Active,EPassiveAbilities::Ability_Bonus_Damage,ActiveAbility);
-							break;
-						}
-					}
-				}
-			}
-			else
-			{
-				EPassiveAbilities PassiveAbility = AvailablePassiveAbilities[FMath::RandRange(0,AvailablePassiveAbilities.Num()-1)];
-
-				AvailablePassiveAbilities.Remove(PassiveAbility);
-
-				bCanAddPassiveAbility = !AvailablePassiveAbilities.IsEmpty();
-
-				TArray<FName> PAbilityNames = DT_PassiveAbilities->GetRowNames();
-
-				for(const FName& Name : PAbilityNames)
-				{
-					const UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE,TEXT("EPassiveAbilities"), true);
-					FString NameString;
-					if(EnumPtr)
-					{
-						NameString = EnumPtr->GetNameStringByValue(static_cast<int64>(PassiveAbility));
-					}
-
-					if(Name.ToString() == NameString)
-					{
-						FAbilityLevelUp* AbilityLevelUp = DT_PassiveAbilities->FindRow<FAbilityLevelUp>(Name,TEXT("DT_PassiveAbilities"));
-
-						if(AbilityLevelUp)
-						{
-							int32 level = 0;
-							int32* findLevel = PassiveAbilityMap.Find(PassiveAbility);
-							if(findLevel)
-								level = *findLevel;
-
-							++level;
-
-							ChestUI->AddSelection(FText::FromString(NameString),level,AbilityLevelUp->LevelUpText,
-								UFunctionLibrary_Helper::FindPassiveIcon(GetWorld(),PassiveAbility),EActiveAbilities::Hammer,PassiveAbility,EAbilityType::Passive);
-							AssignAbility(EAbilityType::Passive,PassiveAbility,EActiveAbilities::Hammer);
-							break;
-						}
-					}
-				}
-			}
-	}
-	else
-	{
-		// If no abilities can be added - give bonus gold
-		ChestUI->AddSelection(FText::FromString(TEXT("Bonus")),0,FText::FromString(TEXT("50 Gold")),CoinIcon,
-			EActiveAbilities::Hammer,EPassiveAbilities::Ability_Bonus_Damage,EAbilityType::Active);
-		AssignAbility(EAbilityType::Gold,EPassiveAbilities::Ability_Bonus_Damage,EActiveAbilities::Hammer);
-	}
-}
-
-TArray<EActiveAbilities> AGameplay_PlayerController::Chest_BuildActiveList(TMap<EActiveAbilities, int32> ActiveMap,
-	int32 MaxLevel)
-{
-	TArray<EActiveAbilities> Result;
-	TMap<EActiveAbilities,int32> TempActiveMap = ActiveMap;
-	int32 MaxAbilityLevel = MaxLevel;
-
-	// Add Abilities that are not maxed out
-	TArray<EActiveAbilities> AAbilities;
-	TempActiveMap.GetKeys(AAbilities);
-
-	for(EActiveAbilities aability : AAbilities)
-	{
-		if(TempActiveMap[aability]<MaxAbilityLevel)
-		{
-			Result.Add(aability);
-		}
-	}
-
-	// return any abilities that are not yet maxed out
-	return Result;
-}
-
-TArray<EPassiveAbilities> AGameplay_PlayerController::Chest_BuildPassiveList(TMap<EPassiveAbilities, int32> PassiveMap,
-	int32 MaxLevel)
-{
-	TArray<EPassiveAbilities> Result;
-	TMap<EPassiveAbilities,int32> TempActiveMap = PassiveMap;
-	int32 MaxAbilityLevel = MaxLevel;
-
-	// Add Abilities that are not maxed out
-	TArray<EPassiveAbilities> PAbilities;
-	TempActiveMap.GetKeys(PAbilities);
-
-	for(EPassiveAbilities pability : PAbilities)
-	{
-		if(TempActiveMap[pability]<MaxAbilityLevel)
-		{
-			Result.Add(pability);
-		}
-	}
-
-	// return any abilities that are not yet maxed out
-	return Result;
-}
+// TArray<EPassiveAbilities> AGameplay_PlayerController::Chest_BuildPassiveList(TMap<EPassiveAbilities, int32> PassiveMap,
+// 	int32 MaxLevel)
+// {
+// 	TArray<EPassiveAbilities> Result;
+// 	TMap<EPassiveAbilities,int32> TempActiveMap = PassiveMap;
+// 	int32 MaxAbilityLevel = MaxLevel;
+//
+// 	// Add Abilities that are not maxed out
+// 	TArray<EPassiveAbilities> PAbilities;
+// 	TempActiveMap.GetKeys(PAbilities);
+//
+// 	for(EPassiveAbilities pability : PAbilities)
+// 	{
+// 		if(TempActiveMap[pability]<MaxAbilityLevel)
+// 		{
+// 			Result.Add(pability);
+// 		}
+// 	}
+//
+// 	// return any abilities that are not yet maxed out
+// 	return Result;
+// }
 
 void AGameplay_PlayerController::CloseChestUI()
 {
@@ -989,87 +1007,92 @@ void AGameplay_PlayerController::CloseChestUI()
 	}
 
 	// Update UI and abilities when abiltiy is modified
-	UpdateHotbar();
-
-	AbilityComponent->RefreshAbilities();
+	
+	// TODO : 삭제
+	
+	// UpdateHotbar();
+	//
+	// AbilityComponent->RefreshAbilities();
 	
 }
 
-void AGameplay_PlayerController::ActivateEvolution(EActiveAbilities Evo)
-{
-	AbilityComponent->EvolutionMap.Remove(Evo);
+	// TODO : 삭제
 
-	AbilityComponent->EvolutionTracker[(int32)Evo] = true;
+// void AGameplay_PlayerController::ActivateEvolution(EActiveAbilities Evo)
+// {
+// 	AbilityComponent->EvolutionMap.Remove(Evo);
+//
+// 	AbilityComponent->EvolutionTracker[(int32)Evo] = true;
+//
+// 	// Do Specific logic here that can't be handled in ability preparation
+// 	if(Evo == EActiveAbilities::FrostBolt)
+// 	{
+// 		AbilityComponent->FBTimer = 0.2f;
+// 	}
+// }
 
-	// Do Specific logic here that can't be handled in ability preparation
-	if(Evo == EActiveAbilities::FrostBolt)
-	{
-		AbilityComponent->FBTimer = 0.2f;
-	}
-}
-
-void AGameplay_PlayerController::AssignAbility(EAbilityType Type, EPassiveAbilities PAbility, EActiveAbilities AAbility)
-{
-	switch (Type)
-	{
-	case EAbilityType::Active:
-		switch (AAbility)
-		{
-		case EActiveAbilities::Hammer:
-			AbilityComponent->LevelUpHammer();
-			break;
-		case EActiveAbilities::Fireball:
-			AbilityComponent->LevelUpFireball();
-			break;
-		case EActiveAbilities::Lightning:
-			AbilityComponent->LevelUpLightning();
-			break;
-		case EActiveAbilities::FrostBolt:
-			AbilityComponent->LevelUpFrostBolt();
-			break;
-	default :
-		break;
-		}
-		break;
-	case EAbilityType::Passive:
-		switch (PAbility)
-		{
-		case EPassiveAbilities::Ability_Bonus_Damage:
-			AbilityComponent->LevelUpAbilityDamageBonus(false);
-			break;
-		case EPassiveAbilities::Health_Bonus:
-			AbilityComponent->LevelUpMaxHealth(false);
-			break;
-		case EPassiveAbilities::Speed_Bonus:
-			AbilityComponent->LevelUpSpeedBonus(false);
-			break;
-		case EPassiveAbilities::Ability_Cooldown_Reduction:
-			AbilityComponent->LevelUpTimerReduction(false);
-			break;
-		default:
-			break;
-		}
-		break;
-	case EAbilityType::Evolution:
-		ActivateEvolution(AAbility);
-		break;
-	case EAbilityType::Gold:
-		if(!GetPawn()->GetPlayerState()->GetClass()->ImplementsInterface(UInterface_PlayerState::StaticClass()))
-		{
-			RS_LOG_ERROR(TEXT("PlayerState가 PlayerState 인터페이스를 상속받지 않았습니다."))
-			return;
-		}
-		IInterface_PlayerState::Execute_OnGoldPickUp(GetPawn()->GetPlayerState(),50);
-		break;
-	case EAbilityType::Health:
-		if(!GetPawn()->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
-		{
-			RS_LOG_ERROR(TEXT("Pawn이 CharacterManager 인터페이스를 상속받지 않았습니다."))
-			return;
-		}
-		IInterface_CharacterManager::Execute_RestoreHealth(GetPawn(),9999.0f);
-		break;
-	default:
-		break;
-	}
-}
+// void AGameplay_PlayerController::AssignAbility(EAbilityType Type, EPassiveAbilities PAbility, EActiveAbilities AAbility)
+// {
+// 	switch (Type)
+// 	{
+// 	case EAbilityType::Active:
+// 		switch (AAbility)
+// 		{
+// 		case EActiveAbilities::Hammer:
+// 			AbilityComponent->LevelUpHammer();
+// 			break;
+// 		case EActiveAbilities::Fireball:
+// 			AbilityComponent->LevelUpFireball();
+// 			break;
+// 		case EActiveAbilities::Lightning:
+// 			AbilityComponent->LevelUpLightning();
+// 			break;
+// 		case EActiveAbilities::FrostBolt:
+// 			AbilityComponent->LevelUpFrostBolt();
+// 			break;
+// 	default :
+// 		break;
+// 		}
+// 		break;
+// 	case EAbilityType::Passive:
+// 		switch (PAbility)
+// 		{
+// 		case EPassiveAbilities::Ability_Bonus_Damage:
+// 			AbilityComponent->LevelUpAbilityDamageBonus(false);
+// 			break;
+// 		case EPassiveAbilities::Health_Bonus:
+// 			AbilityComponent->LevelUpMaxHealth(false);
+// 			break;
+// 		case EPassiveAbilities::Speed_Bonus:
+// 			AbilityComponent->LevelUpSpeedBonus(false);
+// 			break;
+// 		case EPassiveAbilities::Ability_Cooldown_Reduction:
+// 			AbilityComponent->LevelUpTimerReduction(false);
+// 			break;
+// 		default:
+// 			break;
+// 		}
+// 		break;
+// 	case EAbilityType::Evolution:
+// 		ActivateEvolution(AAbility);
+// 		break;
+// 	case EAbilityType::Gold:
+// 		if(!GetPawn()->GetPlayerState()->GetClass()->ImplementsInterface(UInterface_PlayerState::StaticClass()))
+// 		{
+// 			RS_LOG_ERROR(TEXT("PlayerState가 PlayerState 인터페이스를 상속받지 않았습니다."))
+// 			return;
+// 		}
+// 		IInterface_PlayerState::Execute_OnGoldPickUp(GetPawn()->GetPlayerState(),50);
+// 		break;
+// 	case EAbilityType::Health:
+// 		if(!GetPawn()->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
+// 		{
+// 			RS_LOG_ERROR(TEXT("Pawn이 CharacterManager 인터페이스를 상속받지 않았습니다."))
+// 			return;
+// 		}
+// 		IInterface_CharacterManager::Execute_RestoreHealth(GetPawn(),9999.0f);
+// 		break;
+// 	default:
+// 		break;
+// 	}
+// }

@@ -487,7 +487,9 @@ void UMyGameManager::ProcessEndGame()
 	{
 		if(Character->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
 		{
-			UAbilitiesComponent* AbilitiesComponent = IInterface_CharacterManager::Execute_GetAbilityComponent(Character);
+			// TODO : 삭제
+			
+			UAbilitiesComponent* AbilitiesComponent = nullptr;//IInterface_CharacterManager::Execute_GetAbilityComponent(Character);
 
 			AbilitiesComponent->InvalidateTimers();
 
