@@ -204,13 +204,15 @@ void ABase_Character::AddCharacterAbilities()
 	}
 
 	// 2. 어빌리티 순회하며 부여
-	for (TSubclassOf<UGameplayAbility>& AbilityClass : DefaultAbilities)
+	for (const FGAbilityID& AbilityID : DefaultAbilities)
 	{
-		if (AbilityClass)
+		if (AbilityID.GameplayAbility)
 		{
+			int32 InputID = AbilityID.InputID==EAbilityInputID::None?-1:(int32)AbilityID.InputID;
+			
 			// 3. Spec 생성 (클래스, 레벨, 입력ID, 소스)
 			// 예시: 레벨 1, 입력 ID는 -1 (없음) 또는 Enum 값
-			FGameplayAbilitySpec Spec(AbilityClass, 1, -1, this);
+			FGameplayAbilitySpec Spec(AbilityID.GameplayAbility, 1, InputID, this);
 
 			// 4. 어빌리티 부여 (GiveAbility)
 			// 리턴받은 Handle은 나중에 필요하면 저장해둡니다.
@@ -305,23 +307,54 @@ void ABase_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		{
 			EnhancedInputComponent->BindAction(MoveAction,ETriggerEvent::Triggered,this,&ABase_Character::Move);
 		}
+		
+		// 지금은 하드코딩으로 넣어주지만 
+		// 스킬마다 넣어주는 것은 어려우니
+		// 데이터 애셋을 만들어서 클릭으로 동작하는지 홀드로 동작하는지, InputID는 무엇인지 담아 데이터를 가져오도록 하자.
+		if (Skill1Action)
+		{
+			EnhancedInputComponent->BindAction(Skill1Action,ETriggerEvent::Started,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill1,true);
+			
+			EnhancedInputComponent->BindAction(Skill1Action,ETriggerEvent::Completed,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill1,false);
+		}
+		
+		if (Skill2Action)
+		{
+			EnhancedInputComponent->BindAction(Skill2Action,ETriggerEvent::Started,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill2,true);
+			
+			EnhancedInputComponent->BindAction(Skill2Action,ETriggerEvent::Completed,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill2,false);
+		}
+		
+		if (Skill3Action)
+		{
+			EnhancedInputComponent->BindAction(Skill3Action,ETriggerEvent::Started,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill3,true);
+			
+			EnhancedInputComponent->BindAction(Skill3Action,ETriggerEvent::Completed,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill3,false);
+		}
+		
+		if (Skill4Action)
+		{
+			EnhancedInputComponent->BindAction(Skill4Action,ETriggerEvent::Started,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill4,true);
+			
+			EnhancedInputComponent->BindAction(Skill4Action,ETriggerEvent::Completed,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill4,false);
+		}
+		
+		if (Skill5Action)
+		{
+			EnhancedInputComponent->BindAction(Skill5Action,ETriggerEvent::Started,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill5,true);
+			
+			EnhancedInputComponent->BindAction(Skill5Action,ETriggerEvent::Completed,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill5,false);
+		}
 	}
-	
 }
 
 void ABase_Character::UpdateCharacterClass_Implementation(FAvailableCharacter AvailableCharacter)
 {
-	// IInterface_CharacterManager::UpdateCharacterClass_Implementation(Character);
 
 	S_SetCharacterData(AvailableCharacter);
 }
 
-	// TODO : 삭제
 
-// UAbilitiesComponent* ABase_Character::GetAbilityComponent_Implementation()
-// {
-// 	return AbilityComponent;
-// }
 
 void ABase_Character::S_SetCharacterMesh_Implementation(USkeletalMesh* SK)
 {
@@ -694,23 +727,23 @@ void ABase_Character::CharacterInputSetting()
 	}
 }
 
-// TODO : 삭제
+void ABase_Character::SendAbilityLocalInput(const EAbilityInputID InputID, bool bIsPressed)
+{
+	if (GetAbilitySystemComponent())
+	{
+		if (bIsPressed)
+		{
+			// ASC에게 "이 ID 눌렸어"라고 알림 -> 자동으로 연결된 GA 발동 시도
+			GetAbilitySystemComponent()->AbilityLocalInputPressed((int32)InputID);
+		}
+		else
+		{
+			// ASC에게 "이 ID 떼졌어"라고 알림 -> GA 내부에서 WaitInputRelease 태스크가 반응함
+			GetAbilitySystemComponent()->AbilityLocalInputReleased((int32)InputID);
+		}
+	}
+}
 
-// void ABase_Character::S_UpdatePassiveStat_Implementation(EPassiveAbilities Stat, float Value)
-// {
-// 	switch (Stat)
-// 	{
-// 	case EPassiveAbilities::Health_Bonus:
-// 		MaxHealth = MaxHealth*Value;
-// 		IInterface_CharacterManager::Execute_RestoreHealth(this,MaxHealth*0.1f);
-// 		break;
-// 	case EPassiveAbilities::Speed_Bonus:
-// 		GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed * Value;
-// 		break;
-// 	default:
-// 		break;
-// 	}
-// }
 
 
 

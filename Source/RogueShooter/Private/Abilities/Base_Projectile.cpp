@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "RogueShooter/AssetPath.h"
 #include "Particles/ParticleSystem.h"
+#include "Utility/RSLog.h"
 
 
 // Sets default values
@@ -83,8 +84,10 @@ void ABase_Projectile::NotifyHit(class UPrimitiveComponent* MyComp, AActor* Othe
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 
-	UGameplayStatics::ApplyDamage(Hit.GetActor(),Damage,GetInstigator()->GetInstigatorController(),this,nullptr);
+	// UGameplayStatics::ApplyDamage(Hit.GetActor(),Damage,GetInstigator()->GetInstigatorController(),this,nullptr);
 
+	RS_LOG_SCREEN(TEXT("Projectile Hit"))
+	
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),Hit_VFX,HitLocation);
 
 	Destroy();

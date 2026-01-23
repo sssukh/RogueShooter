@@ -32,6 +32,18 @@ class UCharAttributeSet;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoad);
 
+USTRUCT(BlueprintType)
+struct FGAbilityID
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	TSubclassOf<UGameplayAbility> GameplayAbility;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	EAbilityInputID InputID;
+};
+
 UCLASS()
 class ROGUESHOOTER_API ABase_Character : public ACharacter, public IInterface_CharacterManager, public IAbilitySystemInterface
 {
@@ -77,7 +89,7 @@ protected:
 	
 	// 부여할 어빌리티 목록
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category =  "GAS | Config")
-	TArray<TSubclassOf<UGameplayAbility>> DefaultAbilities;
+	TArray<FGAbilityID> DefaultAbilities;
 	
 	// 초기화 함수 (아래 설명 참조)
 	virtual void PossessedBy(AController* NewController) override;
@@ -287,9 +299,25 @@ protected:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Config | Input", meta = (AllowPrivateAccess))
 	TObjectPtr<class UInputAction> MoveAction;
 	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Config | Input", meta = (AllowPrivateAccess))
+	TObjectPtr<class UInputAction> Skill1Action;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Config | Input", meta = (AllowPrivateAccess))
+	TObjectPtr<class UInputAction> Skill2Action;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Config | Input", meta = (AllowPrivateAccess))
+	TObjectPtr<class UInputAction> Skill3Action;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Config | Input", meta = (AllowPrivateAccess))
+	TObjectPtr<class UInputAction> Skill4Action;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Config | Input", meta = (AllowPrivateAccess))
+	TObjectPtr<class UInputAction> Skill5Action;
+	
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Config | Input", meta = (AllowPrivateAccess)) 
 	TObjectPtr<class UInputMappingContext> DefaultMappingContext;
 	
+	void SendAbilityLocalInput(const EAbilityInputID InputID,bool bIsPressed);
 	// Character Setup
 public:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")

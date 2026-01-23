@@ -231,3 +231,17 @@ enum class EDamageReceiveType : uint8
 	Health,
 	Shield
 };
+
+UENUM(BlueprintType)
+enum class EAbilityInputID : uint8
+{
+	None,
+	Confirm,
+	Cancel,
+	Attack,
+	Skill1, // 왼쪽 마우스
+	Skill2, // 오른쪽 마우스
+	Skill3, // shift
+	Skill4, // r
+	Skill5, // q
+};
