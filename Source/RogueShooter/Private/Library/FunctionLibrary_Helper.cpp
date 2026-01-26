@@ -3,6 +3,8 @@
 
 #include "Library/FunctionLibrary_Helper.h"
 
+#include "GameplayEffect.h"
+#include "GameplayEffectTypes.h"
 #include "Blueprint/UserWidget.h"
 #include "Engine/AssetManager.h"
 #include "Engine/DamageEvents.h"
@@ -113,6 +115,18 @@ USG_Player* UFunctionLibrary_Helper::LoadPlayerData(const UObject* WorldContextO
 void UFunctionLibrary_Helper::SavePlayerData(const UObject* WorldContextObject, USG_Player* SaveData)
 {
 	UGameplayStatics::SaveGameToSlot(SaveData,TEXT("PlayerData1"),0);
+}
+
+void UFunctionLibrary_Helper::AddGrantedTagsToSpec(FGameplayEffectSpecHandle& SpecHandle,
+	FGameplayTagContainer TagsToAdd)
+{
+	// 핸들이 유효한지 확인
+	if (SpecHandle.IsValid())
+	{
+		// Spec 데이터에 직접 접근하여 DynamicGrantedTags에 태그를 추가합니다.
+		// 이 태그들은 GE가 적용된 동안 Target에게 부여됩니다.
+		SpecHandle.Data->DynamicGrantedTags.AppendTags(TagsToAdd);
+	}
 }
 
 

@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "UW_PlayerHud.generated.h"
 
+class UUW_SkillIcon;
 class UUW_AbilityTile;
 enum class EPassiveAbilities : uint8;
 enum class EActiveAbilities : uint8;
@@ -24,7 +25,7 @@ public:
 	UUW_PlayerHud(const FObjectInitializer& ObjectInitializer);
 
 	virtual void NativeConstruct() override;
-
+	
 	void BuildHotbar(const TMap<EActiveAbilities,int32>& ActiveAbilities, const TMap<EPassiveAbilities,int32>& PassiveAbilities);
 
 	void UpdateGold(int32 Gold);
@@ -53,5 +54,9 @@ public:
 	UPROPERTY(BlueprintReadWrite,Category = "UW_PlayerHud | Designer", meta = (BindWidget))
 	TObjectPtr<UTextBlock> TextBlock_Time;
 
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "UW_PlayerHud | Config")
 	TSubclassOf<UUW_AbilityTile> AbilityTileClass;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "UW_PlayerHud | Config")
+	TSubclassOf<UUW_SkillIcon> SkillIconClass;
 };

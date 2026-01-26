@@ -8,6 +8,7 @@
 #include "RogueShooter/RSEnumStruct.h"
 #include "FunctionLibrary_Helper.generated.h"
 
+struct FGameplayEffectSpecHandle;
 class UUW_LoadingScreen;
 class USG_Player;
 /**
@@ -34,8 +35,9 @@ public:
 	UFUNCTION(BlueprintCallable,Category = "Function Library Helper",meta = (WorldContext = "WorldContextObject"))
 	static USG_Player* LoadPlayerData(const UObject* WorldContextObject);
 	
-	
 	UFUNCTION(BlueprintCallable,Category = "Function Library Helper",meta = (WorldContext = "WorldContextObject"))
 	static void SavePlayerData(const UObject* WorldContextObject,USG_Player* SaveData);
 	
+	UFUNCTION(BlueprintCallable,Category = "GAS|Ability",meta = (DisplayName = "Add Granted Tags To Spec"))
+	static void AddGrantedTagsToSpec(UPARAM(ref) FGameplayEffectSpecHandle& SpecHandle, FGameplayTagContainer TagsToAdd);
 };

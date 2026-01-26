@@ -23,9 +23,21 @@ void FRsGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	Data_Stat_CriticalDamage = Manager.AddNativeGameplayTag(FName("Data.Stat.CriticalDamage"),TEXT("치명타 데미지"));
 	Data_Stat_Defense = Manager.AddNativeGameplayTag(FName("Data.Stat.Defense"),TEXT("방어력"));
 	
+	Data_Duration = Manager.AddNativeGameplayTag(FName("Data.Duration"),TEXT("기간"));
+	
 	Status_Dead = Manager.AddNativeGameplayTag(FName("Status.Dead"),TEXT("죽은 상태"));
 	Status_Debuff = Manager.AddNativeGameplayTag(FName("Status.Debuff"),TEXT("디버프"));
 	Status_Debuff_Stun = Manager.AddNativeGameplayTag(FName("Status.Debuff.Stun"),TEXT("디버프 스턴"));
+	
+	Status_Cooldown_SKill1 = Manager.AddNativeGameplayTag(FName("Status.Cooldown.Skill1"),TEXT("Skill1 쿨다운"));
+	Status_Cooldown_SKill2 = Manager.AddNativeGameplayTag(FName("Status.Cooldown.Skill2"),TEXT("Skill2 쿨다운"));
+	Status_Cooldown_SKill3 = Manager.AddNativeGameplayTag(FName("Status.Cooldown.Skill3"),TEXT("Skill3 쿨다운"));
+	Status_Cooldown_SKill4 = Manager.AddNativeGameplayTag(FName("Status.Cooldown.Skill4"),TEXT("Skill4 쿨다운"));
+	Status_Cooldown_SKill5 = Manager.AddNativeGameplayTag(FName("Status.Cooldown.Skill5"),TEXT("Skill5 쿨다운"));
+	
+	Ability_Skill = Manager.AddNativeGameplayTag(FName("Ability.SKill"),TEXT("스킬 태그"));
+	Ability_Skill_Dash = Manager.AddNativeGameplayTag(FName("Ability.SKill.Dash"),TEXT("스킬 대쉬 태그"));
+	
 	
 	Event_Death = Manager.AddNativeGameplayTag(FName("Event.Death"),TEXT("죽음"));
 	Event_Equip = Manager.AddNativeGameplayTag(FName("Event.Equip"),TEXT("아이템 착용"));

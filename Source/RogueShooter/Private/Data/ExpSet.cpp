@@ -64,7 +64,7 @@ void UExpSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackD
 			NextMaxXp = Char->GetMaxXpForLevel(CurrentLevel);
 		}
 		
-		RS_LOG_SCREEN(TEXT("Incoming : %f, Current : %f, Max : %f, Level : %f"),LocalIncomingXp,CurrentXp,NextMaxXp,CurrentLevel)
+		// RS_LOG_SCREEN(TEXT("Incoming : %f, Current : %f, Max : %f, Level : %f"),LocalIncomingXp,CurrentXp,NextMaxXp,CurrentLevel)
 		
 		if (LocalIncomingXp + CurrentXp >= NextMaxXp)
 		{
@@ -86,7 +86,7 @@ void UExpSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackD
 			SetExpGained(LocalIncomingXp + CurrentXp);
 			
 		}
-		RS_LOG_SCREEN(TEXT("ExpGained : %f, ExpMax : %f "),GetExpGained(),GetMaxExpGained())
+		// RS_LOG_SCREEN(TEXT("ExpGained : %f, ExpMax : %f "),GetExpGained(),GetMaxExpGained())
 		
 		if (OnExpChange.IsBound())
 		{

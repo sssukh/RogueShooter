@@ -245,3 +245,21 @@ enum class EAbilityInputID : uint8
 	Skill4, // r
 	Skill5, // q
 };
+
+USTRUCT(BlueprintType)
+struct FSkillInfo : public FTableRowBase
+{
+	GENERATED_BODY()
+public:
+	// 스킬 키값 
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	FGameplayTag AbilityTag;
+	
+	// 스킬에 사용할 아이콘 
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	TObjectPtr<UTexture2D> SkillIcon;
+	
+	// 스킬 설명 
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	FText SkillDescription;
+};

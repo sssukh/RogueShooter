@@ -25,9 +25,22 @@ public:
 	FGameplayTag Data_Stat_CriticalDamage;
 	FGameplayTag Data_Stat_Defense;
 	
+	FGameplayTag Data_Duration;
+	
+	
 	FGameplayTag Status_Dead;
 	FGameplayTag Status_Debuff;
 	FGameplayTag Status_Debuff_Stun;
+	FGameplayTag Status_Cooldown_SKill1;
+	FGameplayTag Status_Cooldown_SKill2;
+	FGameplayTag Status_Cooldown_SKill3;
+	FGameplayTag Status_Cooldown_SKill4;
+	FGameplayTag Status_Cooldown_SKill5;
+	
+	
+	FGameplayTag Ability_Skill;
+	FGameplayTag Ability_Skill_Dash;
+	
 	
 	FGameplayTag Event_Death;
 	FGameplayTag Event_Equip;
