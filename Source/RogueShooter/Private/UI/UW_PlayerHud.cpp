@@ -104,5 +104,10 @@ void UUW_PlayerHud::UpdateTime(FText Time)
 	TextBlock_Time->SetText(Time);
 }
 
+void UUW_PlayerHud::SetWidgetController(URsWidgetController* InWidgetController)
+{
+	WidgetController = InWidgetController;
+}
+
 
 

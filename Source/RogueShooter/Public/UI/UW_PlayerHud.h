@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "System/RsWidgetController.h"
 #include "UW_PlayerHud.generated.h"
 
+class UOverlay;
+class URsWidgetController;
 class UUW_SkillIcon;
 class UUW_AbilityTile;
 enum class EPassiveAbilities : uint8;
@@ -32,6 +35,12 @@ public:
 
 	void UpdateTime(FText Time);
 	
+	void SetWidgetController(URsWidgetController* InWidgetController);
+	
+protected:
+	UPROPERTY()
+	TObjectPtr<URsWidgetController> WidgetController;
+	
 public:
 	UPROPERTY(BlueprintReadWrite,Category = "UW_PlayerHud | Designer", meta = (BindWidget))
 	TObjectPtr<UHorizontalBox> HorizontalBox_Active;
@@ -53,7 +62,10 @@ public:
 
 	UPROPERTY(BlueprintReadWrite,Category = "UW_PlayerHud | Designer", meta = (BindWidget))
 	TObjectPtr<UTextBlock> TextBlock_Time;
-
+	
+	UPROPERTY(BlueprintReadWrite,Category = "UW_PlayerHud | Designer", meta = (BindWidget))
+	TObjectPtr<UOverlay> Overlay_Hud;
+	
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "UW_PlayerHud | Config")
 	TSubclassOf<UUW_AbilityTile> AbilityTileClass;
 	

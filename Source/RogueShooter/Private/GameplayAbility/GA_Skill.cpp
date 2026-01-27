@@ -8,6 +8,7 @@
 
 UGA_Skill::UGA_Skill()
 {
+	CooldownDurationTag = FRsGameplayTags::Get().Data_Duration;
 }
 
 void UGA_Skill::ApplyCooldown(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,

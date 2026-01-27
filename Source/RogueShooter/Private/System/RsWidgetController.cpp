@@ -10,9 +10,12 @@ URsWidgetController::URsWidgetController()
 {
 }
 
-void URsWidgetController::SetWidgetControllerParams(UAbilitySystemComponent* InASC)
+void URsWidgetController::SetWidgetControllerParams(const FWidgetControllerParams& WcParams)
 {
-	ASC = InASC;
+	ASC = WcParams.AbilitySystemComponent;
+	PS = WcParams.PlayerState;
+	PC = WcParams.PlayerController;
+	
 	BindCallbacksToDependencies();
 }
 

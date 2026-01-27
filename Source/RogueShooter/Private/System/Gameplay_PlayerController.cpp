@@ -4,6 +4,7 @@
 #include "System/Gameplay_PlayerController.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Character/Base_Character.h"
 #include "Components/InventoryComponent.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
@@ -13,10 +14,11 @@
 #include "Kismet/GameplayStatics.h"
 #include "Library/FunctionLibrary_Helper.h"
 #include "RogueShooter/AssetPath.h"
+#include "System/RsHUD.h"
+#include "System/RsWidgetController.h"
 #include "UI/UW_ChestMaster.h"
 #include "UI/UW_GameMenu.h"
 #include "UI/UW_LevelUpMaster.h"
-#include "UI/UW_PlayerHud.h"
 #include "UI/UW_MatchResults.h"
 #include "Utility/MyCheatManager.h"
 #include "Utility/RSLog.h"
@@ -49,9 +51,7 @@ AGameplay_PlayerController::AGameplay_PlayerController()
 	if(PassiveDTFinder.Succeeded())
 		DT_PassiveAbilities = PassiveDTFinder.Object;
 
-	static ConstructorHelpers::FClassFinder<UUW_PlayerHud> PlayerHudClassFinder(*AssetPath::Blueprint::WBP_PlayerHud_C);
-	if(PlayerHudClassFinder.Succeeded())
-		PlayerHudClass = PlayerHudClassFinder.Class;
+	
 
 	static ConstructorHelpers::FClassFinder<UUW_LevelUpMaster> LevelUpMasterClassFinder(*AssetPath::Blueprint::WBP_LevelUpMaster_C);
 	if(LevelUpMasterClassFinder.Succeeded())
@@ -196,7 +196,6 @@ void AGameplay_PlayerController::OC_UpdateHudHotbar_Implementation(const TArray<
 		PassiveMap.Add(PABInt.PAbility,PABInt.Value);
 	}
 	
-	PlayerHud->BuildHotbar(ActiveMap,PassiveMap);
 }
 
 
@@ -208,13 +207,19 @@ void AGameplay_PlayerController::OC_UpdateCharUI_Implementation(float Percent, i
 
 void AGameplay_PlayerController::OC_UpdateTimer_Implementation(const FText& Time)
 {
-	PlayerHud->UpdateTime(Time);
+	if (ARsHUD* Hud = Cast<ARsHUD>(MyHUD))
+	{
+		Hud->UpdateOverlayTime(Time);
+	}
 }
 
 
 void AGameplay_PlayerController::OC_UpdateGoldInUI_Implementation(int32 Amount)
 {
-	PlayerHud->UpdateGold(Amount);
+	if (ARsHUD* Hud = Cast<ARsHUD>(MyHUD))
+	{
+		Hud->UpdateOverlayGold(Amount);
+	}
 }
 
 void AGameplay_PlayerController::OC_EndMatch_Implementation(bool Victory, int32 EnemiesKilled)
@@ -229,8 +234,15 @@ void AGameplay_PlayerController::SetupPlayer()
 
 	CleanUpUI();
 
-	CreateGameplayUI();
-
+	// TODO : 여기에 새로운 HUD 초기화 
+	ABase_Character* Char = Cast<ABase_Character>(GetCharacter());
+	
+	
+	if (ARsHUD* Hud = Cast<ARsHUD>(MyHUD))
+	{
+		Hud->InitOverlay(FWidgetControllerParams(this,PlayerState,Char->GetAbilitySystemComponent(),nullptr));
+	}
+	
 	SetReference();
 
 	// TODO : 삭제
@@ -240,16 +252,6 @@ void AGameplay_PlayerController::SetupPlayer()
 	// UpdateHotbar();
 }
 
-void AGameplay_PlayerController::CreateGameplayUI()
-{
-	if(PlayerHud == nullptr)
-	{
-		PlayerHud = CreateWidget<UUW_PlayerHud>(this,PlayerHudClass);
-	}
-
-	if(!PlayerHud->IsInViewport())
-		PlayerHud->AddToViewport();
-}
 
 void AGameplay_PlayerController::SetReference()
 {
@@ -270,14 +272,18 @@ void AGameplay_PlayerController::UpdateCharacterUI(float Percent, int32 Level)
 
 void AGameplay_PlayerController::UpdateExpBar(float Percent)
 {
-	PlayerHud->ProgressBar_XP->SetPercent(Percent);
-	
+	if (ARsHUD* Hud = Cast<ARsHUD>(MyHUD))
+	{
+		Hud->UpdateOverlayExpBar(Percent);
+	}
 }
 
 void AGameplay_PlayerController::UpdateLevelUI(int32 Level)
 {
-	PlayerHud->TextBlock_Level->SetText(FText::FromString(FString::Printf(TEXT("Level %d"),Level)));
-	
+	if (ARsHUD* Hud = Cast<ARsHUD>(MyHUD))
+	{
+		Hud->UpdateOverlayLevelUI(Level);
+	}
 }
 	// TODO : 삭제
 

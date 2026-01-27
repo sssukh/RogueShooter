@@ -275,8 +275,7 @@ public:
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Ability")
 	TObjectPtr<UUW_ChestMaster> ChestUI;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Default")
-	TObjectPtr<UUW_PlayerHud> PlayerHud;
+	
 
 	
 
@@ -298,7 +297,6 @@ public:
 	UPROPERTY()
 	TObjectPtr<USoundBase> LoseSound;
 	
-	TSubclassOf<UUW_PlayerHud> PlayerHudClass;
 
 	TSubclassOf<UUW_LevelUpMaster> LevelUpMasterClass;
 
