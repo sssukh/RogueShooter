@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "UW_SkillSlotList.generated.h"
 
+struct FGameplayTag;
 class URsWidgetController;
 class UUW_SkillIcon;
 class UHorizontalBox;
@@ -19,13 +20,18 @@ class ROGUESHOOTER_API UUW_SkillSlotList : public UUserWidget
 public:
 	UUW_SkillSlotList(const FObjectInitializer& ObjectInitializer);
 	
+	virtual void NativeConstruct() override;
+	
 public:
 	UPROPERTY(BlueprintReadWrite,Category = "SKill Slot List", meta = (BindWidget))
-	TObjectPtr<UHorizontalBox> HorizontalBox_SkillIcon;
+	TObjectPtr<UHorizontalBox> HorizontalBox_SkillSlot;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "SKill Slot List | Config") 
-	TSubclassOf<UUW_SkillIcon> SkillIcon;
+	TSubclassOf<UUW_SkillIcon> SkillIconClass;
 	
 	UPROPERTY()
 	TObjectPtr<URsWidgetController> WidgetController;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SKill Slot List | Config")
+	TArray<FGameplayTag> SkillTagsforSlots;
 };

@@ -7,6 +7,7 @@
 #include "System/RsWidgetController.h"
 #include "UW_PlayerHud.generated.h"
 
+class UUW_SkillSlotList;
 class UOverlay;
 class URsWidgetController;
 class UUW_SkillIcon;
@@ -36,6 +37,8 @@ public:
 	void UpdateTime(FText Time);
 	
 	void SetWidgetController(URsWidgetController* InWidgetController);
+	
+	void BuildSkillIconList();
 	
 protected:
 	UPROPERTY()
@@ -70,5 +73,5 @@ public:
 	TSubclassOf<UUW_AbilityTile> AbilityTileClass;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "UW_PlayerHud | Config")
-	TSubclassOf<UUW_SkillIcon> SkillIconClass;
+	TSubclassOf<UUW_SkillSlotList> SkillSlotListClass;
 };

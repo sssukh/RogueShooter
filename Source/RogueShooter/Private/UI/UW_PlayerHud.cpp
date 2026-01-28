@@ -4,11 +4,13 @@
 #include "UI/UW_PlayerHud.h"
 
 #include "Components/HorizontalBox.h"
+#include "Components/Overlay.h"
 #include "Components/TextBlock.h"
 #include "Library/FunctionLibrary_Helper.h"
 #include "RogueShooter/RSEnumStruct.h"
 #include "System/Subsystem/UIAssetCacheSubsystem.h"
 #include "UI/UW_AbilityTile.h"
+#include "UI/UW_SkillSlotList.h"
 
 UUW_PlayerHud::UUW_PlayerHud(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -28,6 +30,8 @@ void UUW_PlayerHud::NativeConstruct()
 	{
 		
 	}),2.0f,false);
+	
+	BuildSkillIconList();
 }
 
 void UUW_PlayerHud::BuildHotbar(const TMap<EActiveAbilities, int32>& ActiveAbilities,
@@ -107,6 +111,27 @@ void UUW_PlayerHud::UpdateTime(FText Time)
 void UUW_PlayerHud::SetWidgetController(URsWidgetController* InWidgetController)
 {
 	WidgetController = InWidgetController;
+}
+
+void UUW_PlayerHud::BuildSkillIconList()
+{
+	if (!SkillSlotListClass)
+		return;
+	
+	UUW_SkillSlotList* SkillSlotList = CreateWidget<UUW_SkillSlotList>(GetOwningPlayer(),SkillSlotListClass);
+	
+	if (!SkillSlotList)
+		return;
+	
+	SkillSlotList->WidgetController = WidgetController;
+	
+	// TODO : 위의 buildhotbar 처럼 비동기로 이미지 애셋 로드하도록 하자.
+	
+	Overlay_Hud->ClearChildren();
+	
+	Overlay_Hud->AddChildToOverlay(SkillSlotList);
+	
+	// SkillSlotList->AddToViewport();
 }
 
 
