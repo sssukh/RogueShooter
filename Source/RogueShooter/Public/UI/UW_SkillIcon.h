@@ -10,8 +10,12 @@
 class URsWidgetController;
 class UImage;
 class UTextBlock;
+
+
 /**
- * 
+ * 스킬의 이미지와 쿨다운 여부를 알려주는 아이콘
+ * BP에서 설정한 CooldownTag와 WidgetController 내부에 설정한 Tag와 일치하면
+ * 해당 Tag가 ASC에 부착되면 쿨다운이 동작한다.
  */
 UCLASS()
 class ROGUESHOOTER_API UUW_SkillIcon : public UUserWidget
@@ -28,12 +32,12 @@ public:
 	TObjectPtr<UImage> SkillIcon;
 	
 	UPROPERTY(BlueprintReadWrite,meta = (BindWidget))
-	TObjectPtr<UTextBlock> SkillDescription;
+	TObjectPtr<UTextBlock> SkillCooldownText;
 	
 	UPROPERTY(BlueprintReadWrite,meta = (ExposeOnSpawn))
 	TObjectPtr<URsWidgetController> WidgetController;
 	
 	UPROPERTY(BlueprintReadWrite,meta = (ExposeOnSpawn))
-	FGameplayTag SkillTag;
+	FGameplayTag CooldownTag;
 	// Skill tooltip도 필요 
 };

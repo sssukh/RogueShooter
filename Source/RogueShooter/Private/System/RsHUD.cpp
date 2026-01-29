@@ -15,7 +15,7 @@ URsWidgetController* ARsHUD::GetOverlayWidgetController(const FWidgetControllerP
 	if (OverlayWidgetController == nullptr)
 	{
 		OverlayWidgetController = NewObject<URsWidgetController>(this, OverlayWidgetControllerClass);
-		OverlayWidgetController->SetWidgetControllerParams(WcParams);
+		OverlayWidgetController->SetWidgetControllerParams(WcParams,TagsToListen);
 	}
 	return OverlayWidgetController;
 }

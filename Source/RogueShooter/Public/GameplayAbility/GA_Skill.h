@@ -20,7 +20,12 @@ class ROGUESHOOTER_API UGA_Skill : public UGameplayAbility
 public:
 	UGA_Skill();
 	
+	UFUNCTION(BlueprintImplementableEvent, Category = "GAS|Interface", DisplayName = "On Activate Skill")
+	void BP_OnActivateSkill();
 	
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+	
+	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 	/**
 	 * 블루프린트 에디터에서 설정한 Cooldown GE Class를 CommitAbility로 간단히 실행 가능하도록 오버라이드
 	 * SetByCaller를 통해 동적으로 쿨타임을 제어한다.
@@ -33,8 +38,17 @@ public:
 	
 	// 쿨다운 여부를 
 	virtual const FGameplayTagContainer* GetCooldownTags() const override;
+	
+	// Utility Helpers
+protected:
+	UFUNCTION(BlueprintCallable, Category = "GAS|Helper")
+	FVector GetMouseCursorLocation();
+
+
+	
 public:
 	// 데이터 애셋에 접근할 키 값 
+	// 스킬 아이콘 및 설명을 가져옴 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "GAS | Config | Setup")
 	FGameplayTag AbilityTag;
 	
@@ -49,4 +63,18 @@ public:
 	// 외부에서 쿨타임을 설정할 때 필요한 태그
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "GAS | Config | Setup") 
 	FGameplayTag CooldownDurationTag;
+	
+	// 실행할 애니메이션 (없으면 안 함)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS | Visual")
+	TObjectPtr<UAnimMontage> SkillMontage;
+    
+	// 몽타주 재생 속도
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS | Visual")
+	float MontageRate = 1.0f;
+	
+	// [Policy] 스킬 시작 시 자동으로 비용과 쿨타임을 처리할지 여부
+	// - True (기본값): 파이어볼, 힐 등 즉발 스킬용. (기존 방식)
+	// - False: 차징, 연사, 홀드 스킬용. (BP에서 수동 처리)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS | Policy")
+	bool bAutoCommit = true;
 };

@@ -4,6 +4,7 @@
 #include "UI/UW_SkillSlotList.h"
 
 #include "Components/HorizontalBox.h"
+#include "System/RsWidgetController.h"
 #include "UI/UW_SkillIcon.h"
 
 UUW_SkillSlotList::UUW_SkillSlotList(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -16,10 +17,12 @@ void UUW_SkillSlotList::NativeConstruct()
 	
 	HorizontalBox_SkillSlot->ClearChildren();
 	
+	SetSkillTagsForSlots(WidgetController->GetTagsToListen());
+	
 	if (!SkillIconClass)
 		return;
 	
-	for (int i=0;i<SkillTagsforSlots.Num();++i)
+	for (int i=0;i<SkillTagsForSlots.Num();++i)
 	{
 		UUW_SkillIcon* SkillSlot = CreateWidget<UUW_SkillIcon>(GetOwningPlayer(),SkillIconClass);
 		
@@ -28,8 +31,14 @@ void UUW_SkillSlotList::NativeConstruct()
 		
 		SkillSlot->WidgetController = WidgetController;
 		
-		SkillSlot->SkillTag = SkillTagsforSlots[i];
+		SkillSlot->CooldownTag = SkillTagsForSlots[i];
 		
 		HorizontalBox_SkillSlot->AddChildToHorizontalBox(SkillSlot);
 	}
 }
+
+void UUW_SkillSlotList::SetSkillTagsForSlots(const TArray<FGameplayTag>& SkillTags)
+{
+	SkillTagsForSlots = SkillTags;
+}
+

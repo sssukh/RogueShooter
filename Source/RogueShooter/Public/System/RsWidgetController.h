@@ -54,10 +54,16 @@ public:
 	
 	// 초기화 함수 
 	UFUNCTION(BlueprintCallable)
-	void SetWidgetControllerParams(const FWidgetControllerParams& WcParams);
+	void SetWidgetControllerParams(const FWidgetControllerParams& WcParams, FGameplayTagContainer InTagsToListen);
 	
 	// 감시 함수 
 	virtual void BindCallbacksToDependencies();
+	
+	void SetTagsToListen(FGameplayTagContainer Tags);
+	
+	bool GetCooldownInfo(const FGameplayTag& CooldownTag, float& OutRemaining, float& OutDuration);
+	
+	FORCEINLINE const TArray<FGameplayTag> GetTagsToListen() const {return TagsToListen;}
 	
 protected:
 	UPROPERTY()
@@ -72,4 +78,6 @@ protected:
 	// 내부 콜백 
 	void OnCooldownTagChanged(const FGameplayTag CooldownTag, int32 NewCount);
 	
+	UPROPERTY()
+	TArray<FGameplayTag> TagsToListen;
 };

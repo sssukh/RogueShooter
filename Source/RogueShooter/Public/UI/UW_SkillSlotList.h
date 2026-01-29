@@ -22,6 +22,7 @@ public:
 	
 	virtual void NativeConstruct() override;
 	
+	void SetSkillTagsForSlots(const TArray<FGameplayTag>& SkillTags);
 public:
 	UPROPERTY(BlueprintReadWrite,Category = "SKill Slot List", meta = (BindWidget))
 	TObjectPtr<UHorizontalBox> HorizontalBox_SkillSlot;
@@ -32,6 +33,7 @@ public:
 	UPROPERTY()
 	TObjectPtr<URsWidgetController> WidgetController;
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SKill Slot List | Config")
-	TArray<FGameplayTag> SkillTagsforSlots;
+protected:
+	UPROPERTY(BlueprintReadOnly,Category="SKill Slot List")
+	TArray<FGameplayTag> SkillTagsForSlots;
 };

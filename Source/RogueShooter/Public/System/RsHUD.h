@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/HUD.h"
 #include "RsHUD.generated.h"
 
@@ -35,6 +36,7 @@ public:
 	void UpdateOverlayTime(const FText& Time);
 	
 	void UpdateOverlayGold(int32 Amount);
+	
 protected:
 	// 1. 메인 화면 위젯 클래스 (블루프린트에서 설정 WBP_Overlay)
 	UPROPERTY(EditAnywhere, Category = "UI")
@@ -43,6 +45,9 @@ protected:
 	// 2. 위젯 컨트롤러 클래스 (블루프린트에서 설정 BP_OverlayWidgetController)
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<URsWidgetController> OverlayWidgetControllerClass;
+	
+	UPROPERTY(EditAnywhere,Category = "Config") 
+	FGameplayTagContainer TagsToListen;
 
 private:
 	UPROPERTY()
