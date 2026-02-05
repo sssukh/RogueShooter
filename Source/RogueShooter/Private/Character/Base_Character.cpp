@@ -38,6 +38,8 @@
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
 #include "EnhancedInputSubsystems.h"
+#include "System/RsHUD.h"
+#include "System/UnitWidgetController.h"
 
 // Sets default values
 ABase_Character::ABase_Character()
@@ -60,24 +62,13 @@ ABase_Character::ABase_Character()
 	GetCapsuleComponent()->SetLineThickness(0.0f);
 	GetCapsuleComponent()->SetCapsuleRadius(34.0f);
 
-	// TODO : 삭제
 	
-	// AbilitySphere = CreateDefaultSubobject<USphereComponent>("AbilitySphere");
-	// AbilitySphere->SetSphereRadius(960.0f);
-	// AbilitySphere->SetLineThickness(0.0f);
-	// AbilitySphere->SetupAttachment(GetCapsuleComponent());
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
-	// SpringArm->TargetArmLength = 2500.0f;
-	// SpringArm->SetRelativeRotation(FRotator(-35.0f,0.0f,0.0f));
-	// SpringArm->bInheritPitch = false;
-	// SpringArm->bInheritRoll = false;
-	// SpringArm->bInheritYaw = false;
+	
 	SpringArm->SetupAttachment(GetCapsuleComponent());
 
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
-	// Camera->SetFieldOfView(45.0f);
-	// Camera->SetProjectionMode(ECameraProjectionMode::Perspective);
 	Camera->SetupAttachment(SpringArm);
 
 	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceFinder(*AssetPath::Animation::BaseCharAnim);
@@ -130,14 +121,13 @@ ABase_Character::ABase_Character()
 	
 	// AbilitySystemComponent 세팅
 	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	
+	
 	HealthAttributes = CreateDefaultSubobject<UHealthSet>(TEXT("HeathAttributes"));
 	CombatAttributes = CreateDefaultSubobject<UCombatSet>(TEXT("CombatAttributes"));
 	ExpAttributes = CreateDefaultSubobject<UExpSet>(TEXT("ExpAttributes"));
 	
-	// ASC에 AttributeSet 등록
-	AbilitySystemComponent->AddAttributeSetSubobject<UHealthSet>(HealthAttributes);
-	AbilitySystemComponent->AddAttributeSetSubobject<UCombatSet>(CombatAttributes);
-	AbilitySystemComponent->AddAttributeSetSubobject<UExpSet>(ExpAttributes);
+	
 	
 	StartLevel = 1;
 }
@@ -152,32 +142,6 @@ void ABase_Character::BeginPlay()
 	LoadLastCharacterClass();
 	
 	CharacterInputSetting();
-	
-	if (AbilitySystemComponent)
-	{
-		AbilitySystemComponent->InitAbilityActorInfo(this,this);
-		
-		AddCharacterAbilities();
-	
-		HealthAttributes->OnHealthDamaged.AddDynamic(this,&ABase_Character::SpawnFloatingText);
-		HealthAttributes->OnShieldDamaged.AddDynamic(this,&ABase_Character::SpawnFloatingText);
-		ExpAttributes->OnLevelUp.AddDynamic(this,&ABase_Character::OnLevelup);
-		ExpAttributes->OnExpChange.AddDynamic(this,&ABase_Character::OnExpChange);
-		
-		OnLevelup(StartLevel);
-	}
-	
-	// 위젯 세팅
-	FTimerHandle BeginTimer;
-	GetWorld()->GetTimerManager().SetTimer(BeginTimer,FTimerDelegate::CreateLambda([this]()
-	{
-		OC_SetupWidgets();
-	}),
-	1.0f,
-	false
-	);
-	
-	
 }
 
 // Called every frame
@@ -189,10 +153,55 @@ void ABase_Character::Tick(float DeltaTime)
 void ABase_Character::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+	// 0204 : attribute 초기화를 서버에서만 하도록 수정
+	// 이유 : 서버만 초기값을 계산하고 클라이언트는 서버가 보내준 값을 받아오기만 해야한다. 
 	
-	//TODO : 지금은 여기있지만 ASC를 PlayerState로 옮기고 이 부분도 옮겨야함
-	IGameplayAbilitiesModule::Get().GetAbilitySystemGlobals()->GetAttributeSetInitter()->InitAttributeSetDefaults(AbilitySystemComponent,TEXT("BaseCharacter"),StartLevel,true);
 	
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		// IGameplayAbilitiesModule::Get().GetAbilitySystemGlobals()->GetAttributeSetInitter()->InitAttributeSetDefaults(AbilitySystemComponent,TEXT("BaseCharacter"),StartLevel,true);
+		
+		// TODO :  
+		// broadcast InitialValues
+		// OnLEvelup을 Level이 오를 때마다 호출시키기.
+	}
+	// BroadcastInitialValues();
+}
+
+void ABase_Character::OnRep_Controller()
+{
+	Super::OnRep_Controller();
+	
+	// 클라이언트에서 위젯 초기화 
+	InitHUDAndUI();
+}
+
+
+void ABase_Character::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+	
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->SetIsReplicated(true);
+		AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+        
+		// 0204 InitAbilityActorInfo 호출하기전에 ASC에 AttributeSet들을 모두 추가 
+		// InitializeDefaultAttrbute();
+		
+		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	}
+	// 클라이언트에서 위젯 초기화 
+	
+	
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle,FTimerDelegate::CreateLambda(
+		[this]()
+		{
+			RS_LOG_WARNING(TEXT("Hp : %f, MaxHp : %f, Level : %f, Exp : %f")
+				,HealthAttributes->GetHealth(),HealthAttributes->GetMaxHealth(),ExpAttributes->GetExpLevel(),ExpAttributes->GetExpGained())
+			InitHUDAndUI();
+		} ),0.2f,false);
 }
 
 void ABase_Character::AddCharacterAbilities()
@@ -218,10 +227,88 @@ void ABase_Character::AddCharacterAbilities()
 			// 리턴받은 Handle은 나중에 필요하면 저장해둡니다.
 			FGameplayAbilitySpecHandle Handle = AbilitySystemComponent->GiveAbility(Spec);
 			
-			// AbilitySystemComponent->TryActivateAbility(Handle);
 		}
 	}
 }
+
+void ABase_Character::InitializeDefaultAttrbute()
+{
+	// ASC에 AttributeSet 등록
+	AbilitySystemComponent->AddAttributeSetSubobject<UHealthSet>(HealthAttributes);
+	AbilitySystemComponent->AddAttributeSetSubobject<UCombatSet>(CombatAttributes);
+	AbilitySystemComponent->AddAttributeSetSubobject<UExpSet>(ExpAttributes);
+}
+
+void ABase_Character::InitHUDAndUI()
+{
+	if (bIsGASInitialized)
+		return;
+	
+	// Controller와 PlayerState 검사 
+	if (GetController() == nullptr || GetPlayerState() == nullptr)
+	{
+		return;
+	}
+	
+	if (IsLocallyControlled())
+	{
+		if (!AbilitySystemComponent || !HealthAttributes || !ExpAttributes || !CombatAttributes)
+		{
+			FTimerHandle TimerHandle_InitUI;
+			GetWorldTimerManager().SetTimer(TimerHandle_InitUI, this, &ABase_Character::InitHUDAndUI, 0.1f, false);
+			return;
+		}
+		
+		if (AGameplay_PlayerController* PC = Cast<AGameplay_PlayerController>(GetController()))
+		{
+			if (ARsHUD* HUD = Cast<ARsHUD>(PC->GetHUD()))
+			{
+				HUD->InitOverlay(FWidgetControllerParams(PC,GetPlayerState(),AbilitySystemComponent));
+				RS_LOG_SCREEN(TEXT("HUD Init Success!")) // 로그 확인용
+			}
+			else
+			{
+				RS_LOG_SCREEN(TEXT("HUD Casting Failed! Check GameMode HUD Class."))
+			}
+		
+		
+			if (HealthBarClass)
+			{
+				CreateHealthWidget(PC);
+			}
+		}
+		else
+		{
+			RS_LOG_SCREEN( TEXT("PC Casting Failed! Check GameMode PlayerController Class."))
+		}
+		
+		
+			
+		if (AbilitySystemComponent && HealthBarWidgetReference && CharacterWidgetControllerClass)
+		{
+			// 컨트롤러 인스턴스 생성 
+			CharacterWidgetController = NewObject<UUnitWidgetController>(this,CharacterWidgetControllerClass);
+		
+			// 파라미터 주입
+			FWidgetControllerParams Params;
+			Params.AbilitySystemComponent = AbilitySystemComponent;
+		
+			CharacterWidgetController->SetWidgetControllerParams(Params);
+			CharacterWidgetController->BindCallbacksToDependencies();
+		
+			// 위젯에 컨트롤러 연결 
+			IInterface_WidgetManager::Execute_SetWidgetController(HealthBarWidgetReference,CharacterWidgetController);
+		}
+		
+		
+		OnLevelup(StartLevel);
+		
+		bIsGASInitialized = true;
+	}
+}
+
+
+
 
 UAbilitySystemComponent* ABase_Character::GetAbilitySystemComponent() const
 {
@@ -235,12 +322,48 @@ void ABase_Character::PossessedBy(AController* NewController)
 	// [중요] 서버 쪽 초기화: 여기서 Init을 해줘야 ASC가 작동을 시작합니다.
 	if (AbilitySystemComponent)
 	{
-		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+		AbilitySystemComponent->SetIsReplicated(true);
+		AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+		
+		// InitializeDefaultAttrbute();
+		
+		AbilitySystemComponent->InitAbilityActorInfo(this,this);
+		
+		// 초기 스킬 및 스탯 부여 
+		AddCharacterAbilities();
+		
+		// 0204 InitAbilityActorInfo 이후에 호출, 그리고 Attribute값들이 추가된 이후에 호출 
+		// 이걸 그냥 ge를 생성해서 따로 적용하자
+		// InitAttributeDefaults_ServerOnly();
+		OnLevelup(StartLevel);
+		
+		RS_LOG_WARNING(TEXT("Hp : %f, MaxHp : %f, Level : %f, Exp : %f")
+				,HealthAttributes->GetHealth(),HealthAttributes->GetMaxHealth(),ExpAttributes->GetExpLevel(),ExpAttributes->GetExpGained())
+		
+		// 0204  테스트용 
+		// ForceNetUpdate();
 	}
+	
+	
+	
+	// TODO : 타이머 없이 테스트 
+	// 타이머 없으면 안된다. 나중에 Restart나 다른곳으로 옮기기 
+	FTimerHandle TimerHandle_InitUI;
+	GetWorldTimerManager().SetTimer(
+		TimerHandle_InitUI, 
+		this, 
+		&ABase_Character::InitHUDAndUI, 
+		0.1f, // 0.01f도 충분할 수 있지만 안전하게 0.1f 추천
+		false
+	);
+	
+	// InitHUDAndUI();
 }
 
 void ABase_Character::OnLevelup( float NewLevel)
 {
+	// 서버에서만 적용 
+	if (!HasAuthority()) return;
 	FGameplayEffectContextHandle Context = AbilitySystemComponent->MakeEffectContext();
 	Context.AddSourceObject(this);
 	
@@ -250,17 +373,6 @@ void ABase_Character::OnLevelup( float NewLevel)
 	{
 		AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 	}
-	
-	MC_UpdateCurrentHealth(HealthAttributes->GetHealth());
-	
-	// TODO : 레벨 UI 갱신 필요 
-	// TODO : 임시로 갱신 시킴
-	AGameplay_PlayerController* PC = Cast<AGameplay_PlayerController>(GetController());
-	
-	float maxXp = ExpAttributes->GetMaxExpGained();
-	float currentXp = ExpAttributes->GetExpGained();
-	
-	PC->UpdateLevelUI((int32)NewLevel);
 }
 
 void ABase_Character::OnExpChange(float NewExp)
@@ -270,6 +382,26 @@ void ABase_Character::OnExpChange(float NewExp)
 	float maxXp = ExpAttributes->GetMaxExpGained();
 	
 	PC->UpdateExpBar(NewExp/maxXp);
+}
+
+
+
+void ABase_Character::Cheat_ForceExp()
+{
+	Server_ForceExp(); // 서버에게 명령
+}
+
+void ABase_Character::Server_ForceExp_Implementation()
+{
+	if (ExpAttributes)
+	{
+		// GAS 로직 무시하고 강제로 값 변경!
+		// 이러면 예측(Prediction) 없이 순수하게 서버 -> 클라 복제만 일어남
+		float OldVal = ExpAttributes->GetExpGained();
+		ExpAttributes->SetExpGained(OldVal + 50.0f);
+        
+		UE_LOG(LogTemp, Warning, TEXT("[SERVER CHEAT] Changed Exp to %f"), OldVal + 50.0f);
+	}
 }
 
 float ABase_Character::GetMaxXpForLevel(float pLevel) const
@@ -350,7 +482,6 @@ void ABase_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void ABase_Character::UpdateCharacterClass_Implementation(FAvailableCharacter AvailableCharacter)
 {
-
 	S_SetCharacterData(AvailableCharacter);
 }
 
@@ -367,22 +498,22 @@ void ABase_Character::S_SetCharacterData_Implementation(FAvailableCharacter Char
 	Character = CharacterData;
 }
 
-void ABase_Character::CreateHealthWidget()
+void ABase_Character::CreateHealthWidget(APlayerController* PlayerController)
 {
-	UUW_HealthBar* HealthBar = Cast<UUW_HealthBar>(CreateWidget(GetPlayerState()->GetPlayerController(),HealthBarClass));
+	UUW_HealthBar* HealthBar = Cast<UUW_HealthBar>(CreateWidget<UUW_HealthBar>(PlayerController,HealthBarClass));
 
+	if (!HealthBar)
+		return;
+	
 	HealthBarWidgetReference = HealthBar;
-
+	
 	HealthWidget->SetWidget(HealthBarWidgetReference);
 
 	HealthBarWidgetReference->CurrentHp = HealthAttributes->GetHealth();
 	HealthBarWidgetReference->MaxHp = HealthAttributes->GetMaxHealth();
 	HealthBarWidgetReference->RefreshHpBar();
-	// MC_UpdateHealthBar(CurrentHealth,MaxHealth);
-	
-	HealthAttributes->OnCurrentHealthChanged.AddDynamic(this,&ABase_Character::MC_UpdateCurrentHealth);
-	HealthAttributes->OnMaxHealthChanged.AddDynamic(this,&ABase_Character::MC_UpdateMaxHealth);
 }
+
 void ABase_Character::SetupReference()
 {
 	if(AGameplay_PlayerController* Gameplay_PlayerController = Cast<AGameplay_PlayerController>(GetController()))
@@ -402,24 +533,11 @@ void ABase_Character::LoadLastCharacterClass()
 	S_SetCharacterData(GameSave->Character);
 }
 
-void ABase_Character::SetupDispatchers()
-{
-}
+
 
 float ABase_Character::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
                                   class AController* EventInstigator, AActor* DamageCauser)
 {
-	// CurrentHealth = CurrentHealth-DamageAmount;
-
-	// TODO : AttributeSet을 이용해서 값이 변하면 델리게이트를 호출해 자동으로 업데이트하도록 함.
-	// MC_UpdateHealthBar(CurrentHealth/MaxHealth);
-
-	// if(CurrentHealth<=0)
-	// {
-	// 	// TODO : 지금은 코드로 하지만 GAS로 하게되면 거기로 옮겨야됨 
-	// 	CharDie();
-	// }
-	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
@@ -444,18 +562,9 @@ void ABase_Character::CharDie_Implementation(AActor* Causer)
 		{
 			IInterface_GameManager::Execute_OnPlayerDeath(GM_Interface);
 				
-			// AbilityComponent->InvalidateTimers();
 		}
 	}
 }
-	// TODO : 삭제
-	// TODO : 큐로 옮긴거 확인하고 삭제 
-void ABase_Character::SpawnFloatingText(float InDamage, EDamageReceiveType DamageType)
-{
-	
-}
-
-
 void ABase_Character::MC_UpdateMaxHealth_Implementation(float pNewMaxHp)
 {
 	if (!HealthBarWidgetReference)
@@ -519,21 +628,7 @@ void ABase_Character::RestoreHealth_Implementation(float amount)
 
 
 
-// 어디서 호출되는지?
-// 안됐으면 위젯이 왜 있는지?
-// BeginPlay에서 OC_SetupWidgets()를 호출한다.
-// 이 함수가 왜 있는건가?
-// 그냥 인터페이스 용으로 남겨둔건가
-void ABase_Character::SetupHealthWidget_Implementation()
-{
-	// IInterface_CharacterManager::SetupHealthWidget_Implementation();
-	OC_SetupWidgets();
-}
 
-void ABase_Character::OC_SetupWidgets_Implementation()
-{
-	CreateHealthWidget();
-}
 
 void ABase_Character::S_RestoreHealth_Implementation(float amount)
 {
@@ -619,11 +714,6 @@ void ABase_Character::Pause_Implementation(bool Pause, bool Override)
 
 void ABase_Character::AdjustPassive_Implementation(EPassiveAbilities Stat, float MultiplicationAmount)
 {
-	// TODO : 삭제
-	
-	// IInterface_CharacterManager::AdjustPassive_Implementation(Stat, MultiplicationAmount);
-
-	// S_UpdatePassiveStat(Stat,MultiplicationAmount);
 }
 
 bool ABase_Character::IsAlive_Implementation()
@@ -644,6 +734,11 @@ void ABase_Character::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 	DOREPLIFETIME(ABase_Character,Character)
 
 	DOREPLIFETIME(ABase_Character,CharSK);
+
+	// 0204 ASC에서 관리하는 변수들인데 replication을 캐릭터에서 하게되면 클라가 꼬이거나 복제되어 서로 다른 포인터를 가리키게 된다고 한다. by gpt
+	// DOREPLIFETIME(ABase_Character, ExpAttributes);
+	// DOREPLIFETIME(ABase_Character, HealthAttributes);
+	// DOREPLIFETIME(ABase_Character, CombatAttributes);
 }
 
 void ABase_Character::OROnRepCharacterClass()

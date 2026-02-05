@@ -39,5 +39,8 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite,meta = (ExposeOnSpawn))
 	FGameplayTag CooldownTag;
+	
+	UPROPERTY(BlueprintReadWrite,meta = (ExposeOnSpawn))
+	FGameplayTag AbilityTag;
 	// Skill tooltip도 필요 
 };

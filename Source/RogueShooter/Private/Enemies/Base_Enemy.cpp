@@ -170,9 +170,9 @@ void ABase_Enemy::BeginPlay()
 	DamageSphereOverlapDelegate.BindUObject(this,&ABase_Enemy::DamagePlayer);
 	RetriggerDelegate.BindUObject(this,&ABase_Enemy::ResetDoOnce);
 
-	UE_LOG(LogTemp, Warning, TEXT("Enemy %s BeginPlay, Controller: %s"),
-		*GetName(),
-		GetController() ? *GetController()->GetName() : TEXT("NULL"));
+	// UE_LOG(LogTemp, Warning, TEXT("Enemy %s BeginPlay, Controller: %s"),
+	// 	*GetName(),
+	// 	GetController() ? *GetController()->GetName() : TEXT("NULL"));
 	
 	// AbilitySystem 초기화 
 	if (AbilitySystemComponent)

@@ -330,12 +330,12 @@ void AGameManager::StartTimer()
 {
 	UpdateTimer();
 
-	GetWorldTimerManager().SetTimer(ClockReference,FTimerDelegate::CreateLambda([&]()
-	{
-		UpdateTimer();
-	}),
-	1.0f,
-	true);
+	// GetWorldTimerManager().SetTimer(ClockReference,FTimerDelegate::CreateLambda([&]()
+	// {
+	// 	UpdateTimer();
+	// }),
+	// 1.0f,
+	// true);
 }
 
 void AGameManager::PrepareWaveElites()
@@ -605,7 +605,7 @@ void AGameManager::OnRep_GameTime()
 	if(Controller->GetClass()->ImplementsInterface(UInterface_ControllerManager::StaticClass()))
 	{
 		// RS_LOG_SCREEN(TEXT("OnRep_GameTime Called. Value is %s"),*GameTime.ToString());
-		IInterface_ControllerManager::Execute_UpdateTime(Controller,GameTime);
+		// IInterface_ControllerManager::Execute_UpdateTime(Controller,GameTime);
 	}
 	else
 	{

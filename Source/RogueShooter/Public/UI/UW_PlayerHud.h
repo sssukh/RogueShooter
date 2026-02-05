@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Interface/Interface_WidgetManager.h"
 #include "System/RsWidgetController.h"
 #include "UW_PlayerHud.generated.h"
 
@@ -22,7 +23,7 @@ class UHorizontalBox;
  * 
  */
 UCLASS()
-class ROGUESHOOTER_API UUW_PlayerHud : public UUserWidget
+class ROGUESHOOTER_API UUW_PlayerHud : public UUserWidget, public IInterface_WidgetManager
 {
 	GENERATED_BODY()
 public:
@@ -36,13 +37,29 @@ public:
 
 	void UpdateTime(FText Time);
 	
-	void SetWidgetController(URsWidgetController* InWidgetController);
-	
 	void BuildSkillIconList();
+	
+	void UpdateExpBar();
+	
+	UFUNCTION()
+	void SetLevel(float InLevel);
+	
+	UFUNCTION()
+	void SetCurrentExp(float NewValue);
+	
+	UFUNCTION()
+	void SetMaxExp(float NewValue);
+	
+	virtual void SetWidgetController_Implementation(URsBaseWidgetController* InWidgetController) override;
 	
 protected:
 	UPROPERTY()
 	TObjectPtr<URsWidgetController> WidgetController;
+	
+	float CurrentExp;
+	
+	float MaxExp;
+	
 	
 public:
 	UPROPERTY(BlueprintReadWrite,Category = "UW_PlayerHud | Designer", meta = (BindWidget))

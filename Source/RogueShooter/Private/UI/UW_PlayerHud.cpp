@@ -5,12 +5,14 @@
 
 #include "Components/HorizontalBox.h"
 #include "Components/Overlay.h"
+#include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Library/FunctionLibrary_Helper.h"
 #include "RogueShooter/RSEnumStruct.h"
 #include "System/Subsystem/UIAssetCacheSubsystem.h"
 #include "UI/UW_AbilityTile.h"
 #include "UI/UW_SkillSlotList.h"
+#include "Utility/RSLog.h"
 
 UUW_PlayerHud::UUW_PlayerHud(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -108,10 +110,7 @@ void UUW_PlayerHud::UpdateTime(FText Time)
 	TextBlock_Time->SetText(Time);
 }
 
-void UUW_PlayerHud::SetWidgetController(URsWidgetController* InWidgetController)
-{
-	WidgetController = InWidgetController;
-}
+
 
 void UUW_PlayerHud::BuildSkillIconList()
 {
@@ -133,6 +132,50 @@ void UUW_PlayerHud::BuildSkillIconList()
 	
 	// SkillSlotList->AddToViewport();
 }
+
+void UUW_PlayerHud::UpdateExpBar()
+{
+	ProgressBar_XP->SetPercent(CurrentExp/MaxExp);
+}
+
+void UUW_PlayerHud::SetLevel(float InLevel)
+{
+	TextBlock_Level->SetText(FText::FromString(FString::Printf(TEXT("Level %d"),(int32)InLevel)));
+}
+
+void UUW_PlayerHud::SetCurrentExp(float NewValue)
+{
+	CurrentExp = NewValue;
+	
+	UpdateExpBar();
+}
+
+void UUW_PlayerHud::SetMaxExp(float NewValue)
+{
+	MaxExp = NewValue;
+	
+	UpdateExpBar();
+}
+
+
+void UUW_PlayerHud::SetWidgetController_Implementation(URsBaseWidgetController* InWidgetController)
+{
+	WidgetController = Cast<URsWidgetController>(InWidgetController);
+	
+	if (!WidgetController)
+	{
+		RS_LOG_WARNING(TEXT("Widget Controller가 설정되지 않았습니다."))
+		return;
+	}
+	
+	WidgetController->OnExpChanged.AddDynamic(this,&UUW_PlayerHud::SetCurrentExp);
+	WidgetController->OnMaxExpChanged.AddDynamic(this,&UUW_PlayerHud::SetMaxExp);
+	WidgetController->OnLevelChanged.AddDynamic(this,&UUW_PlayerHud::SetLevel);
+	
+	WidgetController->BroadcastInitialValues();
+}
+
+
 
 
 

@@ -8,6 +8,7 @@
 #include "Components/TextBlock.h"
 #include "System/RsWidgetController.h"
 #include "UI/UW_PlayerHud.h"
+#include "Utility/RSLog.h"
 
 URsWidgetController* ARsHUD::GetOverlayWidgetController(const FWidgetControllerParams& WcParams)
 {
@@ -15,7 +16,8 @@ URsWidgetController* ARsHUD::GetOverlayWidgetController(const FWidgetControllerP
 	if (OverlayWidgetController == nullptr)
 	{
 		OverlayWidgetController = NewObject<URsWidgetController>(this, OverlayWidgetControllerClass);
-		OverlayWidgetController->SetWidgetControllerParams(WcParams,TagsToListen);
+		OverlayWidgetController->SetTagsToListen(TagsToListen);
+		OverlayWidgetController->SetWidgetControllerParams(WcParams);
 	}
 	return OverlayWidgetController;
 }
@@ -23,23 +25,35 @@ URsWidgetController* ARsHUD::GetOverlayWidgetController(const FWidgetControllerP
 void ARsHUD::InitOverlay(const FWidgetControllerParams& WCParams)
 {
 	// 이미 생성되었는지 체크
+	if (OverlayWidget)
+	{
+		return;
+	}
+	
 	if (OverlayWidgetClass && OverlayWidgetControllerClass)
 	{
 		// 1. 위젯 컨트롤러 생성 및 데이터 주입
 		// const FWidgetControllerParams WCParams(PC, PS, ASC, AS);
 		URsWidgetController* WidgetController = GetOverlayWidgetController(WCParams);
 
+		APlayerController* PC = GetOwningPlayerController();
+		
 		// 2. 위젯(껍데기) 생성
-		OverlayWidget = CreateWidget<UUW_PlayerHud>(GetWorld(), OverlayWidgetClass);
+		OverlayWidget = CreateWidget<UUW_PlayerHud>(PC, OverlayWidgetClass);
+		
+		// 4. 컨트롤러에게 "이제 감시 시작해!" 명령
+		WidgetController->BindCallbacksToDependencies();
 		
 		// 3. ⭐ 연결 (핵심) ⭐
 		// 위젯에게 "너의 데이터 담당자는 얘야"라고 알려줌
-		OverlayWidget->SetWidgetController(WidgetController);
-        
-		// 4. 컨트롤러에게 "이제 감시 시작해!" 명령
-		WidgetController->BindCallbacksToDependencies();
-
-		// 5. 화면 부착
+		IInterface_WidgetManager::Execute_SetWidgetController(OverlayWidget,WidgetController);
+		
+		
+		
+		// 5. 스킬 정보 싹 읽어서 방송 
+		OverlayWidgetController->BroadcastInitialAbilityInfo();
+		
+		// 6. 화면 부착
 		OverlayWidget->AddToViewport();
 	}
 }

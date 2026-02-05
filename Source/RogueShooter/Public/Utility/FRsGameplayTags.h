@@ -8,6 +8,8 @@ class UGameplayTagsManager;
 
 /**
  * 싱글톤으로 태그를 관리하는 구조체
+ * 태그 추가 시 태그 변수 선언 후 Initialize함수 내부에 태그 추가할 것.
+ * 라이브코딩이 아닌 빌드를 해야 에디터에 적용된다.(애셋 매니저 초기화하면서 추가되기 때문)
  */
 struct FRsGameplayTags
 {
@@ -40,7 +42,7 @@ public:
 	
 	FGameplayTag Ability_Skill;
 	FGameplayTag Ability_Skill_Dash;
-	
+	FGameplayTag Ability_Skill_Strike;
 	
 	FGameplayTag Event_Death;
 	FGameplayTag Event_Equip;

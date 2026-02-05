@@ -12,6 +12,7 @@
 #include "InputActionValue.h"
 #include "Base_Character.generated.h"
 
+class UUnitWidgetController;
 class UExpSet;
 class AFloatingTextActor;
 class UHealthSet;
@@ -63,7 +64,9 @@ public:
 
 	virtual void PostInitializeComponents() override;	
 	
+	virtual void OnRep_Controller() override;
 	
+	virtual void OnRep_PlayerState() override;
 /**
  *	GAS
  */
@@ -71,6 +74,10 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
 	void AddCharacterAbilities();
+	
+	void InitializeDefaultAttrbute();
+	
+	void InitHUDAndUI();
 	
 protected:
 	// 1. GAS 엔진
@@ -108,6 +115,15 @@ protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Attribute")
 	FCurveTableRowHandle MaxXpCurve;
 	
+	
+protected:
+	// 테스트용 함수 선언
+	UFUNCTION(Exec) // 콘솔 명령어로 실행 가능하게
+	void Cheat_ForceExp();
+
+	UFUNCTION(Server, Reliable)
+	void Server_ForceExp();
+	
 public:
 	float GetMaxXpForLevel(float pLevel) const;
 	
@@ -127,7 +143,6 @@ public:
 	// Interface_CharacterManager
 	//*****************************************
 
-	virtual void SetupHealthWidget_Implementation() override;
 	
 	UFUNCTION()
 	virtual void UpdateCharacterClass_Implementation(FAvailableCharacter Character) override;
@@ -158,7 +173,7 @@ public:
 	// Character Setup
 	//*****************************************
 	
-	void CreateHealthWidget();
+	void CreateHealthWidget(APlayerController* PlayerController);
 	
 	/**
 	 * set ref to PC \n
@@ -172,12 +187,7 @@ public:
 	 */
 	void LoadLastCharacterClass();
 	
-	/**
-	* if you need to setup dispatchers do so here.\n
-	* dispatcher를 셋업해야한다면 여기서 하면 된다.
-	*/
-	void SetupDispatchers();
-	 
+	
 	//*****************************************
 	// Health/Damage
 	//*****************************************
@@ -199,15 +209,12 @@ public:
 	UFUNCTION(Server,Unreliable)
 	void S_RestoreHealth(float amount);
 	
-	UFUNCTION(BlueprintCallable)
-	void SpawnFloatingText(float InDamage, EDamageReceiveType DamageType);
 
 	//*****************************************
 	// Widgets
 	//*****************************************
 
-	UFUNCTION(Client,Unreliable)
-	void OC_SetupWidgets();
+
 	
 	// TODO :: GAS에서 delegate를 통해 호출됨. 삭제 필요 
 	// UFUNCTION(NetMulticast,Unreliable)
@@ -335,29 +342,13 @@ public:
 	UPROPERTY(ReplicatedUsing="OnRep_CharSK",VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
 	TObjectPtr<USkeletalMesh> CharSK;
 
-	// UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
-	// EActiveAbilities StartingAbility = EActiveAbilities::Hammer;
-
-	// Character
-public:
-	// UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
-	// int32 NeededXP = 0;
-	//
-	// UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
-	// int32 Level = 1;
-	//
-	// UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
-	// float CurrentHealth = 100.0f;
-	//
-	// UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
-	// float MaxHealth = 100.0f;
+	
 	
 	
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
 	TObjectPtr<UUW_HealthBar> HealthBarWidgetReference;
 
-	// UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
-	// int32 CurrentXP =0;
+	
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
 	bool IsDead = false;
@@ -382,4 +373,11 @@ public:
 	UPROPERTY()
 	int32 StartLevel = 1;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config | UI")
+	TSubclassOf<UUnitWidgetController> CharacterWidgetControllerClass;
+	
+	UPROPERTY()
+	TObjectPtr<UUnitWidgetController> CharacterWidgetController;
+	
+	bool bIsGASInitialized = false;
 };

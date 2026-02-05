@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Base_PlayerController.h"
+#include "RsHUD.h"
 #include "Interface/Interface_ControllerManager.h"
 #include "Gameplay_PlayerController.generated.h"
 
+class ARsHUD;
 class UUW_InventoryMain;
 class UMyCheatManager;
 class UUW_MatchResults;
@@ -78,6 +80,10 @@ public:
 
 	virtual void BeginPlay() override;
 
+	virtual void OnRep_PlayerState() override;
+	
+	FORCEINLINE ARsHUD* GetRsHUD() const {return Cast<ARsHUD>(GetHUD());}
+	
 	// Handles Level up UI Flow
 	UFUNCTION(Client,Unreliable)
 	void OC_CreateLevelupUI();
@@ -149,11 +155,7 @@ public:
 	UFUNCTION()
 	void SetupPlayer();
 
-	/**
-	 * Create Player Hud
-	 */
-	void CreateGameplayUI();
-
+	
 	/**
 	 * Set References for later use
 	 */
@@ -274,11 +276,7 @@ public:
 	
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Ability")
 	TObjectPtr<UUW_ChestMaster> ChestUI;
-
 	
-
-	
-
 	UPROPERTY()
 	TObjectPtr<UDataTable> DT_ActiveAbilities;
 
@@ -296,7 +294,6 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<USoundBase> LoseSound;
-	
 
 	TSubclassOf<UUW_LevelUpMaster> LevelUpMasterClass;
 

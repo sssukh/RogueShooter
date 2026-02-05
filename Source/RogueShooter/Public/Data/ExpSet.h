@@ -7,8 +7,6 @@
 #include "AbilitySystemComponent.h"
 #include "ExpSet.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FLevelChanged,float,NewExpLevel);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FExpChanged,float,NewExp);
 
 #define ATTRIBUTE_ACCESSORS(ClassName, PropertyName) \
 GAMEPLAYATTRIBUTE_PROPERTY_GETTER(ClassName, PropertyName) \
@@ -37,26 +35,19 @@ public:
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 	
-	UPROPERTY(BlueprintAssignable)
-	mutable FLevelChanged OnLevelUp;
-	
-	UPROPERTY(BlueprintAssignable)
-	mutable FExpChanged OnExpChange;
-
 	
 public:
-	UPROPERTY(BlueprintReadOnly,Category = "Attribute", Replicated = OnRep_MaxExpLevel)
+	UPROPERTY(BlueprintReadOnly,Category = "Attribute", ReplicatedUsing = OnRep_MaxExpLevel)
 	FGameplayAttributeData MaxExpLevel;
 	
-	UPROPERTY(BlueprintReadOnly,Category = "Attribute", Replicated = OnRep_ExpLevel)
+	UPROPERTY(BlueprintReadOnly,Category = "Attribute", ReplicatedUsing = OnRep_ExpLevel)
 	FGameplayAttributeData ExpLevel;
 	
-	UPROPERTY(BlueprintReadOnly,Category = "Attribute", Replicated = OnRep_MaxExpGained)
+	UPROPERTY(BlueprintReadOnly,Category = "Attribute", ReplicatedUsing = OnRep_MaxExpGained)
 	FGameplayAttributeData MaxExpGained;
 	
-	UPROPERTY(BlueprintReadOnly,Category = "Attribute", Replicated = OnRep_ExpGained)
+	UPROPERTY(BlueprintReadOnly,Category = "Attribute", ReplicatedUsing = OnRep_ExpGained)
 	FGameplayAttributeData ExpGained;
-	
 	
 	UPROPERTY(BlueprintReadOnly,Category = "Attribute")
 	FGameplayAttributeData IncomingExp;

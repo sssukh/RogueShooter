@@ -29,7 +29,7 @@ public:
 	void InitOverlay(const FWidgetControllerParams& WCParams);
 
 	// Overlay 조작 함수 
-	void UpdateOverlayExpBar(float Percent);
+	void UpdateOverlayExpBar(float percent);
 	
 	void UpdateOverlayLevelUI(int32 Level);
 	

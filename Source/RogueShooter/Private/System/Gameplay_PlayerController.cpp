@@ -70,6 +70,8 @@ AGameplay_PlayerController::AGameplay_PlayerController()
 	static ConstructorHelpers::FClassFinder<UUW_InventoryMain> InventoryClassFinder(*AssetPath::Blueprint::WBP_InventoryMain_C);
 	if (InventoryClassFinder.Succeeded())
 		InventoryMainClass = InventoryClassFinder.Class;
+	
+	SetReplicates(true);
 }
 
 void AGameplay_PlayerController::BeginPlay()
@@ -79,6 +81,17 @@ void AGameplay_PlayerController::BeginPlay()
 	
 	
 	SetupPlayer();
+}
+
+void AGameplay_PlayerController::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+	
+	// if (ARsHUD* Hud = Cast<ARsHUD>(MyHUD))
+	// {
+	// 	ABase_Character* Char = Cast<ABase_Character>(GetCharacter());
+	// 	Hud->InitOverlay(FWidgetControllerParams(this,PlayerState,Char->GetAbilitySystemComponent(),nullptr));
+	// }
 }
 
 void AGameplay_PlayerController::OC_CreateLevelupUI_Implementation()
@@ -147,8 +160,9 @@ void AGameplay_PlayerController::UpdateHudHotbar_Implementation(TMap<EActiveAbil
 
 void AGameplay_PlayerController::UpdateLevelBar_Implementation(float Percent, int32 Level)
 {
+	// TODO : 삭제 
 	// IInterface_ControllerManager::UpdateLevelBar_Implementation(Percent, Level);
-	OC_UpdateCharUI(Percent,Level);
+	// OC_UpdateCharUI(Percent,Level);
 }
 
 void AGameplay_PlayerController::UpdateTime_Implementation(FText& Time)
@@ -201,7 +215,7 @@ void AGameplay_PlayerController::OC_UpdateHudHotbar_Implementation(const TArray<
 
 void AGameplay_PlayerController::OC_UpdateCharUI_Implementation(float Percent, int32 Level)
 {
-	UpdateCharacterUI(Percent,Level);
+	// UpdateCharacterUI(Percent,Level);
 }
 
 
@@ -234,16 +248,7 @@ void AGameplay_PlayerController::SetupPlayer()
 
 	CleanUpUI();
 
-	// TODO : 여기에 새로운 HUD 초기화 
-	ABase_Character* Char = Cast<ABase_Character>(GetCharacter());
 	
-	
-	if (ARsHUD* Hud = Cast<ARsHUD>(MyHUD))
-	{
-		Hud->InitOverlay(FWidgetControllerParams(this,PlayerState,Char->GetAbilitySystemComponent(),nullptr));
-	}
-	
-	SetReference();
 
 	// TODO : 삭제
 	
@@ -253,15 +258,8 @@ void AGameplay_PlayerController::SetupPlayer()
 }
 
 
-void AGameplay_PlayerController::SetReference()
-{
-	// if(GetPawn()->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
-	// // TODO : 삭제
-	// {
-	// 	AbilityComponent = IInterface_CharacterManager::Execute_GetAbilityComponent(GetPawn());
-	// }
-}
 
+// TODO : 삭제 
 void AGameplay_PlayerController::UpdateCharacterUI(float Percent, int32 Level)
 {
 	UpdateExpBar(Percent);

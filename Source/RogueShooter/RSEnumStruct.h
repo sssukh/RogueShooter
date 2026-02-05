@@ -262,4 +262,8 @@ public:
 	// 스킬 설명 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	FText SkillDescription;
+	
+	// 스킬 이름 
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	FText DisplayName;
 };

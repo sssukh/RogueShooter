@@ -6,11 +6,10 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Utility/FRsGameplayTags.h"
+#include "Utility/RSLog.h"
 
 UHealthSet::UHealthSet()
-	:MaxHealth(100.0f)
 {
-	InitHealth(GetMaxHealth());
 }
 
 void UHealthSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
@@ -25,18 +24,16 @@ void UHealthSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData&
 		// meta attribute 초기화
 		SetIncomingDamage(0.0f);
 		
-		if (GetCurrentShield()>0.0f)
+		if (GetShield()>0.0f)
 		{
-			float IncomingShieldDamage = LocalIncomingDamage>GetCurrentShield()?GetCurrentShield():LocalIncomingDamage;
+			float IncomingShieldDamage = LocalIncomingDamage>GetShield()?GetShield():LocalIncomingDamage;
 			
 			// 쉴드를 넘어서는 대미지 (0 이상)
-			LocalIncomingDamage = FMath::Max(0.0f,LocalIncomingDamage-GetCurrentShield());
+			LocalIncomingDamage = FMath::Max(0.0f,LocalIncomingDamage-GetShield());
 			
-			float OldShield = GetCurrentShield();
+			float OldShield = GetShield();
 			
-			SetCurrentShield(OldShield-IncomingShieldDamage);
-			
-			OnShieldDamaged.Broadcast(IncomingShieldDamage,EDamageReceiveType::Shield);
+			SetShield(OldShield-IncomingShieldDamage);
 			
 			// GameplayCue로 shield 피격시 이펙트 발동
 			FGameplayCueParameters CueParams;
@@ -57,7 +54,6 @@ void UHealthSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData&
 			
 			SetHealth(NewHealth);
 			
-			OnHealthDamaged.Broadcast(LocalIncomingDamage,EDamageReceiveType::Health);
 			
 			// GameplayCue로 health 피격시 이펙트 발동
 			FGameplayCueParameters CueParams;
@@ -95,7 +91,7 @@ void UHealthSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& Out
 	
 	DOREPLIFETIME_CONDITION_NOTIFY(UHealthSet,Health,COND_None,REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UHealthSet,MaxHealth,COND_None,REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UHealthSet,CurrentShield,COND_None,REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UHealthSet,Shield,COND_None,REPNOTIFY_Always);
 }
 
 void UHealthSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -110,27 +106,13 @@ void UHealthSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& 
 	{
 		NewValue = FMath::Clamp(NewValue,0.0f,GetMaxHealth());
 	}
-	else if (Attribute == GetCurrentShieldAttribute())
+	else if (Attribute == GetShieldAttribute())
 	{
 		NewValue = FMath::Max(0.0f,NewValue);
 	}
 }
 
-void UHealthSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
-{
-	if (Attribute == GetMaxHealthAttribute())
-	{
-		OnMaxHealthChanged.Broadcast(NewValue);
-	}
-	else if (Attribute == GetHealthAttribute())
-	{
-		OnCurrentHealthChanged.Broadcast(NewValue);
-	}
-	else if (Attribute == GetCurrentShieldAttribute())
-	{
-		OnCurrentShieldDamaged.Broadcast(NewValue);
-	}
-}
+
 
 void UHealthSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
 {
@@ -144,6 +126,6 @@ void UHealthSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth)
 
 void UHealthSet::OnRep_Shield(const FGameplayAttributeData& OldShield)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UHealthSet,CurrentShield,OldShield);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UHealthSet,Shield,OldShield);
 	
 }

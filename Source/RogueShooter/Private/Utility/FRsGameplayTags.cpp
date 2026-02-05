@@ -35,9 +35,9 @@ void FRsGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	Status_Cooldown_SKill4 = Manager.AddNativeGameplayTag(FName("Status.Cooldown.Skill4"),TEXT("Skill4 쿨다운"));
 	Status_Cooldown_SKill5 = Manager.AddNativeGameplayTag(FName("Status.Cooldown.Skill5"),TEXT("Skill5 쿨다운"));
 	
-	Ability_Skill = Manager.AddNativeGameplayTag(FName("Ability.SKill"),TEXT("스킬 태그"));
-	Ability_Skill_Dash = Manager.AddNativeGameplayTag(FName("Ability.SKill.Dash"),TEXT("스킬 대쉬 태그"));
-	
+	Ability_Skill = Manager.AddNativeGameplayTag(FName("Ability.Skill"),TEXT("스킬 태그"));
+	Ability_Skill_Dash = Manager.AddNativeGameplayTag(FName("Ability.Skill.Dash"),TEXT("스킬 대쉬 태그"));
+	Ability_Skill_Strike = Manager.AddNativeGameplayTag(FName("Ability.Skill.Strike"),TEXT("스킬 폭격 태그"));
 	
 	Event_Death = Manager.AddNativeGameplayTag(FName("Event.Death"),TEXT("죽음"));
 	Event_Equip = Manager.AddNativeGameplayTag(FName("Event.Equip"),TEXT("아이템 착용"));

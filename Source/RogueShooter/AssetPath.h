@@ -24,6 +24,7 @@ namespace AssetPath
 		const FString DT_EnemyEliteSpawns= TEXT("DataTable'/Game/RogueShooter/Blueprints/DataTables/DT_ExampleEliteSpawn.DT_ExampleEliteSpawn'");
 		const FString DT_EnemySpawns= TEXT("DataTable'/Game/RogueShooter/Blueprints/DataTables/DT_ExampleSpawn.DT_ExampleSpawn'");
 
+		const FString DT_SkillInfo = TEXT("DataTable'/Game/RogueShooter/Data/Skills/DT_SkillInfo.DT_SkillInfo'");
 
 	}
 	namespace Curve

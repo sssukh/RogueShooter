@@ -9,11 +9,7 @@
 #include "Utility/RSLog.h"
 
 UExpSet::UExpSet()
-	: MaxExpLevel(1000.0f)
-	, MaxExpGained(50.0f)
 {
-	InitExpLevel(1.0f);
-	InitExpGained(0.0f);
 }
 
 void UExpSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -35,18 +31,24 @@ void UExpSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& New
 	}
 	else if (Attribute == GetMaxExpGainedAttribute())
 	{
-		RS_LOG_SCREEN(TEXT("Max Xp has Changed"))
+		// RS_LOG_SCREEN(TEXT("Max Xp has Changed"))
 	}
-	// else if (Attribute == GetExpGainedAttribute())
-	// {
-	// 	NewValue = FMath::Clamp<float>(NewValue,0.0f,GetMaxExpGained());
-	// }
+	else if (Attribute == GetExpGainedAttribute())
+	{
+		// NewValue = FMath::Clamp<float>(NewValue,0.0f,GetMaxExpGained());
+		// RS_LOG_SCREEN(TEXT("Xp has Changed"))
+	}
 }
 
 void UExpSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
 {
 	if (Data.EvaluatedData.Attribute == GetIncomingExpAttribute())
 	{
+		if (GetOwningActor()->HasAuthority())
+		{
+			UE_LOG(LogTemp, Error, TEXT("[SERVER] Real Exp Changed! New Value: %f"), GetExpGained());
+		}
+		
 		float CurrentXp = GetExpGained();
 		
 		const float CurrentLevel = GetExpLevel();
@@ -76,10 +78,7 @@ void UExpSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackD
 			
 			// SetMaxExpGained(NextMaxXp);
 			
-			if (OnLevelUp.IsBound())
-			{
-				OnLevelUp.Broadcast(GetExpLevel());
-			}
+			
 		}
 		else
 		{
@@ -87,11 +86,6 @@ void UExpSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackD
 			
 		}
 		// RS_LOG_SCREEN(TEXT("ExpGained : %f, ExpMax : %f "),GetExpGained(),GetMaxExpGained())
-		
-		if (OnExpChange.IsBound())
-		{
-			OnExpChange.Broadcast(GetExpGained());
-		}
 	}
 }
 
@@ -116,7 +110,7 @@ void UExpSet::OnRep_MaxExpGained(const FGameplayAttributeData& OldMaxExpGained)
 void UExpSet::OnRep_ExpGained(const FGameplayAttributeData& OldExpGained)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UExpSet,ExpGained,OldExpGained);
-	
+	RS_LOG_SCREEN(TEXT("Exp has changed"))
 }
 
 
