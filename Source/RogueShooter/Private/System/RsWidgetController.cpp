@@ -121,9 +121,7 @@ void URsWidgetController::BroadcastInitialValues()
 		OnMaxExpChanged.Broadcast(CharExpSet->GetMaxExpGained());
 		OnLevelChanged.Broadcast(CharExpSet->GetExpLevel());
         
-		// (로그 확인용)
-		RS_LOG_SCREEN(TEXT("[WidgetController] Broadcasting Initial Values: Exp=%f, Max=%f"), 
-			CharExpSet->GetExpGained(), CharExpSet->GetMaxExpGained());
+		
 	}
 	else
 	{

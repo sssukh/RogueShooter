@@ -37,14 +37,7 @@ void UUnitWidgetController::BindCallbacksToDependencies()
 				{
 					OnHealthChanged.Broadcast(Data.NewValue);
 				});
-		if (Handle.IsValid())
-		{
-			UE_LOG(LogTemp, Warning, TEXT("[Binding] Success! Handle is Valid."));
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("[Binding] Failed! Handle is Invalid."));
-		}
+		
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 			UnitHealthSet->GetMaxHealthAttribute()).AddLambda(
 				[this](const FOnAttributeChangeData& Data)

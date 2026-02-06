@@ -3,6 +3,7 @@
 
 #include "System/Gameplay_PlayerController.h"
 
+#include "AbilitySystemComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Character/Base_Character.h"
 #include "Components/InventoryComponent.h"
@@ -15,6 +16,7 @@
 #include "Library/FunctionLibrary_Helper.h"
 #include "RogueShooter/AssetPath.h"
 #include "System/RsHUD.h"
+#include "System/RsPlayerState.h"
 #include "System/RsWidgetController.h"
 #include "UI/UW_ChestMaster.h"
 #include "UI/UW_GameMenu.h"
@@ -93,6 +95,35 @@ void AGameplay_PlayerController::OnRep_PlayerState()
 	// 	Hud->InitOverlay(FWidgetControllerParams(this,PlayerState,Char->GetAbilitySystemComponent(),nullptr));
 	// }
 }
+
+void AGameplay_PlayerController::AcknowledgePossession(class APawn* P)
+{
+	Super::AcknowledgePossession(P);
+	
+	if (!IsLocalController())
+		return;
+	
+	// 캐릭터 확인 
+	// 탑승물에 탔을 경우 자체적인 ASC를 사용할 수 있어서 해당 ASC를 가져올 수 있도록 하기 위함 
+	ABase_Character* BaseChar = Cast<ABase_Character>(P);
+	if (!BaseChar) return;
+	
+	
+	if (UAbilitySystemComponent* ASC =  BaseChar->GetAbilitySystemComponent())
+	{
+		GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateLambda([this, ASC]()
+		{
+			// 람다 함수 내부에서 안전하게 체크 후 생성
+			if (IsValid(this) && IsValid(ASC))
+			{
+				CreateAndInitHUD(ASC);
+			}
+		}));
+		//CreateAndInitHUD(ASC);
+	}
+}
+
+
 
 void AGameplay_PlayerController::OC_CreateLevelupUI_Implementation()
 {
@@ -283,7 +314,21 @@ void AGameplay_PlayerController::UpdateLevelUI(int32 Level)
 		Hud->UpdateOverlayLevelUI(Level);
 	}
 }
-	// TODO : 삭제
+
+void AGameplay_PlayerController::CreateAndInitHUD(UAbilitySystemComponent* InAsc)
+{
+	if (ARsHUD* HUD = Cast<ARsHUD>(GetHUD()))
+	{
+		HUD->InitOverlay(FWidgetControllerParams(this,GetPlayerState<ARsPlayerState>(),InAsc));
+		
+	}
+	else
+	{
+		RS_LOG_SCREEN(TEXT("HUD Casting Failed! Check GameMode HUD Class."))
+	}
+}
+
+// TODO : 삭제
 
 // void AGameplay_PlayerController::UpdateHotbar()
 // {

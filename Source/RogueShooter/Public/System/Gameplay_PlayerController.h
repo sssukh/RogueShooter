@@ -82,6 +82,9 @@ public:
 
 	virtual void OnRep_PlayerState() override;
 	
+	virtual void AcknowledgePossession(class APawn* P) override;
+	
+	
 	FORCEINLINE ARsHUD* GetRsHUD() const {return Cast<ARsHUD>(GetHUD());}
 	
 	// Handles Level up UI Flow
@@ -174,6 +177,8 @@ public:
 	void UpdateExpBar(float Percent);
 	
 	void UpdateLevelUI(int32 Level);
+	
+	void CreateAndInitHUD(UAbilitySystemComponent* InASC);
 	
 	/**
 	 * Refresh Hotbar with active and passive skills

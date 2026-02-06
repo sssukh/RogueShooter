@@ -75,7 +75,6 @@ public:
 	
 	void AddCharacterAbilities();
 	
-	void InitHUD();
 	
 protected:
 	// 1. GAS 엔진
@@ -143,10 +142,6 @@ public:
 	
 	virtual ABase_Character* GetCharacter_Implementation() override;
 	
-	// Interface 상속 
-	UFUNCTION()
-	virtual void RestoreHealth_Implementation(float amount) override;
-	
 
 	//*****************************************
 	// Widget 
@@ -187,9 +182,6 @@ public:
 	// Interface
 	virtual void CharDie_Implementation(AActor* Causer) override;
 
-	// server 
-	UFUNCTION(Server,Unreliable)
-	void S_RestoreHealth(float amount);
 	
 
 

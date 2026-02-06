@@ -120,15 +120,6 @@ ABase_Character::ABase_Character()
 	
 	InventoryComponent->bEditableWhenInherited = true;
 	
-	// 옮김 
-	// AbilitySystemComponent 세팅
-	// AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
-	// HealthAttributes = CreateDefaultSubobject<UHealthSet>(TEXT("HeathAttributes"));
-	// CombatAttributes = CreateDefaultSubobject<UCombatSet>(TEXT("CombatAttributes"));
-	// ExpAttributes = CreateDefaultSubobject<UExpSet>(TEXT("ExpAttributes"));
-	
-	
-	
 	StartLevel = 1;
 }
 
@@ -177,18 +168,8 @@ void ABase_Character::OnRep_PlayerState()
 	{
 		AbilitySystemComponent->InitAbilityActorInfo(PS, this);
 	}
-	// 클라이언트에서 위젯 초기화 
 	
-	
-	// FTimerHandle TimerHandle;
-	// GetWorldTimerManager().SetTimer(TimerHandle,FTimerDelegate::CreateLambda(
-	// 	[this]()
-	// 	{
-	// 		InitHUD();
-	// 	} ),0.2f,false);
-	
-	
-	InitHUD();
+	// InitHUD();
 	InitOverHeadWidget();
 }
 
@@ -218,47 +199,6 @@ void ABase_Character::AddCharacterAbilities()
 		}
 	}
 }
-
-
-
-void ABase_Character::InitHUD()
-{
-	if (bIsGASInitialized)
-		return;
-	
-	ARsPlayerState* PS = Cast<ARsPlayerState>(GetPlayerState());
-	
-	if (GetController() == nullptr || GetPlayerState() == nullptr || !AbilitySystemComponent)
-	{
-		FTimerHandle TimerHandle_InitUI;
-		GetWorldTimerManager().SetTimer(TimerHandle_InitUI, this, &ABase_Character::InitHUD, 0.1f, false);
-		return;
-	}
-	
-	if (IsLocallyControlled())
-	{
-		AGameplay_PlayerController* PC = Cast<AGameplay_PlayerController>(GetController());
-		if (PC)
-		{
-			if (ARsHUD* HUD = Cast<ARsHUD>(PC->GetHUD()))
-			{
-				HUD->InitOverlay(FWidgetControllerParams(PC,GetPlayerState(),AbilitySystemComponent));
-				RS_LOG_SCREEN(TEXT("HUD Init Success!")) // 로그 확인용
-			}
-			else
-			{
-				RS_LOG_SCREEN(TEXT("HUD Casting Failed! Check GameMode HUD Class."))
-			}
-		}
-		else
-		{
-			RS_LOG_SCREEN( TEXT("PC Casting Failed! Check GameMode PlayerController Class."))
-		}
-		bIsGASInitialized = true;
-	}	
-}
-
-
 
 
 UAbilitySystemComponent* ABase_Character::GetAbilitySystemComponent() const
@@ -302,22 +242,8 @@ void ABase_Character::PossessedBy(AController* NewController)
 		// InitAttributeDefaults_ServerOnly();
 		OnLevelup(StartLevel);
 		
-		// 0204  테스트용 
-		// ForceNetUpdate();
 	}
-	// TODO : 타이머 없이 테스트 
-	// 타이머 없으면 안된다. 나중에 Restart나 다른곳으로 옮기기 
-	FTimerHandle TimerHandle_InitUI;
-	GetWorldTimerManager().SetTimer(
-		TimerHandle_InitUI, 
-		FTimerDelegate::CreateLambda([this]()
-		{
-			InitHUD();
-		}) 
-		, 
-		0.1f, // 0.01f도 충분할 수 있지만 안전하게 0.1f 추천
-		false
-	);
+	
 	InitOverHeadWidget();
 }
 
@@ -522,12 +448,7 @@ void ABase_Character::MC_Death_Implementation()
 
 
 
-void ABase_Character::RestoreHealth_Implementation(float amount)
-{
-	// IInterface_CharacterManager::RestoreHealth_Implementation(amount);
 
-	S_RestoreHealth(amount);
-}
 
 void ABase_Character::InitOverHeadWidget()
 {
@@ -575,13 +496,7 @@ void ABase_Character::InitOverHeadWidget()
 }
 
 
-void ABase_Character::S_RestoreHealth_Implementation(float amount)
-{
-	// CurrentHealth = FMath::Clamp(CurrentHealth+amount,0.0f,MaxHealth);
 
-	// TODO : AttributeSet을 이용해서 값이 변하면 델리게이트를 호출해 자동으로 업데이트하도록 함.
-	// MC_UpdateHealthBar(CurrentHealth/MaxHealth);
-}
 
 
 
