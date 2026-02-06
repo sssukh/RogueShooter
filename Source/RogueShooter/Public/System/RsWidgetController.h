@@ -50,8 +50,10 @@ public:
 	virtual void SetWidgetControllerParams(const FWidgetControllerParams& WcParams) override;
 	
 	// 감시 함수 
+	// 감시할 ASC의 AttributeSet이 변하면 broadcast하는 람다를 등록.
 	virtual void BindCallbacksToDependencies() override;
 	
+	// BindCallbacksToDependencies로 등록한 오브젝트들에게 초기값 방송
 	virtual void BroadcastInitialValues() override;
 	
 	void SetTagsToListen(FGameplayTagContainer Tags);

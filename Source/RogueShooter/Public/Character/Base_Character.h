@@ -77,7 +77,7 @@ public:
 	
 	void InitializeDefaultAttrbute();
 	
-	void InitHUDAndUI();
+	void InitHUD();
 	
 protected:
 	// 1. GAS 엔진
@@ -168,12 +168,14 @@ public:
 	virtual void RestoreHealth_Implementation(float amount) override;
 	
 
+	//*****************************************
+	// Widget 
+	//*****************************************
+	void InitOverHeadWidget();
 	
 	//*****************************************
 	// Character Setup
 	//*****************************************
-	
-	void CreateHealthWidget(APlayerController* PlayerController);
 	
 	/**
 	 * set ref to PC \n
@@ -210,21 +212,7 @@ public:
 	void S_RestoreHealth(float amount);
 	
 
-	//*****************************************
-	// Widgets
-	//*****************************************
 
-
-	
-	// TODO :: GAS에서 delegate를 통해 호출됨. 삭제 필요 
-	// UFUNCTION(NetMulticast,Unreliable)
-	// void MC_UpdateHealthBar(float percent);
-	
-	UFUNCTION(NetMulticast,Unreliable)
-	void MC_UpdateCurrentHealth(float pNewCurrentHp);
-
-	UFUNCTION(NetMulticast,Unreliable)
-	void MC_UpdateMaxHealth( float pNewMaxHp);
 	//*****************************************
 	// Pause Logic
 	//*****************************************
@@ -286,7 +274,7 @@ public:
 	TObjectPtr<USpringArmComponent> SpringArm;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	TObjectPtr<UWidgetComponent> HealthWidget;
+	TObjectPtr<UWidgetComponent> HealthWidgetComponent;
 
 	// Input
 protected:
@@ -342,11 +330,6 @@ public:
 	UPROPERTY(ReplicatedUsing="OnRep_CharSK",VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
 	TObjectPtr<USkeletalMesh> CharSK;
 
-	
-	
-	
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
-	TObjectPtr<UUW_HealthBar> HealthBarWidgetReference;
 
 	
 

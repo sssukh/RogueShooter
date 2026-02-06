@@ -27,13 +27,7 @@ void UUW_PlayerHud::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	FTimerHandle delayHandle;
-	GetWorld()->GetTimerManager().SetTimer(delayHandle,FTimerDelegate::CreateLambda([]()
-	{
-		
-	}),2.0f,false);
 	
-	BuildSkillIconList();
 }
 
 void UUW_PlayerHud::BuildHotbar(const TMap<EActiveAbilities, int32>& ActiveAbilities,
@@ -110,29 +104,6 @@ void UUW_PlayerHud::UpdateTime(FText Time)
 	TextBlock_Time->SetText(Time);
 }
 
-
-
-void UUW_PlayerHud::BuildSkillIconList()
-{
-	if (!SkillSlotListClass)
-		return;
-	
-	UUW_SkillSlotList* SkillSlotList = CreateWidget<UUW_SkillSlotList>(GetOwningPlayer(),SkillSlotListClass);
-	
-	if (!SkillSlotList)
-		return;
-	
-	SkillSlotList->WidgetController = WidgetController;
-	
-	// TODO : 위의 buildhotbar 처럼 비동기로 이미지 애셋 로드하도록 하자.
-	
-	Overlay_Hud->ClearChildren();
-	
-	Overlay_Hud->AddChildToOverlay(SkillSlotList);
-	
-	// SkillSlotList->AddToViewport();
-}
-
 void UUW_PlayerHud::UpdateExpBar()
 {
 	ProgressBar_XP->SetPercent(CurrentExp/MaxExp);
@@ -171,6 +142,10 @@ void UUW_PlayerHud::SetWidgetController_Implementation(URsBaseWidgetController* 
 	WidgetController->OnExpChanged.AddDynamic(this,&UUW_PlayerHud::SetCurrentExp);
 	WidgetController->OnMaxExpChanged.AddDynamic(this,&UUW_PlayerHud::SetMaxExp);
 	WidgetController->OnLevelChanged.AddDynamic(this,&UUW_PlayerHud::SetLevel);
+	
+	UUW_SkillSlotList* SkillSlotList = Cast<UUW_SkillSlotList>(Overlay_SkillSlotList->GetChildAt(0));
+	
+	SkillSlotList->SetWidgetController_Implementation(WidgetController);
 	
 	WidgetController->BroadcastInitialValues();
 }

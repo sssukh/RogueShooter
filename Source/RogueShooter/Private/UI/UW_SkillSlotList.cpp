@@ -14,31 +14,38 @@ UUW_SkillSlotList::UUW_SkillSlotList(const FObjectInitializer& ObjectInitializer
 void UUW_SkillSlotList::NativeConstruct()
 {
 	Super::NativeConstruct();
-	
-	HorizontalBox_SkillSlot->ClearChildren();
-	
-	SetSkillTagsForSlots(WidgetController->GetTagsToListen());
-	
-	if (!SkillIconClass)
-		return;
-	
-	for (int i=0;i<SkillTagsForSlots.Num();++i)
-	{
-		UUW_SkillIcon* SkillSlot = CreateWidget<UUW_SkillIcon>(GetOwningPlayer(),SkillIconClass);
-		
-		if (!SkillSlot)
-			return;
-		
-		SkillSlot->WidgetController = WidgetController;
-		
-		SkillSlot->CooldownTag = SkillTagsForSlots[i];
-		
-		HorizontalBox_SkillSlot->AddChildToHorizontalBox(SkillSlot);
-	}
 }
 
 void UUW_SkillSlotList::SetSkillTagsForSlots(const TArray<FGameplayTag>& SkillTags)
 {
 	SkillTagsForSlots = SkillTags;
+}
+
+void UUW_SkillSlotList::SetWidgetController_Implementation(URsBaseWidgetController* InWidgetController)
+{
+	WidgetController = Cast<URsWidgetController>(InWidgetController);
+	
+	SetSkillTagsForSlots(WidgetController->GetTagsToListen());
+	
+	if (HorizontalBox_SkillSlot)
+	{
+		SkillIcons.Empty();
+		
+		for (int i=0;i<SkillTagsForSlots.Num();++i)
+		{
+			UUW_SkillIcon* SkillSlot = Cast<UUW_SkillIcon>(HorizontalBox_SkillSlot->GetChildAt(i));
+		
+			if (!SkillSlot)
+				return;
+		
+			SkillIcons.Add(SkillSlot);
+			
+			SkillSlot->CooldownTag = SkillTagsForSlots[i];
+			
+			SkillSlot->SetWidgetController_Implementation(WidgetController);
+		}
+		
+		WidgetController->BroadcastInitialAbilityInfo();
+	}
 }
 

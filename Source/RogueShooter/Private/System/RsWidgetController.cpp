@@ -64,22 +64,16 @@ void URsWidgetController::BindCallbacksToDependencies()
 	
 	if (CharExpSet)
 	{
+		// Exp가 변하면 방송
 		FDelegateHandle Handle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 			CharExpSet->GetExpGainedAttribute()).AddLambda(
 				[this](const FOnAttributeChangeData& Data)
 				{
-					RS_LOG_SCREEN(TEXT("EXP Change Broadcast"))
 					OnExpChanged.Broadcast(Data.NewValue);
 				}
 		);
-		if (Handle.IsValid())
-		{
-			UE_LOG(LogTemp, Warning, TEXT("[Binding] Success! Handle is Valid."));
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("[Binding] Failed! Handle is Invalid."));
-		}
+		
+		// Max Exp가 변하면 방송 
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 			CharExpSet->GetMaxExpGainedAttribute()).AddLambda(
 				[this](const FOnAttributeChangeData& Data)
@@ -88,6 +82,7 @@ void URsWidgetController::BindCallbacksToDependencies()
 				}
 		);
 		
+		// Level이 변하면 방송 
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 			CharExpSet->GetExpLevelAttribute()).AddLambda(
 				[this](const FOnAttributeChangeData& Data)
@@ -210,18 +205,20 @@ void URsWidgetController::BroadcastInitialAbilityInfo()
 		if (Ability)
 		{
 			// 3. GA_BaseSkill에 설정해둔 AbilityTag 가져오기
-			FGameplayTag Tag = Ability->AbilityTag; // (public이나 Getter 필요)
+			// FGameplayTag Tag = Ability->AbilityTag; // (public이나 Getter 필요)
 
 			// 4. 태그 이름을 Key로 데이터 테이블 검색
 			// "Ability.Attack.FireBall"이라는 이름의 Row를 찾음
-			FSkillInfo* Row = SkillInfoDataTable->FindRow<FSkillInfo>(Tag.GetTagName(), TEXT(""));
+			FSkillInfo* Row = SkillInfoDataTable->FindRow<FSkillInfo>(Ability->AbilityTag.GetTagName(), TEXT(""));
 			
+			// 알맞은 스킬슬롯을 찾기위한 스킬슬롯 태그 
 			FGameplayTag SkillSlotTag = Ability->CooldownTags.GetByIndex(0);
 			
 			if (Row)
 			{
-				// 5. 찾았으면 방송! "파이어볼 태그에 대한 정보는 이거야!"
-				OnSkillInfoLoaded.Broadcast(SkillSlotTag, *Row);
+				if (OnSkillInfoLoaded.IsBound())
+					// 5. 찾았으면 방송! "파이어볼 태그에 대한 정보는 이거야!"
+					OnSkillInfoLoaded.Broadcast(SkillSlotTag, *Row);
 			}
 		}
 	}

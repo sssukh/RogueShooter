@@ -37,8 +37,6 @@ public:
 
 	void UpdateTime(FText Time);
 	
-	void BuildSkillIconList();
-	
 	void UpdateExpBar();
 	
 	UFUNCTION()
@@ -84,11 +82,9 @@ public:
 	TObjectPtr<UTextBlock> TextBlock_Time;
 	
 	UPROPERTY(BlueprintReadWrite,Category = "UW_PlayerHud | Designer", meta = (BindWidget))
-	TObjectPtr<UOverlay> Overlay_Hud;
+	TObjectPtr<UOverlay> Overlay_SkillSlotList;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "UW_PlayerHud | Config")
 	TSubclassOf<UUW_AbilityTile> AbilityTileClass;
 	
-	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "UW_PlayerHud | Config")
-	TSubclassOf<UUW_SkillSlotList> SkillSlotListClass;
 };

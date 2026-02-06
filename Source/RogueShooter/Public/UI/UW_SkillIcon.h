@@ -5,8 +5,10 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Blueprint/UserWidget.h"
+#include "Interface/Interface_WidgetManager.h"
 #include "UW_SkillIcon.generated.h"
 
+struct FSkillInfo;
 class URsWidgetController;
 class UImage;
 class UTextBlock;
@@ -18,12 +20,21 @@ class UTextBlock;
  * 해당 Tag가 ASC에 부착되면 쿨다운이 동작한다.
  */
 UCLASS()
-class ROGUESHOOTER_API UUW_SkillIcon : public UUserWidget
+class ROGUESHOOTER_API UUW_SkillIcon : public UUserWidget, public IInterface_WidgetManager
 {
 	GENERATED_BODY()
 public:
 	UUW_SkillIcon(const FObjectInitializer& ObjectInitializer);
 	
+	virtual void NativeConstruct() override;
+	
+	UFUNCTION()
+	void ReceiveSkillInfo(const FGameplayTag& ReceivedMatchTag, const FSkillInfo& RowData);
+	
+	virtual void SetWidgetController_Implementation(URsBaseWidgetController* InWidgetController) override;
+	
+	UFUNCTION(BlueprintImplementableEvent, DisplayName = "SetCooldownEffect")
+	void BP_InitializeCooldownEffect();
 public:
 	UPROPERTY(BlueprintReadWrite,meta = (BindWidget))
 	TObjectPtr<UImage> SkillCoolDown;

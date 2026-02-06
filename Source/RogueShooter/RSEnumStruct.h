@@ -239,11 +239,16 @@ enum class EAbilityInputID : uint8
 	Confirm,
 	Cancel,
 	Attack,
-	Skill1, // 왼쪽 마우스
-	Skill2, // 오른쪽 마우스
-	Skill3, // shift
-	Skill4, // r
-	Skill5, // q
+	// 왼쪽 마우스
+	Skill1, 
+	// 오른쪽 마우스
+	Skill2, 
+	// shift
+	Skill3, 
+	// r
+	Skill4, 
+	// q
+	Skill5, 
 };
 
 USTRUCT(BlueprintType)

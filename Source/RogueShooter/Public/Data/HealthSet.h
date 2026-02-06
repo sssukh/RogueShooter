@@ -54,15 +54,7 @@ public:
 	FGameplayAttributeData IncomingDamage;
 	ATTRIBUTE_ACCESSORS(UHealthSet,IncomingDamage);
 	
-	// // Attribute 변화 시 체력바 UI에게 값을 갱신할 델리게이트
-	// mutable FAttributeDataChanged OnMaxHealthChanged;
-	// mutable FAttributeDataChanged OnCurrentHealthChanged;
-	// mutable FAttributeDataChanged OnCurrentShieldDamaged;
-	//
-	// // 체력바에 영향을 주면 floating text나 체력바에 영향
-	// mutable FShieldDamaged OnShieldDamaged;
-	// mutable FHealthDamaged OnHealthDamaged;
-	// mutable FHealthHealed OnHealthHealed;
+	
 public:
 	UFUNCTION()
 	virtual void OnRep_Health(const FGameplayAttributeData& OldHealth);

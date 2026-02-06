@@ -44,17 +44,15 @@ void ARsHUD::InitOverlay(const FWidgetControllerParams& WCParams)
 		// 4. 컨트롤러에게 "이제 감시 시작해!" 명령
 		WidgetController->BindCallbacksToDependencies();
 		
+		// 6. 화면 부착
+		OverlayWidget->AddToViewport();
+		
 		// 3. ⭐ 연결 (핵심) ⭐
 		// 위젯에게 "너의 데이터 담당자는 얘야"라고 알려줌
 		IInterface_WidgetManager::Execute_SetWidgetController(OverlayWidget,WidgetController);
 		
-		
-		
 		// 5. 스킬 정보 싹 읽어서 방송 
-		OverlayWidgetController->BroadcastInitialAbilityInfo();
-		
-		// 6. 화면 부착
-		OverlayWidget->AddToViewport();
+		// OverlayWidgetController->BroadcastInitialAbilityInfo();
 	}
 }
 

@@ -99,17 +99,17 @@ ABase_Character::ABase_Character()
 
 	// HealthWidget  초기화 
 	{
-		HealthWidget = CreateDefaultSubobject<UWidgetComponent>("HealthWidget");
+		HealthWidgetComponent = CreateDefaultSubobject<UWidgetComponent>("HealthWidgetComponent");
 
-		HealthWidget->SetWidgetSpace(EWidgetSpace::Screen);
+		HealthWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
 
-		HealthWidget->SetDrawSize(FVector2D(125.0f,18.0f));
+		HealthWidgetComponent->SetDrawSize(FVector2D(125.0f,18.0f));
 
-		HealthWidget->SetPivot(FVector2D(0.5f,0.5f));
+		HealthWidgetComponent->SetPivot(FVector2D(0.5f,0.5f));
 	
-		HealthWidget->SetRelativeLocation(FVector(0.0f,0.0f,125.0f));
+		HealthWidgetComponent->SetRelativeLocation(FVector(0.0f,0.0f,125.0f));
 
-		HealthWidget->SetupAttachment(RootComponent);
+		HealthWidgetComponent->SetupAttachment(RootComponent);
 	}
 
 	
@@ -172,8 +172,7 @@ void ABase_Character::OnRep_Controller()
 {
 	Super::OnRep_Controller();
 	
-	// 클라이언트에서 위젯 초기화 
-	InitHUDAndUI();
+	
 }
 
 
@@ -200,8 +199,10 @@ void ABase_Character::OnRep_PlayerState()
 		{
 			RS_LOG_WARNING(TEXT("Hp : %f, MaxHp : %f, Level : %f, Exp : %f")
 				,HealthAttributes->GetHealth(),HealthAttributes->GetMaxHealth(),ExpAttributes->GetExpLevel(),ExpAttributes->GetExpGained())
-			InitHUDAndUI();
+			InitHUD();
 		} ),0.2f,false);
+	
+	InitOverHeadWidget();
 }
 
 void ABase_Character::AddCharacterAbilities()
@@ -239,27 +240,22 @@ void ABase_Character::InitializeDefaultAttrbute()
 	AbilitySystemComponent->AddAttributeSetSubobject<UExpSet>(ExpAttributes);
 }
 
-void ABase_Character::InitHUDAndUI()
+void ABase_Character::InitHUD()
 {
 	if (bIsGASInitialized)
 		return;
 	
-	// Controller와 PlayerState 검사 
-	if (GetController() == nullptr || GetPlayerState() == nullptr)
+	if (GetController() == nullptr || GetPlayerState() == nullptr || !AbilitySystemComponent || !HealthAttributes || !ExpAttributes || !CombatAttributes)
 	{
+		FTimerHandle TimerHandle_InitUI;
+		GetWorldTimerManager().SetTimer(TimerHandle_InitUI, this, &ABase_Character::InitHUD, 0.1f, false);
 		return;
 	}
 	
 	if (IsLocallyControlled())
 	{
-		if (!AbilitySystemComponent || !HealthAttributes || !ExpAttributes || !CombatAttributes)
-		{
-			FTimerHandle TimerHandle_InitUI;
-			GetWorldTimerManager().SetTimer(TimerHandle_InitUI, this, &ABase_Character::InitHUDAndUI, 0.1f, false);
-			return;
-		}
-		
-		if (AGameplay_PlayerController* PC = Cast<AGameplay_PlayerController>(GetController()))
+		AGameplay_PlayerController* PC = Cast<AGameplay_PlayerController>(GetController());
+		if (PC)
 		{
 			if (ARsHUD* HUD = Cast<ARsHUD>(PC->GetHUD()))
 			{
@@ -270,41 +266,13 @@ void ABase_Character::InitHUDAndUI()
 			{
 				RS_LOG_SCREEN(TEXT("HUD Casting Failed! Check GameMode HUD Class."))
 			}
-		
-		
-			if (HealthBarClass)
-			{
-				CreateHealthWidget(PC);
-			}
 		}
 		else
 		{
 			RS_LOG_SCREEN( TEXT("PC Casting Failed! Check GameMode PlayerController Class."))
 		}
-		
-		
-			
-		if (AbilitySystemComponent && HealthBarWidgetReference && CharacterWidgetControllerClass)
-		{
-			// 컨트롤러 인스턴스 생성 
-			CharacterWidgetController = NewObject<UUnitWidgetController>(this,CharacterWidgetControllerClass);
-		
-			// 파라미터 주입
-			FWidgetControllerParams Params;
-			Params.AbilitySystemComponent = AbilitySystemComponent;
-		
-			CharacterWidgetController->SetWidgetControllerParams(Params);
-			CharacterWidgetController->BindCallbacksToDependencies();
-		
-			// 위젯에 컨트롤러 연결 
-			IInterface_WidgetManager::Execute_SetWidgetController(HealthBarWidgetReference,CharacterWidgetController);
-		}
-		
-		
-		OnLevelup(StartLevel);
-		
 		bIsGASInitialized = true;
-	}
+	}	
 }
 
 
@@ -343,21 +311,20 @@ void ABase_Character::PossessedBy(AController* NewController)
 		// 0204  테스트용 
 		// ForceNetUpdate();
 	}
-	
-	
-	
 	// TODO : 타이머 없이 테스트 
 	// 타이머 없으면 안된다. 나중에 Restart나 다른곳으로 옮기기 
 	FTimerHandle TimerHandle_InitUI;
 	GetWorldTimerManager().SetTimer(
 		TimerHandle_InitUI, 
-		this, 
-		&ABase_Character::InitHUDAndUI, 
+		FTimerDelegate::CreateLambda([this]()
+		{
+			InitHUD();
+		}) 
+		, 
 		0.1f, // 0.01f도 충분할 수 있지만 안전하게 0.1f 추천
 		false
 	);
-	
-	// InitHUDAndUI();
+	InitOverHeadWidget();
 }
 
 void ABase_Character::OnLevelup( float NewLevel)
@@ -498,21 +465,7 @@ void ABase_Character::S_SetCharacterData_Implementation(FAvailableCharacter Char
 	Character = CharacterData;
 }
 
-void ABase_Character::CreateHealthWidget(APlayerController* PlayerController)
-{
-	UUW_HealthBar* HealthBar = Cast<UUW_HealthBar>(CreateWidget<UUW_HealthBar>(PlayerController,HealthBarClass));
 
-	if (!HealthBar)
-		return;
-	
-	HealthBarWidgetReference = HealthBar;
-	
-	HealthWidget->SetWidget(HealthBarWidgetReference);
-
-	HealthBarWidgetReference->CurrentHp = HealthAttributes->GetHealth();
-	HealthBarWidgetReference->MaxHp = HealthAttributes->GetMaxHealth();
-	HealthBarWidgetReference->RefreshHpBar();
-}
 
 void ABase_Character::SetupReference()
 {
@@ -565,29 +518,9 @@ void ABase_Character::CharDie_Implementation(AActor* Causer)
 		}
 	}
 }
-void ABase_Character::MC_UpdateMaxHealth_Implementation(float pNewMaxHp)
-{
-	if (!HealthBarWidgetReference)
-	{
-		RS_LOG_ERROR(TEXT("Hp Bar Widget is NULL"))
-		return;
-	}
-	
-	HealthBarWidgetReference->MaxHp = pNewMaxHp;
-	HealthBarWidgetReference->RefreshHpBar();
-}
 
-void ABase_Character::MC_UpdateCurrentHealth_Implementation(float pNewCurrentHp)
-{
-	if (!HealthBarWidgetReference)
-	{
-		RS_LOG_ERROR(TEXT("Hp Bar Widget is NULL"))
-		return;
-	}
-	
-	HealthBarWidgetReference->CurrentHp = pNewCurrentHp;
-	HealthBarWidgetReference->RefreshHpBar();
-}
+
+
 
 
 void ABase_Character::Death_Implementation()
@@ -626,8 +559,50 @@ void ABase_Character::RestoreHealth_Implementation(float amount)
 	S_RestoreHealth(amount);
 }
 
-
-
+void ABase_Character::InitOverHeadWidget()
+{
+	if (!AbilitySystemComponent)
+	{
+		RS_LOG_WARNING(TEXT("AbilitySystemComponent is not valid"))
+		return;
+	}
+	
+	if (!HealthWidgetComponent)
+	{
+		RS_LOG_WARNING(TEXT("HealthWidgetComponent is not valid"))
+		return;
+	}
+	
+	if (!CharacterWidgetControllerClass)
+	{
+		RS_LOG_WARNING(TEXT("CharacterWidgetControllerClass is not valid"))
+		return;
+	}
+	
+	UUserWidget* UserWidget = HealthWidgetComponent->GetUserWidgetObject();
+	
+	
+	if (!UserWidget)
+	{
+		HealthWidgetComponent->InitWidget();
+		UserWidget = HealthWidgetComponent->GetUserWidgetObject();
+	}
+	
+	UUW_HealthBar* OverHeadHealthBar = Cast<UUW_HealthBar>(UserWidget);
+	
+	// 컨트롤러 인스턴스 생성 
+	CharacterWidgetController = NewObject<UUnitWidgetController>(this,CharacterWidgetControllerClass);
+	
+	// 파라미터 주입
+	FWidgetControllerParams Params;
+	Params.AbilitySystemComponent = AbilitySystemComponent;
+	
+	CharacterWidgetController->SetWidgetControllerParams(Params);
+	CharacterWidgetController->BindCallbacksToDependencies();
+	
+	// 위젯에 컨트롤러 연결 
+	IInterface_WidgetManager::Execute_SetWidgetController(OverHeadHealthBar,CharacterWidgetController);
+}
 
 
 void ABase_Character::S_RestoreHealth_Implementation(float amount)

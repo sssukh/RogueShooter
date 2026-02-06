@@ -44,10 +44,6 @@ void UExpSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackD
 {
 	if (Data.EvaluatedData.Attribute == GetIncomingExpAttribute())
 	{
-		if (GetOwningActor()->HasAuthority())
-		{
-			UE_LOG(LogTemp, Error, TEXT("[SERVER] Real Exp Changed! New Value: %f"), GetExpGained());
-		}
 		
 		float CurrentXp = GetExpGained();
 		
@@ -110,7 +106,6 @@ void UExpSet::OnRep_MaxExpGained(const FGameplayAttributeData& OldMaxExpGained)
 void UExpSet::OnRep_ExpGained(const FGameplayAttributeData& OldExpGained)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UExpSet,ExpGained,OldExpGained);
-	RS_LOG_SCREEN(TEXT("Exp has changed"))
 }
 
 

@@ -35,7 +35,6 @@ void UUnitWidgetController::BindCallbacksToDependencies()
 			UnitHealthSet->GetHealthAttribute()).AddLambda(
 				[this](const FOnAttributeChangeData& Data)
 				{
-					RS_LOG_SCREEN(TEXT("Hp Change Broadcast"))
 					OnHealthChanged.Broadcast(Data.NewValue);
 				});
 		if (Handle.IsValid())
