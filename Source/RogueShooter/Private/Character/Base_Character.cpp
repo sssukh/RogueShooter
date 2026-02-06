@@ -39,6 +39,7 @@
 #include "InputAction.h"
 #include "EnhancedInputSubsystems.h"
 #include "System/RsHUD.h"
+#include "System/RsPlayerState.h"
 #include "System/UnitWidgetController.h"
 
 // Sets default values
@@ -119,13 +120,12 @@ ABase_Character::ABase_Character()
 	
 	InventoryComponent->bEditableWhenInherited = true;
 	
+	// 옮김 
 	// AbilitySystemComponent 세팅
-	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
-	
-	
-	HealthAttributes = CreateDefaultSubobject<UHealthSet>(TEXT("HeathAttributes"));
-	CombatAttributes = CreateDefaultSubobject<UCombatSet>(TEXT("CombatAttributes"));
-	ExpAttributes = CreateDefaultSubobject<UExpSet>(TEXT("ExpAttributes"));
+	// AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	// HealthAttributes = CreateDefaultSubobject<UHealthSet>(TEXT("HeathAttributes"));
+	// CombatAttributes = CreateDefaultSubobject<UCombatSet>(TEXT("CombatAttributes"));
+	// ExpAttributes = CreateDefaultSubobject<UExpSet>(TEXT("ExpAttributes"));
 	
 	
 	
@@ -153,26 +153,12 @@ void ABase_Character::Tick(float DeltaTime)
 void ABase_Character::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	// 0204 : attribute 초기화를 서버에서만 하도록 수정
-	// 이유 : 서버만 초기값을 계산하고 클라이언트는 서버가 보내준 값을 받아오기만 해야한다. 
 	
-	
-	if (GetLocalRole() == ROLE_Authority)
-	{
-		// IGameplayAbilitiesModule::Get().GetAbilitySystemGlobals()->GetAttributeSetInitter()->InitAttributeSetDefaults(AbilitySystemComponent,TEXT("BaseCharacter"),StartLevel,true);
-		
-		// TODO :  
-		// broadcast InitialValues
-		// OnLEvelup을 Level이 오를 때마다 호출시키기.
-	}
-	// BroadcastInitialValues();
 }
 
 void ABase_Character::OnRep_Controller()
 {
 	Super::OnRep_Controller();
-	
-	
 }
 
 
@@ -180,28 +166,29 @@ void ABase_Character::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
 	
+	ARsPlayerState* PS = Cast<ARsPlayerState>(GetPlayerState());
+	if (PS)
+		AbilitySystemComponent = PS->GetAbilitySystemComponent();
+	else
+	{
+		RS_LOG_WARNING(TEXT("Failed to get PlayerState"))
+	}
 	if (AbilitySystemComponent)
 	{
-		AbilitySystemComponent->SetIsReplicated(true);
-		AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
-        
-		// 0204 InitAbilityActorInfo 호출하기전에 ASC에 AttributeSet들을 모두 추가 
-		// InitializeDefaultAttrbute();
-		
-		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+		AbilitySystemComponent->InitAbilityActorInfo(PS, this);
 	}
 	// 클라이언트에서 위젯 초기화 
 	
 	
-	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle,FTimerDelegate::CreateLambda(
-		[this]()
-		{
-			RS_LOG_WARNING(TEXT("Hp : %f, MaxHp : %f, Level : %f, Exp : %f")
-				,HealthAttributes->GetHealth(),HealthAttributes->GetMaxHealth(),ExpAttributes->GetExpLevel(),ExpAttributes->GetExpGained())
-			InitHUD();
-		} ),0.2f,false);
+	// FTimerHandle TimerHandle;
+	// GetWorldTimerManager().SetTimer(TimerHandle,FTimerDelegate::CreateLambda(
+	// 	[this]()
+	// 	{
+	// 		InitHUD();
+	// 	} ),0.2f,false);
 	
+	
+	InitHUD();
 	InitOverHeadWidget();
 }
 
@@ -232,20 +219,16 @@ void ABase_Character::AddCharacterAbilities()
 	}
 }
 
-void ABase_Character::InitializeDefaultAttrbute()
-{
-	// ASC에 AttributeSet 등록
-	AbilitySystemComponent->AddAttributeSetSubobject<UHealthSet>(HealthAttributes);
-	AbilitySystemComponent->AddAttributeSetSubobject<UCombatSet>(CombatAttributes);
-	AbilitySystemComponent->AddAttributeSetSubobject<UExpSet>(ExpAttributes);
-}
+
 
 void ABase_Character::InitHUD()
 {
 	if (bIsGASInitialized)
 		return;
 	
-	if (GetController() == nullptr || GetPlayerState() == nullptr || !AbilitySystemComponent || !HealthAttributes || !ExpAttributes || !CombatAttributes)
+	ARsPlayerState* PS = Cast<ARsPlayerState>(GetPlayerState());
+	
+	if (GetController() == nullptr || GetPlayerState() == nullptr || !AbilitySystemComponent)
 	{
 		FTimerHandle TimerHandle_InitUI;
 		GetWorldTimerManager().SetTimer(TimerHandle_InitUI, this, &ABase_Character::InitHUD, 0.1f, false);
@@ -280,13 +263,27 @@ void ABase_Character::InitHUD()
 
 UAbilitySystemComponent* ABase_Character::GetAbilitySystemComponent() const
 {
-	return AbilitySystemComponent;
+	if (AbilitySystemComponent) 
+		return AbilitySystemComponent;
+	
+	if (ARsPlayerState* PS = GetPlayerState<ARsPlayerState>())
+	{
+		return PS->GetAbilitySystemComponent();
+	}
+	return nullptr;
 }
 
 void ABase_Character::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 	
+	ARsPlayerState* PS = Cast<ARsPlayerState>(GetPlayerState());
+	if (PS)
+		AbilitySystemComponent = PS->GetAbilitySystemComponent();
+	else
+	{
+		RS_LOG_WARNING(TEXT("Failed to get PlayerState"))
+	}
 	// [중요] 서버 쪽 초기화: 여기서 Init을 해줘야 ASC가 작동을 시작합니다.
 	if (AbilitySystemComponent)
 	{
@@ -295,7 +292,7 @@ void ABase_Character::PossessedBy(AController* NewController)
 		
 		// InitializeDefaultAttrbute();
 		
-		AbilitySystemComponent->InitAbilityActorInfo(this,this);
+		AbilitySystemComponent->InitAbilityActorInfo(PS,this);
 		
 		// 초기 스킬 및 스탯 부여 
 		AddCharacterAbilities();
@@ -304,9 +301,6 @@ void ABase_Character::PossessedBy(AController* NewController)
 		// 이걸 그냥 ge를 생성해서 따로 적용하자
 		// InitAttributeDefaults_ServerOnly();
 		OnLevelup(StartLevel);
-		
-		RS_LOG_WARNING(TEXT("Hp : %f, MaxHp : %f, Level : %f, Exp : %f")
-				,HealthAttributes->GetHealth(),HealthAttributes->GetMaxHealth(),ExpAttributes->GetExpLevel(),ExpAttributes->GetExpGained())
 		
 		// 0204  테스트용 
 		// ForceNetUpdate();
@@ -342,34 +336,10 @@ void ABase_Character::OnLevelup( float NewLevel)
 	}
 }
 
-void ABase_Character::OnExpChange(float NewExp)
-{
-	AGameplay_PlayerController* PC = Cast<AGameplay_PlayerController>(GetController());
-	
-	float maxXp = ExpAttributes->GetMaxExpGained();
-	
-	PC->UpdateExpBar(NewExp/maxXp);
-}
 
 
 
-void ABase_Character::Cheat_ForceExp()
-{
-	Server_ForceExp(); // 서버에게 명령
-}
 
-void ABase_Character::Server_ForceExp_Implementation()
-{
-	if (ExpAttributes)
-	{
-		// GAS 로직 무시하고 강제로 값 변경!
-		// 이러면 예측(Prediction) 없이 순수하게 서버 -> 클라 복제만 일어남
-		float OldVal = ExpAttributes->GetExpGained();
-		ExpAttributes->SetExpGained(OldVal + 50.0f);
-        
-		UE_LOG(LogTemp, Warning, TEXT("[SERVER CHEAT] Changed Exp to %f"), OldVal + 50.0f);
-	}
-}
 
 float ABase_Character::GetMaxXpForLevel(float pLevel) const
 {
@@ -710,10 +680,6 @@ void ABase_Character::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 
 	DOREPLIFETIME(ABase_Character,CharSK);
 
-	// 0204 ASC에서 관리하는 변수들인데 replication을 캐릭터에서 하게되면 클라가 꼬이거나 복제되어 서로 다른 포인터를 가리키게 된다고 한다. by gpt
-	// DOREPLIFETIME(ABase_Character, ExpAttributes);
-	// DOREPLIFETIME(ABase_Character, HealthAttributes);
-	// DOREPLIFETIME(ABase_Character, CombatAttributes);
 }
 
 void ABase_Character::OROnRepCharacterClass()

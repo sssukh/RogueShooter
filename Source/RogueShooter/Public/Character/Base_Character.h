@@ -75,8 +75,6 @@ public:
 	
 	void AddCharacterAbilities();
 	
-	void InitializeDefaultAttrbute();
-	
 	void InitHUD();
 	
 protected:
@@ -84,15 +82,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
-	// 2. 스탯 정보
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
-	TObjectPtr<UHealthSet> HealthAttributes;
-	
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "GAS")
-	TObjectPtr<UCombatSet> CombatAttributes;
-
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "GAS")
-	TObjectPtr<UExpSet> ExpAttributes;
 	
 	// 부여할 어빌리티 목록
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category =  "GAS | Config")
@@ -104,8 +93,6 @@ protected:
 	UFUNCTION()
 	void OnLevelup(float NewLevel);
 	
-	UFUNCTION()
-	void OnExpChange(float NewExp);
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "GAS|Config")
 	TSubclassOf<UGameplayEffect> DefaultCurveEffectClass;
@@ -115,14 +102,7 @@ protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Attribute")
 	FCurveTableRowHandle MaxXpCurve;
 	
-	
-protected:
-	// 테스트용 함수 선언
-	UFUNCTION(Exec) // 콘솔 명령어로 실행 가능하게
-	void Cheat_ForceExp();
 
-	UFUNCTION(Server, Reliable)
-	void Server_ForceExp();
 	
 public:
 	float GetMaxXpForLevel(float pLevel) const;

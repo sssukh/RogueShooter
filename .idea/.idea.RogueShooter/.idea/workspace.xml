@@ -13,34 +13,10 @@
   <component name="ChangeListManager">
     <list default="true" id="8deb027d-5a9e-424c-a7bd-f766f82ad3c0" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.RogueShooter/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.RogueShooter/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/Character/BP_Base_Character.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/Character/BP_Base_Character.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayAbility/BGA_EnemyAttack.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayAbility/BGA_EnemyAttack.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayAbility/GA_CharacterDead.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayAbility/GA_CharacterDead.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayAbility/Skill/Base/GA_BaseSkill2.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayAbility/Skill/Base/GA_BaseSkill2.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayAbility/Skill/Base/GA_BaseSkill3.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayAbility/Skill/Base/GA_BaseSkill3.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayAbility/Skill/Base/GA_BaseSkill4.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayAbility/Skill/Base/GA_BaseSkill4.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayAbility/Skill/Base/GA_BaseSkill5.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayAbility/Skill/Base/GA_BaseSkill5.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Data/Skills/DT_SkillInfo.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Data/Skills/DT_SkillInfo.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Maps/M_Demo.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Maps/M_Demo.umap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Widgets/UWB_PlayerHud.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Widgets/UWB_PlayerHud.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Widgets/UWB_SkillIcon.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Widgets/UWB_SkillIcon.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Widgets/UWB_SkillSlotList.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Widgets/UWB_SkillSlotList.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/System/BP_GameplayGameMode.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/System/BP_GameplayGameMode.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RogueShooter.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/RogueShooter.sln.DotSettings.user" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/Character/Base_Character.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/Character/Base_Character.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/Data/ExpSet.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/Data/ExpSet.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/System/RsHUD.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/System/RsHUD.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/System/RsWidgetController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/System/RsWidgetController.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/System/UnitWidgetController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/System/UnitWidgetController.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/UI/UW_PlayerHud.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/UI/UW_PlayerHud.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/UI/UW_SkillIcon.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/UI/UW_SkillIcon.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/UI/UW_SkillSlotList.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/UI/UW_SkillSlotList.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/Character/Base_Character.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/Character/Base_Character.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/Data/HealthSet.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/Data/HealthSet.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/System/RsWidgetController.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/System/RsWidgetController.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/UI/UW_PlayerHud.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/UI/UW_PlayerHud.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/UI/UW_SkillIcon.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/UI/UW_SkillIcon.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/UI/UW_SkillSlotList.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/UI/UW_SkillSlotList.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/RSEnumStruct.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/RSEnumStruct.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,11 +30,12 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="cidr-memory-view://1" root0="FORCE_HIGHLIGHTING" />
+    <setting file="cidr-memory-view://3" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/AI/MLAdapter/Source/MLAdapter/Private/Sensors/MLAdapterSensor_Attribute.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Private/Abilities/Tasks/AbilityTask.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Private/AbilitySystemComponent.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Private/AttributeSet.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Private/GameplayAbilityTypes.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Private/GameplayEffect.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Developer/DerivedDataCache/Private/DerivedDataCacheStats.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Developer/Profiler/Private/ProfilerSession.h" root0="FORCE_HIGHLIGHTING" />
@@ -143,6 +120,7 @@
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Private/Interface/Interface_WidgetManager.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Private/System/RsBaseWidgetController.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Private/System/RsHUD.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Private/System/RsPlayerState.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Private/System/RsWidgetController.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Private/System/UnitWidgetController.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Private/UI/UW_InventoryMain.cpp" root0="FORCE_HIGHLIGHTING" />
@@ -162,6 +140,7 @@
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Public/Interface/Interface_WidgetManager.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Public/System/RsBaseWidgetController.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Public/System/RsHUD.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Public/System/RsPlayerState.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Public/System/RsWidgetController.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Public/System/UnitWidgetController.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Public/UI/UW_InventoryMain.h" root0="FORCE_HIGHLIGHTING" />
@@ -353,6 +332,8 @@
       <workItem from="1770269699295" duration="5223000" />
       <workItem from="1770295225428" duration="12744000" />
       <workItem from="1770352443808" duration="6195000" />
+      <workItem from="1770359006833" duration="573000" />
+      <workItem from="1770384765659" duration="6293000" />
     </task>
     <servers />
   </component>
