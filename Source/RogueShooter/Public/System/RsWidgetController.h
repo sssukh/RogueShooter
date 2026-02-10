@@ -37,6 +37,7 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="GAS|Messages")
 	FOnSkillInfoLoadedSignature OnSkillInfoLoaded;
 	
+	// EXP 관련 델리게이트 
 	UPROPERTY(BlueprintAssignable, Category="GAS|Messages")
 	FOnAttributeChangedSignatureInHud OnExpChanged;
 	
@@ -45,6 +46,16 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, Category="GAS|Messages")
 	FOnAttributeChangedSignatureInHud OnLevelChanged;
+	
+	// Health 관련 델리게이트
+	UPROPERTY(BlueprintAssignable, Category="GAS|Messages")
+	FOnAttributeChangedSignatureInHud OnHealthChanged;
+	
+	UPROPERTY(BlueprintAssignable, Category="GAS|Messages")
+	FOnAttributeChangedSignatureInHud OnMaxHealthChanged;
+	
+	UPROPERTY(BlueprintAssignable, Category="GAS|Messages")
+	FOnAttributeChangedSignatureInHud OnShieldChanged;
 	
 	// 초기화 함수
 	virtual void SetWidgetControllerParams(const FWidgetControllerParams& WcParams) override;
@@ -65,9 +76,16 @@ public:
 	void BroadcastInitialAbilityInfo();
 	
 protected:
+	void BindExpBarCallbacks();
+	
+	void BindHealthBarCallbacks();
+protected:
 	
 	UPROPERTY(BlueprintReadOnly,Category = "Widget Controller") 
 	TObjectPtr<const UExpSet> CharExpSet;
+	
+	UPROPERTY(BlueprintReadOnly,Category = "Widget Controller") 
+	TObjectPtr<const UHealthSet> CharHealthSet;
 	
 	// 내부 콜백 
 	void OnCooldownTagChanged(const FGameplayTag CooldownTag, int32 NewCount);

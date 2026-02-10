@@ -41,7 +41,7 @@ void ARsHUD::InitOverlay(const FWidgetControllerParams& WCParams)
 		// 2. 위젯(껍데기) 생성
 		OverlayWidget = CreateWidget<UUW_PlayerHud>(PC, OverlayWidgetClass);
 		
-		// 4. 컨트롤러에게 "이제 감시 시작해!" 명령
+		// 4. 컨트롤러에게 Attribute 값변화에 따른 델리게이트 발송 감시 명령
 		WidgetController->BindCallbacksToDependencies();
 		
 		// 6. 화면 부착

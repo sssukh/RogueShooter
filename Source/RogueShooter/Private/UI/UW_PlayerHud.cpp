@@ -11,6 +11,7 @@
 #include "RogueShooter/RSEnumStruct.h"
 #include "System/Subsystem/UIAssetCacheSubsystem.h"
 #include "UI/UW_AbilityTile.h"
+#include "UI/UW_HUDHealthBar.h"
 #include "UI/UW_SkillSlotList.h"
 #include "Utility/RSLog.h"
 
@@ -143,9 +144,16 @@ void UUW_PlayerHud::SetWidgetController_Implementation(URsBaseWidgetController* 
 	WidgetController->OnMaxExpChanged.AddDynamic(this,&UUW_PlayerHud::SetMaxExp);
 	WidgetController->OnLevelChanged.AddDynamic(this,&UUW_PlayerHud::SetLevel);
 	
-	UUW_SkillSlotList* SkillSlotList = Cast<UUW_SkillSlotList>(Overlay_SkillSlotList->GetChildAt(0));
+	if (UUW_SkillSlotList* SkillSlotList = Cast<UUW_SkillSlotList>(Overlay_SkillSlotList->GetChildAt(0)))
+	{
+		SkillSlotList->SetWidgetController_Implementation(WidgetController);
+	}
 	
-	SkillSlotList->SetWidgetController_Implementation(WidgetController);
+	if (UUW_HUDHealthBar* HealthBarSlot = Cast<UUW_HUDHealthBar>(Overlay_HealthBar->GetChildAt(0)))
+	{
+		HealthBarSlot->SetWidgetController_Implementation(WidgetController);
+	}
+	
 	
 	WidgetController->BroadcastInitialValues();
 }

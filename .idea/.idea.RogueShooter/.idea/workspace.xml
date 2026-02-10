@@ -13,12 +13,27 @@
   <component name="ChangeListManager">
     <list default="true" id="8deb027d-5a9e-424c-a7bd-f766f82ad3c0" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.RogueShooter/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.RogueShooter/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Config/DefaultEngine.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultEngine.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/Abilities/BP_BaseProjectile.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/Abilities/BP_BaseProjectile.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/Character/BP_Base_Character.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/Character/BP_Base_Character.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayAbility/Skill/Base/GA_BaseSkill1.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayAbility/Skill/Base/GA_BaseSkill1.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayEffect/GE_Damage.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayEffect/GE_Damage.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Widgets/UWB_PlayerHud.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Widgets/UWB_PlayerHud.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/Abilities/Base_Projectile.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/Abilities/Base_Projectile.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/Abilities/Fireball_Projectile.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/Abilities/Fireball_Projectile.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/Character/Base_Character.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/Character/Base_Character.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/System/Gameplay_PlayerController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/System/Gameplay_PlayerController.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/Data/HealthSet.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/Data/HealthSet.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/GameplayAbility/GA_Skill.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/GameplayAbility/GA_Skill.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/System/RsHUD.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/System/RsHUD.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/System/RsWidgetController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/System/RsWidgetController.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/System/UnitWidgetController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/System/UnitWidgetController.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/UI/UW_HealthBar.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/UI/UW_HUDHealthBar.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/UI/UW_PlayerHud.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/UI/UW_PlayerHud.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/Abilities/Base_Projectile.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/Abilities/Base_Projectile.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/Character/Base_Character.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/Character/Base_Character.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/System/Gameplay_PlayerController.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/System/Gameplay_PlayerController.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/GameplayAbility/GA_Skill.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/GameplayAbility/GA_Skill.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/System/RsWidgetController.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/System/RsWidgetController.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/UI/UW_HealthBar.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/UI/UW_HUDHealthBar.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/UI/UW_PlayerHud.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/UI/UW_PlayerHud.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,13 +47,13 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="cidr-memory-view://4" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/AI/MLAdapter/Source/MLAdapter/Private/Sensors/MLAdapterSensor_Attribute.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Private/Abilities/Tasks/AbilityTask.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Private/AbilitySystemComponent.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Private/AttributeSet.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Private/GameplayAbilityTypes.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Private/GameplayAbilityTypes.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Private/GameplayEffect.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/Abilities/Tasks/AbilityTask_WaitInputRelease.h" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Developer/DerivedDataCache/Private/DerivedDataCacheStats.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Developer/Profiler/Private/ProfilerSession.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Editor/EditorStyle/Private/StarshipStyle.cpp" root0="FORCE_HIGHLIGHTING" />
@@ -117,6 +132,7 @@
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Private/Data/HealthSet.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Private/Data/Item/ItemData.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Private/ExecCalculation/ExecCalc_Damage.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Private/GameplayAbility/GA_GunFire.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Private/GameplayAbility/GA_Skill.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Private/GameplayActors/PickupItem.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Private/Interface/Interface_WidgetManager.cpp" root0="FORCE_HIGHLIGHTING" />
@@ -137,6 +153,7 @@
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Public/Data/HealthSet.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Public/Data/Item/ItemData.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Public/ExecCalculation/ExecCalc_Damage.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Public/GameplayAbility/GA_GunFire.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Public/GameplayAbility/GA_Skill.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Public/GameplayActors/PickupItem.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/RogueShooter/Public/Interface/Interface_WidgetManager.h" root0="FORCE_HIGHLIGHTING" />
@@ -335,7 +352,9 @@
       <workItem from="1770295225428" duration="12744000" />
       <workItem from="1770352443808" duration="6195000" />
       <workItem from="1770359006833" duration="573000" />
-      <workItem from="1770384765659" duration="9295000" />
+      <workItem from="1770384765659" duration="9460000" />
+      <workItem from="1770444540972" duration="662000" />
+      <workItem from="1770702955046" duration="19393000" />
     </task>
     <servers />
   </component>

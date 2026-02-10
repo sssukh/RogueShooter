@@ -6,6 +6,16 @@
 #include "Abilities/GameplayAbility.h"
 #include "GA_Skill.generated.h"
 
+
+UENUM(BlueprintType)
+enum class ESkillInputStyle : uint8
+{
+	Instant     UMETA(DisplayName = "Instant (One Shot)"), // 단발
+	Continuous  UMETA(DisplayName = "Continuous (Hold)"),  // 연사
+	Charging    UMETA(DisplayName = "Charging (Release)"), // 차징 (모아서 쏘기)
+	Burst       UMETA(DisplayName = "Burst Fire")          // 점사 (3점사 등)
+};
+
 /**
  * BaseSkill 클래스 
  * 
@@ -44,8 +54,47 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "GAS|Helper")
 	FVector GetMouseCursorLocation();
 
-
+	// ChargeAmount: 0.0 ~ 1.0 사이의 값 (차징일 때만 변하고, 나머지는 항상 1.0)
+	UFUNCTION(BlueprintNativeEvent, Category = "Skill Logic")
+	void ExecuteSkillLogic(float ChargeAmount);
+	virtual void ExecuteSkillLogic_Implementation(float ChargeAmount);
 	
+protected:
+	// 스킬 타입 (단발 vs 연사)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Config")
+	ESkillInputStyle InputStyle = ESkillInputStyle::Instant;
+
+	// 연사 속도 (초 단위, Continuous 모드일 때만 사용)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Config", meta = (EditCondition = "InputStyle == ESkillInputStyle::Continuous"))
+	float FireRate = 0.1f;
+	
+	// 차징 관련 설정
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Config", meta = (EditCondition = "InputStyle == ESkillInputStyle::Charging"))
+	float MinChargeTime = 0.0f; // 최소 이만큼은 눌러야 발사됨
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Config", meta = (EditCondition = "InputStyle == ESkillInputStyle::Charging"))
+	float MaxChargeTime = 2.0f; // 최대 충전 시간 (이 이상 눌러도 게이지 100%)
+
+	// 점사 관련 설정
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Config", meta = (EditCondition = "InputStyle == ESkillInputStyle::Burst"))
+	int32 BurstCount = 3; // 한 번 누르면 몇 발 나가는지
+	
+private:
+	// 버튼을 뗐을 때 감지 (Task 콜백)
+	UFUNCTION()
+	void OnReleaseInput(float TimeHeld);
+
+	// 타이머 핸들 (반복 실행용)
+	FTimerHandle TimerHandle_Loop;
+
+	// 반복 실행될 함수
+	void LoopLogic();
+	
+	int32 CurrentBurstShots = 0; // 현재 점사 발사 수
+	float ChargeStartTime = 0.0f; // 차징 시작 시간
+
+	// 점사 로직용 함수
+	void BurstLogic();
 public:
 	// 데이터 애셋에 접근할 키 값 
 	// 스킬 아이콘 및 설명을 가져옴 

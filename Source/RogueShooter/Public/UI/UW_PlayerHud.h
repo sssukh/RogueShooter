@@ -87,4 +87,7 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "UW_PlayerHud | Config")
 	TSubclassOf<UUW_AbilityTile> AbilityTileClass;
 	
+	UPROPERTY(BlueprintReadWrite,Category = "UW_PlayerHud | Designer", meta = (BindWidget))
+	TObjectPtr<UOverlay> Overlay_HealthBar;
+	
 };

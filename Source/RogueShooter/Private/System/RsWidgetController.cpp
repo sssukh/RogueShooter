@@ -8,6 +8,7 @@
 #include "GameplayAbility/GA_Skill.h"
 #include "RogueShooter/AssetPath.h"
 #include "GameplayEffectTypes.h"
+#include "Data/HealthSet.h"
 #include "Utility/FRsGameplayTags.h"
 #include "Utility/RSLog.h"
 
@@ -30,7 +31,11 @@ void URsWidgetController::SetWidgetControllerParams(const FWidgetControllerParam
 		CharExpSet = Cast<UExpSet>(AbilitySystemComponent->GetAttributeSet(UExpSet::StaticClass()));
 	}
 	
-	// BindCallbacksToDependencies();
+	if (AbilitySystemComponent)
+	{
+		CharHealthSet = Cast<UHealthSet>(AbilitySystemComponent->GetAttributeSet(UHealthSet::StaticClass()));
+	}
+	
 }
 
 void URsWidgetController::BindCallbacksToDependencies()
@@ -41,56 +46,9 @@ void URsWidgetController::BindCallbacksToDependencies()
 		return;
 	}
 	
-	if (!CharExpSet)
-	{
-		RS_LOG_ERROR(TEXT("ExpSet is NULL"))
-		return;
-	}
+	BindExpBarCallbacks();
 	
-	// 디버깅용 로그: 속성이 유효한지 확인
-	FGameplayAttribute ExpAttribute = CharExpSet->GetExpGainedAttribute();
-	if (!ExpAttribute.IsValid())
-	{
-		UE_LOG(LogTemp, Error, TEXT("CRITICAL: ExpGainedAttribute is Invalid! Check Macros in AttributeSet.h"));
-		return;
-	}
-
-	// ASC가 해당 속성을 가지고 있는지 확인 (값이 있는지)
-	if (!AbilitySystemComponent->HasAttributeSetForAttribute(ExpAttribute))
-	{
-		UE_LOG(LogTemp, Error, TEXT("CRITICAL: ASC does not have CharExpSet registered!"));
-		return;
-	}
-	
-	if (CharExpSet)
-	{
-		// Exp가 변하면 방송
-		FDelegateHandle Handle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-			CharExpSet->GetExpGainedAttribute()).AddLambda(
-				[this](const FOnAttributeChangeData& Data)
-				{
-					OnExpChanged.Broadcast(Data.NewValue);
-				}
-		);
-		
-		// Max Exp가 변하면 방송 
-		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-			CharExpSet->GetMaxExpGainedAttribute()).AddLambda(
-				[this](const FOnAttributeChangeData& Data)
-				{
-					OnMaxExpChanged.Broadcast(Data.NewValue);
-				}
-		);
-		
-		// Level이 변하면 방송 
-		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-			CharExpSet->GetExpLevelAttribute()).AddLambda(
-				[this](const FOnAttributeChangeData& Data)
-				{
-					OnLevelChanged.Broadcast(Data.NewValue);
-				}
-		);
-	}
+	BindHealthBarCallbacks();
 	
 	// [핵심] 우리가 만든 DataAsset을 순회하거나, 
 	// 혹은 미리 알고 있는 '모든 쿨타임 태그'를 등록합니다.
@@ -120,8 +78,18 @@ void URsWidgetController::BroadcastInitialValues()
 		OnExpChanged.Broadcast(CharExpSet->GetExpGained());
 		OnMaxExpChanged.Broadcast(CharExpSet->GetMaxExpGained());
 		OnLevelChanged.Broadcast(CharExpSet->GetExpLevel());
-        
-		
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("[WidgetController] Cannot Broadcast Initial Values: CharExpSet is NULL"));
+	}
+	
+	if (CharHealthSet)
+	{
+		// 2. 현재 값(Current Value)을 읽어서 방송
+		OnHealthChanged.Broadcast(CharHealthSet->GetHealth());
+		OnMaxHealthChanged.Broadcast(CharHealthSet->GetMaxHealth());
+		OnShieldChanged.Broadcast(CharHealthSet->GetShield());
 	}
 	else
 	{
@@ -219,6 +187,101 @@ void URsWidgetController::BroadcastInitialAbilityInfo()
 					OnSkillInfoLoaded.Broadcast(SkillSlotTag, *Row);
 			}
 		}
+	}
+}
+
+void URsWidgetController::BindExpBarCallbacks()
+{
+	// 디버깅용 로그: 속성이 유효한지 확인
+	FGameplayAttribute ExpAttribute = CharExpSet->GetExpGainedAttribute();
+	if (!ExpAttribute.IsValid())
+	{
+		UE_LOG(LogTemp, Error, TEXT("CRITICAL: ExpGainedAttribute is Invalid! Check Macros in AttributeSet.h"));
+		return;
+	}
+
+	// ASC가 해당 속성을 가지고 있는지 확인 (값이 있는지)
+	if (!AbilitySystemComponent->HasAttributeSetForAttribute(ExpAttribute))
+	{
+		UE_LOG(LogTemp, Error, TEXT("CRITICAL: ASC does not have CharExpSet registered!"));
+		return;
+	}
+	
+	if (CharExpSet)
+	{
+		// Exp가 변하면 방송
+		FDelegateHandle Handle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+			CharExpSet->GetExpGainedAttribute()).AddLambda(
+				[this](const FOnAttributeChangeData& Data)
+				{
+					OnExpChanged.Broadcast(Data.NewValue);
+				}
+		);
+		
+		// Max Exp가 변하면 방송 
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+			CharExpSet->GetMaxExpGainedAttribute()).AddLambda(
+				[this](const FOnAttributeChangeData& Data)
+				{
+					OnMaxExpChanged.Broadcast(Data.NewValue);
+				}
+		);
+		
+		// Level이 변하면 방송 
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+			CharExpSet->GetExpLevelAttribute()).AddLambda(
+				[this](const FOnAttributeChangeData& Data)
+				{
+					OnLevelChanged.Broadcast(Data.NewValue);
+				}
+		);
+	}
+}
+
+void URsWidgetController::BindHealthBarCallbacks()
+{
+	FGameplayAttribute HealthAttribute = CharHealthSet->GetHealthAttribute();
+	if (!HealthAttribute.IsValid())
+	{
+		UE_LOG(LogTemp, Error, TEXT("CRITICAL: HealthAttribute is Invalid! Check Macros in AttributeSet.h"));
+		return;
+	}
+
+	// ASC가 해당 속성을 가지고 있는지 확인 (값이 있는지)
+	if (!AbilitySystemComponent->HasAttributeSetForAttribute(HealthAttribute))
+	{
+		UE_LOG(LogTemp, Error, TEXT("CRITICAL: ASC does not have CharHealthSet registered!"));
+		return;
+	}
+	
+	if (CharHealthSet)
+	{
+		// Health가 변하면 방송
+		FDelegateHandle Handle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+			CharHealthSet->GetHealthAttribute()).AddLambda(
+				[this](const FOnAttributeChangeData& Data)
+				{
+					OnHealthChanged.Broadcast(Data.NewValue);
+				}
+		);
+		
+		// Max Health가 변하면 방송 
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+			CharHealthSet->GetMaxHealthAttribute()).AddLambda(
+				[this](const FOnAttributeChangeData& Data)
+				{
+					OnMaxHealthChanged.Broadcast(Data.NewValue);
+				}
+		);
+		
+		// Shield가 변하면 방송 
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+			CharHealthSet->GetShieldAttribute()).AddLambda(
+				[this](const FOnAttributeChangeData& Data)
+				{
+					OnShieldChanged.Broadcast(Data.NewValue);
+				}
+		);
 	}
 }
 

@@ -20,7 +20,7 @@ class UCombatSet;
 class UInventoryComponent;
 class AGameplay_PlayerController;
 class UWidgetComponent;
-class UUW_HealthBar;
+class UUW_HUDHealthBar;
 class UAbilitiesComponent;
 class USG_Player;
 struct FAvailableCharacter;
@@ -146,7 +146,7 @@ public:
 	//*****************************************
 	// Widget 
 	//*****************************************
-	void InitOverHeadWidget();
+	
 	
 	//*****************************************
 	// Character Setup
@@ -317,7 +317,7 @@ public:
 	UPROPERTY()
 	TObjectPtr<UAnimInstance> CharacterAnimInstance;
 
-	TSubclassOf<UUW_HealthBar> HealthBarClass;
+	// TSubclassOf<UUW_HUDHealthBar> HealthBarClass;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UInventoryComponent> InventoryComponent;

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayEffectTypes.h"
 #include "GameFramework/Actor.h"
 #include "Base_Projectile.generated.h"
 
@@ -26,16 +27,20 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	
+	UFUNCTION()
+	void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 	virtual void NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 public:
+	// 충돌 컴포넌트 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	TObjectPtr<USphereComponent> Sphere;
+	TObjectPtr<USphereComponent> SphereComponent;
 
+	// 메쉬(교체 필요)
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	TObjectPtr<UStaticMeshComponent> Cube;
+	TObjectPtr<UStaticMeshComponent> ProjectileStaticMesh;
 
+	// 이동 컴포넌트
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
 public:
@@ -45,4 +50,8 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta = (ExposeOnSpawn = "true"))
 	float Damage;
+	
+	// 대미지 명세서
+	UPROPERTY(BlueprintReadWrite, Meta = (ExposeOnSpawn = true))
+	FGameplayEffectSpecHandle DamageEffectSpecHandle;
 };

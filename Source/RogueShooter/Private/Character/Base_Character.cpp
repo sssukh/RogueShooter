@@ -27,7 +27,7 @@
 #include "UI/UW_AbilityTile.h"
 #include "Utility/RSCollisionChannel.h"
 #include "Utility/RSLog.h"
-#include "UI/UW_HealthBar.h"
+#include "UI/UW_HUDHealthBar.h"
 
 #include "GameplayAbilitiesModule.h"
 #include "AbilitySystemGlobals.h"
@@ -88,15 +88,7 @@ ABase_Character::ABase_Character()
 		GetMesh()->SetSkeletalMesh(MeshFinder.Object);
 	}
 
-	static ConstructorHelpers::FClassFinder<UUW_HealthBar> HealthbarClassFinder(*AssetPath::Blueprint::WBP_HealthBar_C);
-	if(HealthbarClassFinder.Succeeded())
-	{
-		HealthBarClass = HealthbarClassFinder.Class;
-	}
-	else
-	{
-		RS_LOG_ERROR(TEXT("HealthBarClass를 찾을 수 없습니다."))
-	}
+	
 
 	// HealthWidget  초기화 
 	{
@@ -168,9 +160,6 @@ void ABase_Character::OnRep_PlayerState()
 	{
 		AbilitySystemComponent->InitAbilityActorInfo(PS, this);
 	}
-	
-	// InitHUD();
-	InitOverHeadWidget();
 }
 
 void ABase_Character::AddCharacterAbilities()
@@ -244,7 +233,6 @@ void ABase_Character::PossessedBy(AController* NewController)
 		
 	}
 	
-	InitOverHeadWidget();
 }
 
 void ABase_Character::OnLevelup( float NewLevel)
@@ -450,50 +438,7 @@ void ABase_Character::MC_Death_Implementation()
 
 
 
-void ABase_Character::InitOverHeadWidget()
-{
-	if (!AbilitySystemComponent)
-	{
-		RS_LOG_WARNING(TEXT("AbilitySystemComponent is not valid"))
-		return;
-	}
-	
-	if (!HealthWidgetComponent)
-	{
-		RS_LOG_WARNING(TEXT("HealthWidgetComponent is not valid"))
-		return;
-	}
-	
-	if (!CharacterWidgetControllerClass)
-	{
-		RS_LOG_WARNING(TEXT("CharacterWidgetControllerClass is not valid"))
-		return;
-	}
-	
-	UUserWidget* UserWidget = HealthWidgetComponent->GetUserWidgetObject();
-	
-	
-	if (!UserWidget)
-	{
-		HealthWidgetComponent->InitWidget();
-		UserWidget = HealthWidgetComponent->GetUserWidgetObject();
-	}
-	
-	UUW_HealthBar* OverHeadHealthBar = Cast<UUW_HealthBar>(UserWidget);
-	
-	// 컨트롤러 인스턴스 생성 
-	CharacterWidgetController = NewObject<UUnitWidgetController>(this,CharacterWidgetControllerClass);
-	
-	// 파라미터 주입
-	FWidgetControllerParams Params;
-	Params.AbilitySystemComponent = AbilitySystemComponent;
-	
-	CharacterWidgetController->SetWidgetControllerParams(Params);
-	CharacterWidgetController->BindCallbacksToDependencies();
-	
-	// 위젯에 컨트롤러 연결 
-	IInterface_WidgetManager::Execute_SetWidgetController(OverHeadHealthBar,CharacterWidgetController);
-}
+
 
 
 

@@ -27,7 +27,7 @@ AFireball_Projectile::AFireball_Projectile()
 void AFireball_Projectile::BeginPlay()
 {
 	Super::BeginPlay();
-	Cube->SetMaterial(0,FireballMaterial);
+	ProjectileStaticMesh->SetMaterial(0,FireballMaterial);
 }
 
 // Called every frame

@@ -5,10 +5,13 @@
 
 #include "AbilitySystemComponent.h"
 #include "Utility/FRsGameplayTags.h"
+#include "Abilities/Tasks/AbilityTask_WaitInputRelease.h"
 
 UGA_Skill::UGA_Skill()
 {
 	CooldownDurationTag = FRsGameplayTags::Get().Data_Duration;
+	
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
 void UGA_Skill::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
@@ -32,17 +35,64 @@ void UGA_Skill::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 		// 	
 		// }
 	}
-	// 2. 몽타주 자동 재생 (설정되어 있다면)
-	if (SkillMontage)
-	{
-		// AbilityTask_PlayMontageAndWait를 C++에서 생성해서 실행하거나
-		// 단순 재생 후 BP에게 타이밍을 맡길 수도 있습니다.
-	}
-
-	// 3.  블루프린트 로직 실행 
-	BP_OnActivateSkill();
+	// // 2. 몽타주 자동 재생 (설정되어 있다면)
+	// if (SkillMontage)
+	// {
+	// 	// AbilityTask_PlayMontageAndWait를 C++에서 생성해서 실행하거나
+	// 	// 단순 재생 후 BP에게 타이밍을 맡길 수도 있습니다.
+	// }
+	//
+	// // 3.  블루프린트 로직 실행 
+	// BP_OnActivateSkill();
 	
 	// bAutoCommit이 꺼져있다면 EndAbility 앞에 ApplyCooldown 실행 
+	
+	switch (InputStyle)
+	{
+	case ESkillInputStyle::Instant:
+		{
+			ExecuteSkillLogic(1.0f); // 그냥 발사 (파워 100%)
+			EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
+		}
+		break;
+
+	case ESkillInputStyle::Continuous:
+		{
+			ExecuteSkillLogic(1.0f);
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle_Loop, this, &UGA_Skill::LoopLogic, FireRate, true);
+            
+			// 입력 해제 대기
+			UAbilityTask_WaitInputRelease* ReleaseTask = UAbilityTask_WaitInputRelease::WaitInputRelease(this, true);
+			ReleaseTask->OnRelease.AddDynamic(this, &UGA_Skill::OnReleaseInput);
+			ReleaseTask->ReadyForActivation();
+		}
+		break;
+
+	case ESkillInputStyle::Charging:
+		{
+			// 1. 차징 시작 시간 기록
+			ChargeStartTime = GetWorld()->GetTimeSeconds();
+
+			// 2. (옵션) 차징 시작 이펙트/애니메이션 재생 (여기서 PlayMontage 등 호출 가능)
+            
+			// 3. 떼는 것을 기다림 (WaitInputRelease)
+			UAbilityTask_WaitInputRelease* ReleaseTask = UAbilityTask_WaitInputRelease::WaitInputRelease(this, true);
+			ReleaseTask->OnRelease.AddDynamic(this, &UGA_Skill::OnReleaseInput); // 뗄 때 발사!
+			ReleaseTask->ReadyForActivation();
+		}
+		break;
+
+	case ESkillInputStyle::Burst:
+		{
+			// 1. 카운터 초기화
+			CurrentBurstShots = 0;
+
+			// 2. 첫 발 발사 및 타이머 시작
+			BurstLogic(); 
+			// 점사는 입력을 떼도 계속 나가야 하므로 WaitInputRelease가 필요 없습니다.
+		}
+		break;
+	}
 }
 
 void UGA_Skill::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
@@ -99,6 +149,76 @@ const FGameplayTagContainer* UGA_Skill::GetCooldownTags() const
 FVector UGA_Skill::GetMouseCursorLocation()
 {
 	return FVector();
+}
+
+void UGA_Skill::ExecuteSkillLogic_Implementation(float ChargeAmount)
+{
+}
+
+
+
+void UGA_Skill::OnReleaseInput(float TimeHeld)
+{
+	// A. 차징 모드일 때
+	if (InputStyle == ESkillInputStyle::Charging)
+	{
+		// 얼마나 모았는지 계산
+		float ChargeDuration = GetWorld()->GetTimeSeconds() - ChargeStartTime;
+
+		// 최소 시간도 안 채웠으면 취소 (혹은 약하게 발사)
+		if (ChargeDuration < MinChargeTime)
+		{
+			CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
+			return;
+		}
+
+		// 0.0 ~ 1.0 사이로 정규화 (Clamp)
+		float ChargeAlpha = FMath::Clamp((ChargeDuration - MinChargeTime) / (MaxChargeTime - MinChargeTime), 0.0f, 1.0f);
+
+		// 자식에게 전달! (이제 자식은 이 Alpha값으로 대미지나 투사체 크기를 조절)
+		ExecuteSkillLogic(ChargeAlpha);
+
+		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+	}
+	// B. 연사 모드일 때
+	else if (InputStyle == ESkillInputStyle::Continuous)
+	{
+		// 타이머 끄고 종료
+		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+	}
+}
+
+void UGA_Skill::LoopLogic()
+{
+	// 매 발사마다 코스트 지불 시도
+	if (CommitAbilityCost(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo))
+	{
+		ExecuteSkillLogic(1.0f);
+	}
+	else
+	{
+		// 마나 없으면 사격 중지 (선택 사항)
+		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+	}
+}
+
+void UGA_Skill::BurstLogic()
+{
+	// 1. 발사
+	ExecuteSkillLogic(1.0f);
+	CurrentBurstShots++;
+
+	// 2. 횟수 체크
+	if (CurrentBurstShots < BurstCount)
+	{
+		// 다음 발사 예약
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Loop, this, &UGA_Skill::BurstLogic, FireRate, false);
+	}
+	else
+	{
+		// 다 쐈으면 종료
+		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+	}
 }
 
 
