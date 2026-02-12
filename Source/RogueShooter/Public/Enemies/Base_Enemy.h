@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "Character/RsBaseCharacter.h"
 #include "GameFramework/Character.h"
 #include "Interface/Interface_CharacterManager.h"
 #include "RogueShooter/FlowControlLIbrary.h"
@@ -23,7 +24,7 @@ class ABase_Character;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeath);
 
 UCLASS()
-class ROGUESHOOTER_API ABase_Enemy : public ACharacter, public IInterface_CharacterManager, public IAbilitySystemInterface
+class ROGUESHOOTER_API ABase_Enemy : public ARsBaseCharacter
 {
 	GENERATED_BODY()
 
@@ -69,34 +70,27 @@ public:
 	UFUNCTION()
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	
-	// Interface
-	virtual void CharDie_Implementation(AActor* Causer) override;
 	
 	UFUNCTION(NetMulticast,Unreliable)
 	void MC_Enemy_Death();
 	
-	void SendDeathEvent(AActor* Killer);
+	
+	virtual void Die(AActor* DamageCauser) override;
+	
+	void ApplyXpToTargetPlayer(AActor* TargetPlayer);
 	
 	void SetTimerWithDelay(float Time, bool bLoop);
 
 	UFUNCTION()
 	void ResetDoOnce(); 
 
-	// Floating Combat Text
-	
-	UFUNCTION()
-	void SpawnFloatingText(float InDamage);
-
 	// Spawn XP bubble
 
-	UFUNCTION()
-	void SpawnSoul();
 
 	void ShowEliteAura();
 
-	void ScaleHP();
 
-
+	// 왜 필요?
 	// Interface
 	virtual bool IsAlive_Implementation() override;
 
@@ -118,11 +112,6 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup")
 	TObjectPtr<UAnimMontage> AttackAnimation;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup", meta = (ExposeOnSpawn = "true"))
-	float Damage = 10.0f;
-
-	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup", meta = (ExposeOnSpawn = "true"))
-	float Health = 15.0f;
 
 	// 초기값 설정 필요
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup")
@@ -142,10 +131,11 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup", meta = (ExposeOnSpawn = "true"))
 	TObjectPtr<UObject> GM_Interface;
-
+	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup", meta = (ExposeOnSpawn = "true"))
 	int32 CharLevel = 1;
 
+	// TODO : GAS로 관리하므로 공격 관련 변수와 로직 삭제
 	// Attack Logic
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup")
 	TObjectPtr<AActor> PlayerToDamage;
@@ -161,7 +151,8 @@ public:
 	FTimerDelegate RetriggerDelegate;
 	
 	FDoOnce DoOnce;
-
+	// 여기까지 삭제 
+	
 	FAudioDeviceHandle EnemySoundHandle;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy")
@@ -171,20 +162,7 @@ public:
 	TObjectPtr<USoundBase> ImpactSound;
 	
 	FDoOnce TakeDamageDoOnce;
-
-
-	UPROPERTY()
-	TSubclassOf<AFloatingTextActor> FTActorClass;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
-
-	UPROPERTY()
-	TObjectPtr<UHealthSet> HealthAttributes;
-	
-	UPROPERTY()
-	TObjectPtr<UCombatSet> CombatAttributes;
-
 	
 	void AddCharacterAbilities();
 	
@@ -194,7 +172,11 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category =  "GAS | Config")
 	TArray<TSubclassOf<UGameplayAbility>> DefaultAbilities;
 	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category =  "GAS | Config")
+	TSubclassOf<UGameplayEffect> DropExpClass;
+	
 	// Delegate
+	// GameManager에서만 관리중이므로 일단 두고 나중에 GameManager 정리할 때 치우자 
 public:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Base Enemy|Delegate")
 	FOnDeath OnDeath;

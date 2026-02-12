@@ -378,9 +378,6 @@ void UMyGameManager::SpawnEnemy(UEnvQueryInstanceBlueprintWrapper* Instance, EEn
 	{
 		Enemy->PlayerArray = PlayerCharacterArray;
 
-		Enemy->Damage = EnemySpawnType.Damage;
-
-		Enemy->Health = EnemySpawnType.Health;
 
 		Enemy->SoulClass = EnemySpawnType.Soul;
 
@@ -548,10 +545,6 @@ void UMyGameManager::SpawnElite(UEnvQueryInstanceBlueprintWrapper* Instance, EEn
 	if(ABase_Elite* Elite = GetWorld()->SpawnActorDeferred<ABase_Elite>(EliteSpawnType.Enemy,Transform))
 	{
 		Elite->PlayerArray = PlayerCharacterArray;
-
-		Elite->Damage = EliteSpawnType.Damage;
-
-		Elite->Health = EliteSpawnType.Health;
 
 		Elite->SoulClass = EliteSpawnType.Soul;
 

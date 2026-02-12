@@ -31,7 +31,7 @@ void ALobby_Character::BeginPlay()
 
 	DisableInput(LPC);
 
-	LoadLastCharacterClass();
+	// LoadLastCharacterClass();
 
 }
 
@@ -51,7 +51,8 @@ void ALobby_Character::UpdateClassName_Implementation()
 {
 	// Super::UpdateClassName_Implementation();
 
-	S_SetName(Character.CharacterName.ToString());
+	// TODO : 임시 주석 
+	//S_SetName(Character.CharacterName.ToString());
 }
 
 void ALobby_Character::MC_SetName_Implementation(const FString& Name)

@@ -28,33 +28,18 @@ class ROGUESHOOTER_API IInterface_CharacterManager
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
 	bool IsAlive();
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
-	void RestoreHealth(float amount);
-
-	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
-	// USphereComponent* GetAbilitySphere();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
 	ABase_Character* GetCharacter();
-	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
-	void AdjustPassive(EPassiveAbilities Stat, float MultiplicationAmount);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
 	void Pause(bool Pause, bool Override);
-
-	// UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
-	// UAbilitiesComponent* GetAbilityComponent();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
 	void UpdateClassName();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
 	void UpdateCharacterClass(FAvailableCharacter Character);
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="RS|Interface|Character Manager")
-	void SetupHealthWidget();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable,Category = "RS|Interface|Character Manager")
 	void CharDie(AActor* Causer);

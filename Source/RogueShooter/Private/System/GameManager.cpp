@@ -392,10 +392,6 @@ void AGameManager::SpawnEnemy(UEnvQueryInstanceBlueprintWrapper* Instance, EEnvQ
 	{
 		Enemy->PlayerArray = PlayerCharacterArray;
 
-		Enemy->Damage = EnemySpawnType.Damage;
-
-		Enemy->Health = EnemySpawnType.Health;
-
 		Enemy->SoulClass = EnemySpawnType.Soul;
 
 		Enemy->bIsElite = EnemySpawnType.IsElite;
@@ -502,14 +498,6 @@ void AGameManager::ProcessEndGame()
 	{
 		if(Character->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
 		{
-			// TODO : 삭제
-			
-			UAbilitiesComponent* AbilitiesComponent = nullptr;//IInterface_CharacterManager::Execute_GetAbilityComponent(Character);
-
-			// TODO : 삭제
-			
-			// AbilitiesComponent->InvalidateTimers();
-
 			Character->GetController()->SetIgnoreMoveInput(true);
 
 			APlayerState* PS = Character->GetController()->PlayerState;
@@ -565,10 +553,6 @@ void AGameManager::SpawnElite(UEnvQueryInstanceBlueprintWrapper* Instance, EEnvQ
 	if(ABase_Elite* Elite = GetWorld()->SpawnActorDeferred<ABase_Elite>(EliteSpawnType.Enemy,Transform))
 	{
 		Elite->PlayerArray = PlayerCharacterArray;
-
-		Elite->Damage = EliteSpawnType.Damage;
-
-		Elite->Health = EliteSpawnType.Health;
 
 		Elite->SoulClass = EliteSpawnType.Soul;
 

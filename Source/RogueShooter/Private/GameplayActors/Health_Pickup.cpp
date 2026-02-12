@@ -6,6 +6,7 @@
 #include "Interface/Interface_CharacterManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "RogueShooter/AssetPath.h"
+#include "Particles/ParticleSystem.h"
 #include "Utility/RSLog.h"
 
 
@@ -47,7 +48,7 @@ void AHealth_Pickup::DoPickupAction(AActor* Character)
 
 	if(Character->GetClass()->ImplementsInterface(UInterface_CharacterManager::StaticClass()))
 	{
-		IInterface_CharacterManager::Execute_RestoreHealth(Character,HealthAmount);
+		// IInterface_CharacterManager::Execute_RestoreHealth(Character,HealthAmount);
 	}
 	else
 	{

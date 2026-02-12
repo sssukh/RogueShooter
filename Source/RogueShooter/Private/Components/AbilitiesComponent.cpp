@@ -675,25 +675,25 @@ void UAbilitiesComponent::LevelUpMaxHealth(bool PowerUp)
 	
 	if(!PowerUp)
 	{
-		switch (LevelUpPassive(EPassiveAbilities::Health_Bonus))
-		{
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-			IInterface_CharacterManager::Execute_AdjustPassive(GetOwner(),EPassiveAbilities::Health_Bonus,1.1f);
-			break;
-		case 5:
-			IInterface_CharacterManager::Execute_AdjustPassive(GetOwner(),EPassiveAbilities::Health_Bonus,1.1f);
-			EvolutionPassiveArray.AddUnique(EPassiveAbilities::Health_Bonus);
-			break;
-		default:
-			break;
-		}
+		// switch (LevelUpPassive(EPassiveAbilities::Health_Bonus))
+		// {
+		// case 1:
+		// case 2:
+		// case 3:
+		// case 4:
+		// 	IInterface_CharacterManager::Execute_AdjustPassive(GetOwner(),EPassiveAbilities::Health_Bonus,1.1f);
+		// 	break;
+		// case 5:
+		// 	IInterface_CharacterManager::Execute_AdjustPassive(GetOwner(),EPassiveAbilities::Health_Bonus,1.1f);
+		// 	EvolutionPassiveArray.AddUnique(EPassiveAbilities::Health_Bonus);
+		// 	break;
+		// default:
+		// 	break;
+		// }
 	}
 	else
 	{
-		IInterface_CharacterManager::Execute_AdjustPassive(GetOwner(),EPassiveAbilities::Health_Bonus,1.1f);
+		// IInterface_CharacterManager::Execute_AdjustPassive(GetOwner(),EPassiveAbilities::Health_Bonus,1.1f);
 	}
 }
 
@@ -768,25 +768,25 @@ void UAbilitiesComponent::LevelUpSpeedBonus(bool PowerUp)
 	}
 	if(!PowerUp)
 	{
-		switch (LevelUpPassive(EPassiveAbilities::Speed_Bonus))
-		{
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-			IInterface_CharacterManager::Execute_AdjustPassive(GetOwner(),EPassiveAbilities::Speed_Bonus,1.1f);
-			break;
-		case 5:
-			IInterface_CharacterManager::Execute_AdjustPassive(GetOwner(),EPassiveAbilities::Speed_Bonus,1.1f);
-			EvolutionPassiveArray.AddUnique(EPassiveAbilities::Speed_Bonus);
-			break;
-		default:
-			break;
-		}
+		// switch (LevelUpPassive(EPassiveAbilities::Speed_Bonus))
+		// {
+		// case 1:
+		// case 2:
+		// case 3:
+		// case 4:
+		// 	IInterface_CharacterManager::Execute_AdjustPassive(GetOwner(),EPassiveAbilities::Speed_Bonus,1.1f);
+		// 	break;
+		// case 5:
+		// 	IInterface_CharacterManager::Execute_AdjustPassive(GetOwner(),EPassiveAbilities::Speed_Bonus,1.1f);
+		// 	EvolutionPassiveArray.AddUnique(EPassiveAbilities::Speed_Bonus);
+		// 	break;
+		// default:
+		// 	break;
+		// }
 	}
 	else
 	{
-		IInterface_CharacterManager::Execute_AdjustPassive(GetOwner(),EPassiveAbilities::Speed_Bonus,1.1f);
+		// IInterface_CharacterManager::Execute_AdjustPassive(GetOwner(),EPassiveAbilities::Speed_Bonus,1.1f);
 	}
 }
 

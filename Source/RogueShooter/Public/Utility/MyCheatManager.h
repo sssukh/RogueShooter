@@ -6,7 +6,6 @@
 #include "GameFramework/CheatManager.h"
 #include "MyCheatManager.generated.h"
 
-class AGameManager;
 /**
  * 
  */

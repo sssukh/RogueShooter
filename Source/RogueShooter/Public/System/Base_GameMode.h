@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EnvironmentQuery/EnvQueryTypes.h"
 #include "GameFramework/GameModeBase.h"
 #include "Base_GameMode.generated.h"
 
+class ABase_Enemy;
 /**
  * 
  */
@@ -16,6 +18,36 @@ class ROGUESHOOTER_API ABase_GameMode : public AGameModeBase
 public:
 	ABase_GameMode();
 
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+	
+	// 초기화
+	void GameSetup();
+	void SpawnSetup();
+    void BuildPlayerArray();
+	
+	// 스폰 관련
+	void SpawnWave();
+	void FindSpawnLocation();
+    
+	UFUNCTION() // EQS 델리게이트용
+	void SpawnEnemy(class UEnvQueryInstanceBlueprintWrapper* Instance, EEnvQueryStatus::Type Status);
+    
+	UFUNCTION()
+	void SpawnElite(class UEnvQueryInstanceBlueprintWrapper* Instance, EEnvQueryStatus::Type Status);
+	
+	
+	// 게임 종료 및 상태 관리
+	void EndGame(bool Victory);
+	void DetermineGameStatus();
+	void OnPlayerDeath(); // 기존 OnPlayerDeath_Implementation 대체
+	void ProcessEndGame();
+	
+	UFUNCTION()
+	void IncreaseEnemyKill();
+	
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	
 	// Reset int tracking number of players who try to resume
 	// 재개하려는 플레이어의 수를 초기화한다.(pause count)
 	virtual void ResetPauseCount();
@@ -37,9 +69,47 @@ public:
 	virtual void ServerTravel_GamePlay(FName Map);
 
 public:
+	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UDataTable> EnemySpawnDT;
+    
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UDataTable> EnemyEliteSpawnDT;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UEnvQuery> EQS_FindSpawnPoint;
+
+	// 타이머 핸들
+	FTimerHandle SpawnTimerReference;
+	FTimerHandle PhaseIndexTimer;
+	FTimerHandle ClockReference;
+
+	// 내부 계산용 변수
+	int32 Time = 0;
+	int32 Minutes = 0;
+	int32 CurrentEnemyCount = 0;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Pause")
 	bool GameIsPaused = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Pause")
 	int32 PauseCount = 0;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
+	TSubclassOf<ABase_Enemy> EnemyClass;
+	
+	
+private:
+	void UpdateTimer();
+	void IncreaseWaveIndex();
+    
+	// 플레이어 캐싱 (GameMode는 PlayerArray를 GameState에서 접근 가능하지만 편의상 캐싱 가능)
+	UPROPERTY()
+	TArray<class ABase_Character*> CachedPlayerCharacterArray;
+	
+	UPROPERTY()
+	TArray<class AGameplay_PlayerController*> PlayerControllerArray;
+	
+	UPROPERTY()
+	int32 EnemiesKilled;
 };

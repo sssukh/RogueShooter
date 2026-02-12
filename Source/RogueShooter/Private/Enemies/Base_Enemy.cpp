@@ -28,6 +28,8 @@
 #include "GameplayAbilitiesModule.h"
 #include "AbilitySystemGlobals.h"
 #include "Data/ExpSet.h"
+#include "GameFramework/PlayerState.h"
+#include "UObject/FastReferenceCollector.h"
 
 
 // Sets default values
@@ -133,11 +135,7 @@ ABase_Enemy::ABase_Enemy()
 		SoulClass = SoulClassFinder.Class;
 	}
 
-	static ConstructorHelpers::FClassFinder<AFloatingTextActor> FTActorClassFinder(*AssetPath::Blueprint::BP_FloatingTextActor_C);
-	if(FTActorClassFinder.Succeeded())
-	{
-		FTActorClass = FTActorClassFinder.Class;
-	}
+	
 
 	static ConstructorHelpers::FClassFinder<ABase_AIController> AIControllerFinder(*AssetPath::Blueprint::BP_Base_AIController_C);
 	if(AIControllerFinder.Succeeded())
@@ -147,14 +145,11 @@ ABase_Enemy::ABase_Enemy()
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	
-	ScaleHP();
 	
 	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
-	HealthAttributes = CreateDefaultSubobject<UHealthSet>(TEXT("HeathAttributes"));
-	CombatAttributes = CreateDefaultSubobject<UCombatSet>(TEXT("CombatAttributes"));
+	HealthSet = CreateDefaultSubobject<UHealthSet>(TEXT("HeathAttributes"));
+	CombatSet = CreateDefaultSubobject<UCombatSet>(TEXT("CombatAttributes"));
 	
-	AbilitySystemComponent->AddAttributeSetSubobject<UHealthSet>(HealthAttributes);
-	AbilitySystemComponent->AddAttributeSetSubobject<UCombatSet>(CombatAttributes);
 	
 	AbilitySystemComponent->SetIsReplicated(true);
 	// 예측없이 서버가 시키는 대로
@@ -254,7 +249,6 @@ void ABase_Enemy::DamagePlayer()
 	TSubclassOf<UDamageType> const ValidDamageTypeClass = TSubclassOf<UDamageType>(UDamageType::StaticClass());
 	FDamageEvent DamageEvent(ValidDamageTypeClass);
 
-	PlayerToDamage->TakeDamage(Damage, DamageEvent, nullptr, this);
 
 	// TODO : GA를 이용한 attack
 	DamageWithGameplayTag();
@@ -322,65 +316,18 @@ void ABase_Enemy::MC_ShowAura_Implementation()
 float ABase_Enemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
                               class AController* EventInstigator, AActor* DamageCauser)
 {
-	SpawnFloatingText(DamageAmount);
 
 	MC_OnHit();
 
 	// 피격당한 상황을 보이게한다.
 	GetCharacterMovement()->StopMovementKeepPathing();
 
-	Health = Health - DamageAmount;
 
-	// if(Health<=0)
-	// {
-	// 	// Event.Kill 전송
-	// 	SendDeathEvent(DamageCauser);
-	// 	// Interface TODO : 지금은 코드로 하지만 GAS로 하게되면 거기로 옮겨야됨 
-	// 	CharDie();
-	// }
+	
 	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
-
-void ABase_Enemy::CharDie_Implementation(AActor* Causer)
-{
-	if(HasAuthority())
-	{
-		if (!Causer)
-			return;
-		if(TakeDamageDoOnce.Execute())
-		{
-			// Event.Combat.Kill 전송
-			SendDeathEvent(Causer);
-			
-			bIsDead =  true;
-
-			if(OnDeath.IsBound())
-				OnDeath.Broadcast();
-			
-			
-			SpawnSoul();
-
-			GetCharacterMovement()->StopMovementImmediately();
-
-			ABase_AIController* AIController = Cast<ABase_AIController>(GetController());
-
-			if(AIController)
-			{
-				// RS_LOG_SCREEN(TEXT("%s is Dead on Server"),*GetName())
-				
-				AIController->StopMovement();
-
-				AIController->EndAI();
-			}
-
-			MC_Enemy_Death();
-
-			DetachFromControllerPendingDestroy();
-		}
-	}
-}
 
 void ABase_Enemy::MC_Enemy_Death_Implementation()
 {
@@ -418,33 +365,63 @@ void ABase_Enemy::MC_Enemy_Death_Implementation()
 		}),
 		1.5f,
 		false);
+}
 
+
+
+
+void ABase_Enemy::Die(AActor* DamageCauser)
+{
+	if (!DamageCauser)
+		return;
+	
+	ApplyXpToTargetPlayer(DamageCauser);
+	
+	
+	GetCharacterMovement()->StopMovementImmediately();
+
+	ABase_AIController* AIController = Cast<ABase_AIController>(GetController());
+
+	if(AIController)
+	{
+		AIController->StopMovement();
+
+		AIController->EndAI();
+	}
+
+	MC_Enemy_Death();
+
+	DetachFromControllerPendingDestroy();
+}
+
+void ABase_Enemy::ApplyXpToTargetPlayer(AActor* TargetPlayer)
+{
+	
+	// 죽인 유저의 ASC
+	UAbilitySystemComponent* TargetASC  = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetPlayer);
+	
+	if (!TargetASC)
+		return;
+	
+	FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+	ContextHandle.AddSourceObject(this);
+	
+	FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(DropExpClass,CharLevel,ContextHandle);
+	
+	
+	if (SpecHandle.IsValid())
+	{
+		GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data,TargetASC);
+	}
+	
+	// 전송 주기 무시하고 전송 
+	if (APlayerState* PS = Cast<APlayerState>(TargetASC->GetOwner()))
+	{
+		PS->ForceNetUpdate();
+	}
 	
 }
 
-
-void ABase_Enemy::SendDeathEvent(AActor* Killer)
-{
-	IAbilitySystemInterface* ASCInterface = Cast<IAbilitySystemInterface>(Killer);
-	if (ASCInterface)
-	{
-		UAbilitySystemComponent* KillerASC = ASCInterface->GetAbilitySystemComponent();
-		if (KillerASC)
-		{
-			RS_LOG_ERROR(TEXT("Event Death Occur"))
-			
-			// 이벤트 데이터 포장
-			FGameplayEventData Payload;
-			Payload.EventTag = FRsGameplayTags::Get().Event_Death;
-			Payload.Instigator = this;
-			Payload.Target = this;
-
-			// [핵심] 킬러에게 이벤트를 쏘다!
-			// Killer가 "Event.Kill"을 기다리는 GA(WaitGameplayEvent)를 켜놓고 있다면 반응함.
-			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Killer, Payload.EventTag, Payload);
-		}
-	}
-}
 
 void ABase_Enemy::SetTimerWithDelay(float Time, bool bLoop)
 {
@@ -457,40 +434,6 @@ void ABase_Enemy::ResetDoOnce()
 	DoOnce.Reset();
 }
 
-void ABase_Enemy::SpawnFloatingText(float InDamage)
-{
-	// FVector SpawnLocation = GetActorLocation();
-	// SpawnLocation.X+=FMath::RandRange(-10.0f,10.0f);
-	// SpawnLocation.Y+=FMath::RandRange(-10.0f,10.0f);
-	// SpawnLocation.Z+=FMath::RandRange(-10.0f,10.0f);
-	//
-	// if(AFloatingTextActor* FloatingTextActor = GetWorld()->SpawnActorDeferred<AFloatingTextActor>(FTActorClass,FTransform(SpawnLocation)))
-	// {
-	// 	FloatingTextActor->Damage = InDamage;
-	// 	FloatingTextActor->FinishSpawning(FTransform(SpawnLocation));
-	// }
-}
-
-void ABase_Enemy::SpawnSoul()
-{
-	if(ASoul* SoulSpawn = GetWorld()->SpawnActorDeferred<ASoul>(SoulClass,FTransform(GetActorLocation())))
-	{
-		SoulSpawn->GM_Interface = this->GM_Interface;
-		SoulSpawn->FinishSpawning(FTransform(GetActorLocation()));
-	}
-
-	if(bIsElite)
-	{
-		FVector SpawnLocation = GetActorLocation();
-		SpawnLocation.Z -=100.0f;
-		FActorSpawnParameters ActorSpawnParameters;
-		ActorSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-		FRotator Rotator = FRotator();
-		GetWorld()->SpawnActor(ABase_Chest::StaticClass(),&SpawnLocation,&Rotator,ActorSpawnParameters);
-	}
-}
-
 void ABase_Enemy::ShowEliteAura()
 {
 	if(bIsElite)
@@ -499,13 +442,7 @@ void ABase_Enemy::ShowEliteAura()
 	}
 }
 
-void ABase_Enemy::ScaleHP()
-{
-	if(ScaleHPToLevel)
-	{
-		Health = Health * CharLevel;
-	}
-}
+
 
 bool ABase_Enemy::IsAlive_Implementation()
 {

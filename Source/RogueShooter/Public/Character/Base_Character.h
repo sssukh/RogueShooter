@@ -10,6 +10,7 @@
 #include "AbilitySystemInterface.h"
 #include "GameplayTagContainer.h"
 #include "InputActionValue.h"
+#include "RsBaseCharacter.h"
 #include "Base_Character.generated.h"
 
 class UUnitWidgetController;
@@ -46,7 +47,7 @@ public:
 };
 
 UCLASS()
-class ROGUESHOOTER_API ABase_Character : public ACharacter, public IInterface_CharacterManager, public IAbilitySystemInterface
+class ROGUESHOOTER_API ABase_Character : public ARsBaseCharacter
 {
 	GENERATED_BODY()
 
@@ -78,8 +79,8 @@ public:
 	
 protected:
 	// 1. GAS 엔진
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
+	// TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
 	
 	// 부여할 어빌리티 목록
@@ -98,7 +99,7 @@ protected:
 	
 	
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Attribute")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Config | Attribute")
 	FCurveTableRowHandle MaxXpCurve;
 	
 
@@ -135,8 +136,6 @@ public:
 	* Call Server to Update character specific stats
 	* 서버를 호출해서 캐릭터 스탯을 업데이트한다.
 	*/
-	UFUNCTION()
-	virtual void AdjustPassive_Implementation(EPassiveAbilities Stat, float MultiplicationAmount) override;
 
 	virtual bool IsAlive_Implementation() override;
 	
@@ -168,9 +167,6 @@ public:
 	//*****************************************
 	// Health/Damage
 	//*****************************************
-	
-	UFUNCTION()
-	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	UFUNCTION(Client,Unreliable)
 	void Death();
@@ -179,8 +175,7 @@ public:
 	void MC_Death();
 
 	
-	// Interface
-	virtual void CharDie_Implementation(AActor* Causer) override;
+	virtual void Die(AActor* DamageCauser) override;
 
 	
 

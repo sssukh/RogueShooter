@@ -16,7 +16,6 @@
 #include "GameFramework/PlayerState.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameplayActors/FloatingTextActor.h"
-#include "Interface/Interface_GameManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Library/FunctionLibrary_Helper.h"
 #include "Net/UnrealNetwork.h"
@@ -230,7 +229,6 @@ void ABase_Character::PossessedBy(AController* NewController)
 		// 이걸 그냥 ge를 생성해서 따로 적용하자
 		// InitAttributeDefaults_ServerOnly();
 		OnLevelup(StartLevel);
-		
 	}
 	
 }
@@ -261,6 +259,7 @@ float ABase_Character::GetMaxXpForLevel(float pLevel) const
 	if (MaxXpCurve.CurveTable)
 	{
 		ResultXp = MaxXpCurve.CurveTable->FindCurve(MaxXpCurve.RowName,TEXT(""))->Eval(pLevel);
+		RS_LOG_SCREEN(TEXT("max : %f"), ResultXp)
 	}
 	
 	return ResultXp;
@@ -372,17 +371,15 @@ void ABase_Character::LoadLastCharacterClass()
 
 
 
-float ABase_Character::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
-                                  class AController* EventInstigator, AActor* DamageCauser)
-{
-	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-}
+
 
 
 	// TODO : GAS로 옮겨진거 체크 후 삭제 
 
-void ABase_Character::CharDie_Implementation(AActor* Causer)
+void ABase_Character::Die(AActor* DamageCauser)
 {
+	Super::Die(DamageCauser);
+	
 	if(DeathDoOnce.Execute())
 	{
 		IsDead = true;
@@ -391,17 +388,14 @@ void ABase_Character::CharDie_Implementation(AActor* Causer)
 
 		MC_Death();
 
-		if(!GM_Interface.GetClass()->ImplementsInterface(UInterface_GameManager::StaticClass()))
+		if (ABase_GameMode* GM = Cast<ABase_GameMode>(UGameplayStatics::GetGameMode(GetWorld())))
 		{
-			RS_LOG_ERROR(TEXT("GM_Interface 변수가 IInterface_GameManager를 상속받지 않았습니다."))
-		}
-		else
-		{
-			IInterface_GameManager::Execute_OnPlayerDeath(GM_Interface);
-				
+			GM->DetermineGameStatus();
 		}
 	}
 }
+
+
 
 
 
@@ -517,9 +511,6 @@ void ABase_Character::Pause_Implementation(bool Pause, bool Override)
 	OC_Pause(Pause,Override);
 }
 
-void ABase_Character::AdjustPassive_Implementation(EPassiveAbilities Stat, float MultiplicationAmount)
-{
-}
 
 bool ABase_Character::IsAlive_Implementation()
 {

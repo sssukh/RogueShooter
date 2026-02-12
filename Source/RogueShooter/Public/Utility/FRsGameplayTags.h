@@ -43,10 +43,12 @@ public:
 	FGameplayTag Ability_Skill;
 	FGameplayTag Ability_Skill_Dash;
 	FGameplayTag Ability_Skill_Strike;
+	FGameplayTag Ability_Skill_GunFire;
 	
 	FGameplayTag Event_Death;
 	FGameplayTag Event_Equip;
 	FGameplayTag Event_Hit;
+	FGameplayTag Event_LevelUp;
 	
 	FGameplayTag GC_Combat_Damage;
 	FGameplayTag GC_Combat_Damage_Shield;

@@ -38,10 +38,12 @@ void FRsGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	Ability_Skill = Manager.AddNativeGameplayTag(FName("Ability.Skill"),TEXT("스킬 태그"));
 	Ability_Skill_Dash = Manager.AddNativeGameplayTag(FName("Ability.Skill.Dash"),TEXT("스킬 대쉬 태그"));
 	Ability_Skill_Strike = Manager.AddNativeGameplayTag(FName("Ability.Skill.Strike"),TEXT("스킬 폭격 태그"));
+	Ability_Skill_GunFire = Manager.AddNativeGameplayTag(FName("Ability.Skill.GunFire"),TEXT("스킬 총격"));
 	
 	Event_Death = Manager.AddNativeGameplayTag(FName("Event.Death"),TEXT("죽음"));
 	Event_Equip = Manager.AddNativeGameplayTag(FName("Event.Equip"),TEXT("아이템 착용"));
 	Event_Hit = Manager.AddNativeGameplayTag(FName("Event.Hit"),TEXT("피격"));
+	Event_LevelUp = Manager.AddNativeGameplayTag(FName("Event.LevelUp"),TEXT("레벨업"));
 	
 	GC_Combat_Damage = Manager.AddNativeGameplayTag(FName("GameplayCue.Combat.Damage"),TEXT("데미지"));
 	GC_Combat_Damage_Health = Manager.AddNativeGameplayTag(FName("GameplayCue.Combat.Damage.Health"),TEXT("체력에 데미지"));

@@ -9,7 +9,7 @@
 class UTextRenderComponent;
 
 UCLASS()
-class ROGUESHOOTER_API ALobby_Character : public ABase_Character
+class ROGUESHOOTER_API ALobby_Character : public ARsBaseCharacter
 {
 	GENERATED_BODY()
 

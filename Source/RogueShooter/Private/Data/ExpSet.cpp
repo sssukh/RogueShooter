@@ -3,9 +3,11 @@
 
 #include "Data/ExpSet.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "GameplayEffectExtension.h"
 #include "Character/Base_Character.h"
 #include "Net/UnrealNetwork.h"
+#include "Utility/FRsGameplayTags.h"
 #include "Utility/RSLog.h"
 
 UExpSet::UExpSet()
@@ -27,7 +29,7 @@ void UExpSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& New
 	if (Attribute == GetExpLevelAttribute())
 	{
 		NewValue = FMath::Clamp<float>(NewValue,0.0f,GetMaxExpLevel());
-		NewValue = FMath::TruncToFloat(NewValue);
+		// NewValue = FMath::TruncToFloat(NewValue);
 	}
 	else if (Attribute == GetMaxExpGainedAttribute())
 	{
@@ -47,7 +49,7 @@ void UExpSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackD
 		
 		float CurrentXp = GetExpGained();
 		
-		const float CurrentLevel = GetExpLevel();
+		float CurrentLevel = GetExpLevel();
         
 		float LocalIncomingXp = GetIncomingExp();
 		
@@ -55,32 +57,43 @@ void UExpSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackD
 		
 		// 커브에서 값 평가 (Evaluate)
 		float NextMaxXp = 100.0f; // 기본값
-		if (ABase_Character* Char = Cast<ABase_Character>(GetOwningActor()))
+		ABase_Character* Char = Cast<ABase_Character>(Data.Target.GetAvatarActor());
+		if (Char)
 		{
 			// ContextString은 디버깅용 빈 문자열
 			// 캐릭터에 있는 커브 테이블에서 값 가져오기 
 			NextMaxXp = Char->GetMaxXpForLevel(CurrentLevel);
 		}
-		
-		// RS_LOG_SCREEN(TEXT("Incoming : %f, Current : %f, Max : %f, Level : %f"),LocalIncomingXp,CurrentXp,NextMaxXp,CurrentLevel)
-		
-		if (LocalIncomingXp + CurrentXp >= NextMaxXp)
-		{
-			const float remainXp = CurrentXp + LocalIncomingXp - NextMaxXp;
-			
-			SetExpLevel(CurrentLevel + 1.0f);
-			
-			SetExpGained(remainXp);
-			
-			// SetMaxExpGained(NextMaxXp);
-			
-			
-		}
 		else
 		{
-			SetExpGained(LocalIncomingXp + CurrentXp);
-			
+			RS_LOG_ERROR(TEXT("Character의 클래스가 Base_Character가 아닙니다."))
+			return;
 		}
+		
+		// 갑자기 큰 경험치가 들어와서 레벨업이 여러번 일어남을 방지 
+		float RemainXp = CurrentXp + LocalIncomingXp;
+		while (RemainXp >= NextMaxXp)
+		{
+			RemainXp -= NextMaxXp;
+			
+			CurrentLevel+=1.0f;
+			
+			SetExpLevel(CurrentLevel);
+			
+			SetExpGained(RemainXp);
+			
+			FGameplayEventData Payload;
+			Payload.EventTag = FRsGameplayTags::Get().Event_LevelUp;
+			Payload.EventMagnitude = CurrentLevel; // 필요하면 현재 레벨을 담음
+        
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Data.Target.GetAvatarActor(), Payload.EventTag, Payload);
+			
+			NextMaxXp = Char->GetMaxXpForLevel(GetExpLevel());
+		}
+		
+		SetExpGained(RemainXp);
+			
+		
 		// RS_LOG_SCREEN(TEXT("ExpGained : %f, ExpMax : %f "),GetExpGained(),GetMaxExpGained())
 	}
 }
