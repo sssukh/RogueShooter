@@ -18,7 +18,14 @@ class ROGUESHOOTER_API UGA_GunFire : public UGA_Skill
 public:
 	UGA_GunFire();
 	
+	void ApplyDamage(AActor* TargetActor);
+	
+	void TriggerFireGameplayCue(FVector MuzzleLoc, FVector TargetLoc, const FHitResult& HitResult);
+	
 	virtual void ExecuteSkillLogic_Implementation(float ChargeAmount) override;
+	
+	UFUNCTION(BlueprintCallable,Category = "Weapon")
+	void FireHitScan(FName SocketName);
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category ="GAS | Config")
 	TSubclassOf<UGameplayEffect> DamageEffectClass;

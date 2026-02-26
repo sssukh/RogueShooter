@@ -49,10 +49,15 @@ public:
 	FGameplayTag Event_Equip;
 	FGameplayTag Event_Hit;
 	FGameplayTag Event_LevelUp;
+	FGameplayTag Event_Montage_Fire;
 	
 	FGameplayTag GC_Combat_Damage;
 	FGameplayTag GC_Combat_Damage_Shield;
 	FGameplayTag GC_Combat_Damage_Health;
+	FGameplayTag GC_Weapon_Fire;
+	
+	FGameplayTag Socket_Muzzle_L;
+	FGameplayTag Socket_Muzzle_R;
 	
 	
 protected:

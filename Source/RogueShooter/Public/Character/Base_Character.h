@@ -113,19 +113,10 @@ public:
 
 	
 
-	UFUNCTION(Server,Reliable)
-	void S_SetCharacterMesh(USkeletalMesh* SK);
-
-	UFUNCTION(Server,Unreliable)
-	void S_SetCharacterData(FAvailableCharacter CharacterData);
 
 	//*****************************************
 	// Interface_CharacterManager
 	//*****************************************
-
-	
-	UFUNCTION()
-	virtual void UpdateCharacterClass_Implementation(FAvailableCharacter Character) override;
 
 	
 	
@@ -240,8 +231,8 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<USpringArmComponent> SpringArm;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	TObjectPtr<UWidgetComponent> HealthWidgetComponent;
+	// UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	// TObjectPtr<UWidgetComponent> HealthWidgetComponent;
 
 	// Input
 protected:
@@ -294,8 +285,6 @@ public:
 	UPROPERTY(ReplicatedUsing="OnRep_Character",VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
 	FAvailableCharacter Character;
 
-	UPROPERTY(ReplicatedUsing="OnRep_CharSK",VisibleAnywhere,BlueprintReadOnly,Category="Character Setup")
-	TObjectPtr<USkeletalMesh> CharSK;
 
 
 	
@@ -306,13 +295,12 @@ public:
 	//
 	FDoOnce DeathDoOnce;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Config")
 	TObjectPtr<UAnimMontage> DeathAnimMontage;
 
-	UPROPERTY()
-	TObjectPtr<UAnimInstance> CharacterAnimInstance;
+	// UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Config")
+	// TObjectPtr<UAnimInstance> CharacterAnimInstance;
 
-	// TSubclassOf<UUW_HUDHealthBar> HealthBarClass;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UInventoryComponent> InventoryComponent;

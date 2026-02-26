@@ -51,11 +51,7 @@ ABase_Character::ABase_Character()
 	
 	DeathDoOnce.Reset();
 
-	ConstructorHelpers::FObjectFinder<UAnimMontage> DeathAMFinder(*AssetPath::Montage::PlayerDeath);
-	if(DeathAMFinder.Succeeded())
-	{
-		DeathAnimMontage = DeathAMFinder.Object;
-	}
+
 
 	SetRootComponent(GetCapsuleComponent());
 	GetCapsuleComponent()->SetCapsuleHalfHeight(88.0f);
@@ -71,40 +67,21 @@ ABase_Character::ABase_Character()
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Camera->SetupAttachment(SpringArm);
 
-	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceFinder(*AssetPath::Animation::BaseCharAnim);
-	if(AnimInstanceFinder.Succeeded())
-	{
-		GetMesh()->SetAnimInstanceClass(AnimInstanceFinder.Class);
-	}
+	// static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceFinder(*AssetPath::Animation::BaseCharAnim);
+	// if(AnimInstanceFinder.Succeeded())
+	// {
+	// 	GetMesh()->SetAnimInstanceClass(AnimInstanceFinder.Class);
+	// }
 	
 	GetMesh()->SetRelativeLocation(FVector(0.0f,0.0f,-90.0f));
 	GetMesh()->SetRelativeRotation(FRotator(0.0f,270.0f,0.0f));
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshFinder(*AssetPath::Mesh::SKM_Quinn_Simple);
-
-	if(MeshFinder.Succeeded())
-	{
-		GetMesh()->SetSkeletalMesh(MeshFinder.Object);
-	}
-
-	
-
-	// HealthWidget  초기화 
-	{
-		HealthWidgetComponent = CreateDefaultSubobject<UWidgetComponent>("HealthWidgetComponent");
-
-		HealthWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
-
-		HealthWidgetComponent->SetDrawSize(FVector2D(125.0f,18.0f));
-
-		HealthWidgetComponent->SetPivot(FVector2D(0.5f,0.5f));
-	
-		HealthWidgetComponent->SetRelativeLocation(FVector(0.0f,0.0f,125.0f));
-
-		HealthWidgetComponent->SetupAttachment(RootComponent);
-	}
-
-	
+	// static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshFinder(*AssetPath::Mesh::SKM_Quinn_Simple);
+	//
+	// if(MeshFinder.Succeeded())
+	// {
+	// 	GetMesh()->SetSkeletalMesh(MeshFinder.Object);
+	// }
 	
 	// InventoryComponent 세팅
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
@@ -183,7 +160,6 @@ void ABase_Character::AddCharacterAbilities()
 			// 4. 어빌리티 부여 (GiveAbility)
 			// 리턴받은 Handle은 나중에 필요하면 저장해둡니다.
 			FGameplayAbilitySpecHandle Handle = AbilitySystemComponent->GiveAbility(Spec);
-			
 		}
 	}
 }
@@ -230,7 +206,6 @@ void ABase_Character::PossessedBy(AController* NewController)
 		// InitAttributeDefaults_ServerOnly();
 		OnLevelup(StartLevel);
 	}
-	
 }
 
 void ABase_Character::OnLevelup( float NewLevel)
@@ -259,7 +234,7 @@ float ABase_Character::GetMaxXpForLevel(float pLevel) const
 	if (MaxXpCurve.CurveTable)
 	{
 		ResultXp = MaxXpCurve.CurveTable->FindCurve(MaxXpCurve.RowName,TEXT(""))->Eval(pLevel);
-		RS_LOG_SCREEN(TEXT("max : %f"), ResultXp)
+		// RS_LOG_SCREEN(TEXT("max : %f"), ResultXp)
 	}
 	
 	return ResultXp;
@@ -330,23 +305,7 @@ void ABase_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	}
 }
 
-void ABase_Character::UpdateCharacterClass_Implementation(FAvailableCharacter AvailableCharacter)
-{
-	S_SetCharacterData(AvailableCharacter);
-}
 
-
-
-void ABase_Character::S_SetCharacterMesh_Implementation(USkeletalMesh* SK)
-{
-	CharSK = SK;
-}
-
-
-void ABase_Character::S_SetCharacterData_Implementation(FAvailableCharacter CharacterData)
-{
-	Character = CharacterData;
-}
 
 
 
@@ -366,7 +325,6 @@ void ABase_Character::LoadLastCharacterClass()
 	{
 		RS_LOG_ERROR(TEXT("Saved Player가 존재하지 않습니다."))
 	}
-	S_SetCharacterData(GameSave->Character);
 }
 
 
@@ -374,24 +332,20 @@ void ABase_Character::LoadLastCharacterClass()
 
 
 
-	// TODO : GAS로 옮겨진거 체크 후 삭제 
-
 void ABase_Character::Die(AActor* DamageCauser)
 {
 	Super::Die(DamageCauser);
 	
-	if(DeathDoOnce.Execute())
+	
+	IsDead = true;
+
+	Death();
+
+	MC_Death();
+
+	if (ABase_GameMode* GM = Cast<ABase_GameMode>(UGameplayStatics::GetGameMode(GetWorld())))
 	{
-		IsDead = true;
-
-		Death();
-
-		MC_Death();
-
-		if (ABase_GameMode* GM = Cast<ABase_GameMode>(UGameplayStatics::GetGameMode(GetWorld())))
-		{
-			GM->DetermineGameStatus();
-		}
+		GM->DetermineGameStatus();
 	}
 }
 
@@ -403,10 +357,6 @@ void ABase_Character::Die(AActor* DamageCauser)
 
 void ABase_Character::Death_Implementation()
 {
-	// TODO : 삭제
-	
-	// AbilityComponent->InvalidateTimers();
-
 	DisableInput(LocalPlayerController);
 }
 
@@ -529,7 +479,6 @@ void ABase_Character::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 
 	DOREPLIFETIME(ABase_Character,Character)
 
-	DOREPLIFETIME(ABase_Character,CharSK);
 
 }
 
@@ -543,15 +492,15 @@ void ABase_Character::OnRep_Character()
 	
 	// StartingAbility = Character.StartingAbilities;
 
-	S_SetCharacterMesh(Character.CharacterSK);
+	// S_SetCharacterMesh(Character.CharacterSK);
 }
 
 void ABase_Character::OnRep_CharSK()
 {
-	if(IsValid(CharSK))
-	{
-		GetMesh()->SetSkinnedAssetAndUpdate(CharSK,false);
-	}
+	// if(IsValid(CharSK))
+	// {
+	// 	GetMesh()->SetSkinnedAssetAndUpdate(CharSK,false);
+	// }
 }
 
 void ABase_Character::Look(const FInputActionValue& Value)

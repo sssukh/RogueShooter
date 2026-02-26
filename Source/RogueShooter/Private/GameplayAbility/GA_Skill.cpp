@@ -17,6 +17,8 @@ UGA_Skill::UGA_Skill()
 void UGA_Skill::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	
 	// 자동 커밋 옵션이 켜져 있을 때만 실행 
 	if (bAutoCommit)
 	{
