@@ -270,10 +270,14 @@ void ABase_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		// 데이터 애셋을 만들어서 클릭으로 동작하는지 홀드로 동작하는지, InputID는 무엇인지 담아 데이터를 가져오도록 하자.
 		if (Skill1Action)
 		{
-			EnhancedInputComponent->BindAction(Skill1Action,ETriggerEvent::Started,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill1,true);
+			// TODO :   임시로 잠깐만
+			EnhancedInputComponent->BindAction(Skill1Action,ETriggerEvent::Triggered,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill1,true);
 			
-			EnhancedInputComponent->BindAction(Skill1Action,ETriggerEvent::Completed,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill1,false);
-		}
+			
+		// 	EnhancedInputComponent->BindAction(Skill1Action,ETriggerEvent::Started,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill1,true);
+		// 	
+		// 	EnhancedInputComponent->BindAction(Skill1Action,ETriggerEvent::Completed,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill1,false);
+		 }
 		
 		if (Skill2Action)
 		{

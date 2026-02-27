@@ -59,6 +59,7 @@ protected:
 	void ExecuteSkillLogic(float ChargeAmount);
 	virtual void ExecuteSkillLogic_Implementation(float ChargeAmount);
 	
+	FORCEINLINE ESkillInputStyle GetSkillInputStyle() const {return InputStyle;}
 protected:
 	// 스킬 타입 (단발 vs 연사)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Config")

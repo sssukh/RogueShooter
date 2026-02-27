@@ -6,14 +6,30 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Abilities/Base_Projectile.h"
 #include "GameFramework/Character.h"
+#include "Utility/FRsGameplayTags.h"
 
 
 UGA_GunFire::UGA_GunFire()
 {
 }
 
+void UGA_GunFire::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+{
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	
+	UAbilitySystemComponent* ASC = ActorInfo->AbilitySystemComponent.Get();
+
+	// 🎧 [서버] 클라이언트가 쏘아올릴 TargetData를 받을 수 있도록 귀를 열어둡니다.
+	if (HasAuthority(&CurrentActivationInfo))
+	{
+		ASC->AbilityTargetDataSetDelegate(Handle, ActivationInfo.GetActivationPredictionKey()).AddUObject(this, &UGA_GunFire::OnTargetDataReceived);
+	}
+}
+
 void UGA_GunFire::ApplyDamage(AActor* TargetActor)
 {
+	
 	if (!DamageEffectClass||!TargetActor)
 		return;
 	
@@ -61,7 +77,7 @@ void UGA_GunFire::TriggerFireGameplayCue(FVector MuzzleLoc, FVector TargetLoc, c
 
 	// 5. GC 실행
 	GetAbilitySystemComponentFromActorInfo()->ExecuteGameplayCue(
-		FGameplayTag::RequestGameplayTag(FName("GameplayCue.Weapon.Fire")), 
+		FRsGameplayTags::Get().GC_Weapon_Fire, 
 		CueParams
 	);
 }
@@ -116,8 +132,76 @@ void UGA_GunFire::ExecuteSkillLogic_Implementation(float ChargeAmount)
 	}
 }
 
+void UGA_GunFire::SendTargetDataToServer(const FHitResult& HitResult)
+{
+	UAbilitySystemComponent* ASC = CurrentActorInfo->AbilitySystemComponent.Get();
+
+	// TargetData 보따리 생성 및 HitResult 담기
+	FGameplayAbilityTargetData_SingleTargetHit* HitData = new FGameplayAbilityTargetData_SingleTargetHit();
+	HitData->HitResult = HitResult;
+
+	FGameplayAbilityTargetDataHandle TargetDataHandle;
+	TargetDataHandle.Add(HitData);
+
+	// GAS 예측(Prediction) 키 발급 - "이 데이터는 내가 쏜 거야!" 라는 꼬리표
+	FScopedPredictionWindow ScopedPrediction(ASC, true);
+
+	// 내가 권한이 없는 클라이언트라면 서버로 데이터 쏘기
+	if (!HasAuthority(&CurrentActivationInfo))
+	{
+		ASC->CallServerSetReplicatedTargetData(
+			CurrentSpecHandle,
+			CurrentActivationInfo.GetActivationPredictionKey(),
+			TargetDataHandle,
+			FGameplayTag(),
+			ASC->ScopedPredictionKey
+		);
+	}
+	else
+	{
+		// 내가 이미 호스트(서버 권한 있음)라면 네트워크로 보낼 필요 없이 바로 수신 함수 호출
+		OnTargetDataReceived(TargetDataHandle, FGameplayTag());
+	}
+}
+
+void UGA_GunFire::OnTargetDataReceived(const FGameplayAbilityTargetDataHandle& Data, FGameplayTag ActivationTag)
+{
+	UAbilitySystemComponent* ASC = CurrentActorInfo->AbilitySystemComponent.Get();
+
+	// 🧹 메모리 누수 방지: 서버 캐시 비우기
+	ASC->ConsumeClientReplicatedTargetData(CurrentSpecHandle, CurrentActivationInfo.GetActivationPredictionKey());
+
+	// 데이터가 정상적으로 들어왔는지 확인
+	if (Data.Data.Num() > 0)
+	{
+		const FHitResult* HitResult = Data.Data[0]->GetHitResult();
+		if (HitResult)
+		{
+			// 🛡️ [검증 로직 (선택)] 거리가 너무 멀거나 벽을 관통했다면 여기서 데미지를 취소할 수 있습니다.
+
+			// 💥 [실제 데미지 적용] 
+			if (HitResult->GetActor())
+			{
+				// ApplyGameplayEffectToTarget(...) 을 호출하여 체력 차감
+				ApplyDamage(HitResult->GetActor());
+			}
+
+			// 🎇 [다른 클라이언트들에게 이펙트 뿌리기]
+			// 이 TriggerFireGameplayCue는 서버가 실행하여 모두에게 전파(Multicast)됩니다.
+			// 하지만 GAS의 PredictionKey 시스템 덕분에, 방금 이펙트를 띄운 클라이언트 화면에는 중복해서 그리지 않습니다!
+			FVector MuzzleLoc = HitResult->TraceStart; // 필요시 소켓 이름 동기화 로직 추가
+			FVector TargetLoc = HitResult->bBlockingHit ? HitResult->ImpactPoint : HitResult->TraceEnd;
+            
+			TriggerFireGameplayCue(MuzzleLoc, TargetLoc, *HitResult);
+		}
+	}
+}
+
 void UGA_GunFire::FireHitScan(FName SocketName)
 {
+	// 🌟 1. 오직 '나(직접 조종하는 클라이언트 또는 호스트)'만 발사 연산을 합니다.
+	if (!CurrentActorInfo->IsLocallyControlled()) return;
+	
 	ACharacter* Avatar = Cast<ACharacter>(GetAvatarActorFromActorInfo());
 	APlayerController* PC = Cast<APlayerController>(Avatar->GetController());
 	if (!Avatar || !PC) return;
@@ -204,13 +288,15 @@ void UGA_GunFire::FireHitScan(FName SocketName)
         
 		// 피격 이펙트 (GameplayCue: Impact)
 		// HitResult.Location에서 파티클 재생
-		
-		// 타겟 지점 계산 (맞았으면 ImpactPoint, 안 맞았으면 허공의 끝점)
-		FVector BeamTarget = bHit ? HitResult.ImpactPoint : End;
-    
-		TriggerFireGameplayCue(MuzzleLoc, BeamTarget, HitResult);
 	}
+	// 타겟 지점 계산 (맞았으면 ImpactPoint, 안 맞았으면 허공의 끝점)
+	FVector BeamTarget = bHit ? HitResult.ImpactPoint : End;
+    
+	HitResult.TraceStart = MuzzleLoc;
+	
+	TriggerFireGameplayCue(MuzzleLoc, BeamTarget, HitResult);
 
+	SendTargetDataToServer(HitResult);
 	// 7. 총구 이펙트 (GameplayCue: Muzzle)
 	// SocketName 위치에서 Muzzle Flash 재생
 }

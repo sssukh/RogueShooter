@@ -52,23 +52,24 @@ void UGA_Skill::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 	switch (InputStyle)
 	{
 	case ESkillInputStyle::Instant:
+	case ESkillInputStyle::Continuous:
 		{
 			ExecuteSkillLogic(1.0f); // 그냥 발사 (파워 100%)
 			EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 		}
 		break;
 
-	case ESkillInputStyle::Continuous:
-		{
-			ExecuteSkillLogic(1.0f);
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle_Loop, this, &UGA_Skill::LoopLogic, FireRate, true);
-            
-			// 입력 해제 대기
-			UAbilityTask_WaitInputRelease* ReleaseTask = UAbilityTask_WaitInputRelease::WaitInputRelease(this, true);
-			ReleaseTask->OnRelease.AddDynamic(this, &UGA_Skill::OnReleaseInput);
-			ReleaseTask->ReadyForActivation();
-		}
-		break;
+	// case ESkillInputStyle::Continuous:
+	// 	{
+	// 		ExecuteSkillLogic(1.0f);
+	// 		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Loop, this, &UGA_Skill::LoopLogic, FireRate, true);
+ //            
+	// 		// 입력 해제 대기
+	// 		UAbilityTask_WaitInputRelease* ReleaseTask = UAbilityTask_WaitInputRelease::WaitInputRelease(this, true);
+	// 		ReleaseTask->OnRelease.AddDynamic(this, &UGA_Skill::OnReleaseInput);
+	// 		ReleaseTask->ReadyForActivation();
+	// 	}
+	// 	break;
 
 	case ESkillInputStyle::Charging:
 		{
@@ -131,7 +132,10 @@ void UGA_Skill::ApplyCooldown(const FGameplayAbilitySpecHandle Handle, const FGa
 	if (!SpecHandle.IsValid()) return;
 	
 	// Duration 설정 (SetByCaller)
-	SpecHandle.Data->SetSetByCallerMagnitude(CooldownDurationTag,CooldownDuration);
+	if (InputStyle == ESkillInputStyle::Continuous)
+		SpecHandle.Data->SetSetByCallerMagnitude(CooldownDurationTag,FireRate);
+	else
+		SpecHandle.Data->SetSetByCallerMagnitude(CooldownDurationTag,CooldownDuration);
 	
 	// 쿨타임 태그 동적 추가
 	SpecHandle.Data->DynamicGrantedTags.AppendTags(CooldownTags);
