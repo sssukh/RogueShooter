@@ -49,6 +49,7 @@ public:
 	// 쿨다운 여부를 
 	virtual const FGameplayTagContainer* GetCooldownTags() const override;
 	
+	FORCEINLINE ESkillInputStyle GetSkillInputStyle() const {return InputStyle;}
 	// Utility Helpers
 protected:
 	UFUNCTION(BlueprintCallable, Category = "GAS|Helper")
@@ -59,7 +60,7 @@ protected:
 	void ExecuteSkillLogic(float ChargeAmount);
 	virtual void ExecuteSkillLogic_Implementation(float ChargeAmount);
 	
-	FORCEINLINE ESkillInputStyle GetSkillInputStyle() const {return InputStyle;}
+	
 protected:
 	// 스킬 타입 (단발 vs 연사)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Config")

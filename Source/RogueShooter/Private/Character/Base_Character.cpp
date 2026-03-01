@@ -40,6 +40,7 @@
 #include "System/RsHUD.h"
 #include "System/RsPlayerState.h"
 #include "System/UnitWidgetController.h"
+#include "GameplayAbility/GA_Skill.h"
 
 // Sets default values
 ABase_Character::ABase_Character()
@@ -147,15 +148,29 @@ void ABase_Character::AddCharacterAbilities()
 	}
 
 	// 2. 어빌리티 순회하며 부여
-	for (const FGAbilityID& AbilityID : DefaultAbilities)
+	for (TSubclassOf<UGameplayAbility> GA : DefaultAbilities)
 	{
-		if (AbilityID.GameplayAbility)
+		if (GA)
 		{
-			int32 InputID = AbilityID.InputID==EAbilityInputID::None?-1:(int32)AbilityID.InputID;
+			// 3. Spec 생성 (클래스, 레벨, 입력ID, 소스)
+			// 예시: 레벨 1, 입력 ID는 -1 (없음) 또는 Enum 값
+			FGameplayAbilitySpec Spec(GA, 1, -1, this);
+
+			// 4. 어빌리티 부여 (GiveAbility)
+			// 리턴받은 Handle은 나중에 필요하면 저장해둡니다.
+			FGameplayAbilitySpecHandle Handle = AbilitySystemComponent->GiveAbility(Spec);
+		}
+	}
+	
+	for (const FSkillInputMapping& Mapping : DefaultSkills)
+	{
+		if (Mapping.Ability)
+		{
+			int32 InputID = Mapping.InputAction?(int32)Mapping.InputID:-1;
 			
 			// 3. Spec 생성 (클래스, 레벨, 입력ID, 소스)
 			// 예시: 레벨 1, 입력 ID는 -1 (없음) 또는 Enum 값
-			FGameplayAbilitySpec Spec(AbilityID.GameplayAbility, 1, InputID, this);
+			FGameplayAbilitySpec Spec(Mapping.Ability, 1, InputID, this);
 
 			// 4. 어빌리티 부여 (GiveAbility)
 			// 리턴받은 Handle은 나중에 필요하면 저장해둡니다.
@@ -253,7 +268,7 @@ void ABase_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	
 	// Enhanced Input Component로 캐스팅
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-        
+		
 		// LookAction이 유효한지 확인 후 바인딩
 		if (LookAction)
 		{
@@ -265,47 +280,69 @@ void ABase_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 			EnhancedInputComponent->BindAction(MoveAction,ETriggerEvent::Triggered,this,&ABase_Character::Move);
 		}
 		
-		// 지금은 하드코딩으로 넣어주지만 
-		// 스킬마다 넣어주는 것은 어려우니
-		// 데이터 애셋을 만들어서 클릭으로 동작하는지 홀드로 동작하는지, InputID는 무엇인지 담아 데이터를 가져오도록 하자.
-		if (Skill1Action)
+		for (const FSkillInputMapping& Mapping : DefaultSkills)
 		{
-			// TODO :   임시로 잠깐만
-			EnhancedInputComponent->BindAction(Skill1Action,ETriggerEvent::Triggered,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill1,true);
+			if (!Mapping.InputAction || !Mapping.Ability) continue;
 			
-			
-		// 	EnhancedInputComponent->BindAction(Skill1Action,ETriggerEvent::Started,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill1,true);
-		// 	
-		// 	EnhancedInputComponent->BindAction(Skill1Action,ETriggerEvent::Completed,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill1,false);
-		 }
-		
-		if (Skill2Action)
-		{
-			EnhancedInputComponent->BindAction(Skill2Action,ETriggerEvent::Started,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill2,true);
-			
-			EnhancedInputComponent->BindAction(Skill2Action,ETriggerEvent::Completed,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill2,false);
+			// 🌟 [핵심 기법] CDO (Class Default Object) 가져오기!
+			// 스킬을 스폰하지 않고도, 해당 블루프린트의 기본 세팅값을 미리 읽어옵니다.
+			UGA_Skill* DefaultSkill = Mapping.Ability->GetDefaultObject<UGA_Skill>();
+
+			// 스킬 타입에 따라 알아서 바인딩을 분기 처리합니다.
+			if (DefaultSkill->GetSkillInputStyle() == ESkillInputStyle::Continuous)
+			{
+				// 연사형: 버튼을 누르고 있는 동안 매 프레임 스킬 실행 시도
+				EnhancedInputComponent->BindAction(Mapping.InputAction, ETriggerEvent::Triggered, this, &ABase_Character::SendAbilityLocalInput,Mapping.InputID,true);
+			}
+			else 
+			{
+				// 단발형/차징형: 눌렀을 때 실행, 뗐을 때 종료/취소
+				EnhancedInputComponent->BindAction(Mapping.InputAction, ETriggerEvent::Started, this, &ABase_Character::SendAbilityLocalInput, Mapping.InputID,true);
+				EnhancedInputComponent->BindAction(Mapping.InputAction, ETriggerEvent::Completed, this, &ABase_Character::SendAbilityLocalInput, Mapping.InputID,false);
+			}
 		}
 		
-		if (Skill3Action)
-		{
-			EnhancedInputComponent->BindAction(Skill3Action,ETriggerEvent::Started,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill3,true);
-			
-			EnhancedInputComponent->BindAction(Skill3Action,ETriggerEvent::Completed,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill3,false);
-		}
-		
-		if (Skill4Action)
-		{
-			EnhancedInputComponent->BindAction(Skill4Action,ETriggerEvent::Started,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill4,true);
-			
-			EnhancedInputComponent->BindAction(Skill4Action,ETriggerEvent::Completed,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill4,false);
-		}
-		
-		if (Skill5Action)
-		{
-			EnhancedInputComponent->BindAction(Skill5Action,ETriggerEvent::Started,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill5,true);
-			
-			EnhancedInputComponent->BindAction(Skill5Action,ETriggerEvent::Completed,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill5,false);
-		}
+	// 	// 지금은 하드코딩으로 넣어주지만 
+	// 	// 스킬마다 넣어주는 것은 어려우니
+	// 	// 데이터 애셋을 만들어서 클릭으로 동작하는지 홀드로 동작하는지, InputID는 무엇인지 담아 데이터를 가져오도록 하자.
+	// 	if (Skill1Action)
+	// 	{
+	// 		// TODO :   임시로 잠깐만
+	// 		EnhancedInputComponent->BindAction(Skill1Action,ETriggerEvent::Triggered,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill1,true);
+	// 		
+	// 		
+	// 	// 	EnhancedInputComponent->BindAction(Skill1Action,ETriggerEvent::Started,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill1,true);
+	// 	// 	
+	// 	// 	EnhancedInputComponent->BindAction(Skill1Action,ETriggerEvent::Completed,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill1,false);
+	// 	 }
+	// 	
+	// 	if (Skill2Action)
+	// 	{
+	// 		EnhancedInputComponent->BindAction(Skill2Action,ETriggerEvent::Started,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill2,true);
+	// 		
+	// 		EnhancedInputComponent->BindAction(Skill2Action,ETriggerEvent::Completed,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill2,false);
+	// 	}
+	// 	
+	// 	if (Skill3Action)
+	// 	{
+	// 		EnhancedInputComponent->BindAction(Skill3Action,ETriggerEvent::Started,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill3,true);
+	// 		
+	// 		EnhancedInputComponent->BindAction(Skill3Action,ETriggerEvent::Completed,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill3,false);
+	// 	}
+	// 	
+	// 	if (Skill4Action)
+	// 	{
+	// 		EnhancedInputComponent->BindAction(Skill4Action,ETriggerEvent::Started,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill4,true);
+	// 		
+	// 		EnhancedInputComponent->BindAction(Skill4Action,ETriggerEvent::Completed,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill4,false);
+	// 	}
+	// 	
+	// 	if (Skill5Action)
+	// 	{
+	// 		EnhancedInputComponent->BindAction(Skill5Action,ETriggerEvent::Started,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill5,true);
+	// 		
+	// 		EnhancedInputComponent->BindAction(Skill5Action,ETriggerEvent::Completed,this,&ABase_Character::SendAbilityLocalInput,EAbilityInputID::Skill5,false);
+	// 	}
 	}
 }
 

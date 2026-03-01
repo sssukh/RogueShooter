@@ -13,6 +13,7 @@
 #include "RsBaseCharacter.h"
 #include "Base_Character.generated.h"
 
+class UGA_Skill;
 class UUnitWidgetController;
 class UExpSet;
 class AFloatingTextActor;
@@ -34,15 +35,30 @@ class UCharAttributeSet;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoad);
 
+// USTRUCT(BlueprintType)
+// struct FGAbilityID
+// {
+// 	GENERATED_BODY()
+// public:
+// 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+// 	TSubclassOf<UGameplayAbility> GameplayAbility;
+// 	
+// 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+// 	EAbilityInputID InputID;
+// };
+
 USTRUCT(BlueprintType)
-struct FGAbilityID
+struct FSkillInputMapping
 {
 	GENERATED_BODY()
-public:
-	UPROPERTY(EditAnywhere,BlueprintReadOnly)
-	TSubclassOf<UGameplayAbility> GameplayAbility;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* InputAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Skill")
+	TSubclassOf<UGA_Skill> Ability;
 	
-	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Skill")
 	EAbilityInputID InputID;
 };
 
@@ -82,10 +98,13 @@ protected:
 	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
 	// TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
-	
-	// 부여할 어빌리티 목록
+	// 부여할 어빌리티 목록(자동으로 발동)
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category =  "GAS | Config")
-	TArray<FGAbilityID> DefaultAbilities;
+	TArray<TSubclassOf<UGameplayAbility>> DefaultAbilities;
+	
+	// 부여할 스킬 목록(버튼을 눌러 발동)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category =  "GAS | Config")
+	TArray<FSkillInputMapping> DefaultSkills;
 	
 	// 초기화 함수 (아래 설명 참조)
 	virtual void PossessedBy(AController* NewController) override;
@@ -217,22 +236,12 @@ public:
 	void OnRep_CharSK();
 	
 	
-	// Components
-public:
-	// UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	// TObjectPtr<USphereComponent> AbilitySphere;
-	//
-	// UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	// TObjectPtr<UAbilitiesComponent> AbilityComponent;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<UCameraComponent> Camera;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<USpringArmComponent> SpringArm;
-
-	// UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	// TObjectPtr<UWidgetComponent> HealthWidgetComponent;
 
 	// Input
 protected:
