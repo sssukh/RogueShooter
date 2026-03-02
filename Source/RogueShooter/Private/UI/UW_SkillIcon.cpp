@@ -20,6 +20,8 @@ void UUW_SkillIcon::ReceiveSkillInfo(const FGameplayTag& ReceivedMatchTag, const
 	if (CooldownTag == ReceivedMatchTag)
 	{
 		SkillIcon->SetBrushFromTexture(RowData.SkillIcon);
+		
+		AbilityTag = RowData.AbilityTag;
 	}
 }
 

@@ -39,6 +39,9 @@ void FRsGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	Ability_Skill_Dash = Manager.AddNativeGameplayTag(FName("Ability.Skill.Dash"),TEXT("스킬 대쉬 태그"));
 	Ability_Skill_Strike = Manager.AddNativeGameplayTag(FName("Ability.Skill.Strike"),TEXT("스킬 폭격 태그"));
 	Ability_Skill_GunFire = Manager.AddNativeGameplayTag(FName("Ability.Skill.GunFire"),TEXT("스킬 총격"));
+	Ability_Skill_Skill1 = Manager.AddNativeGameplayTag(FName("Ability.Skill.Skill1"),TEXT("1번 슬롯 스킬"));
+	Ability_Skill_Skill1_DoubleTap = Manager.AddNativeGameplayTag(FName("Ability.Skill.Skill1.DoubleTap"),TEXT("더블 탭"));
+	
 	
 	Event_Death = Manager.AddNativeGameplayTag(FName("Event.Death"),TEXT("죽음"));
 	Event_Equip = Manager.AddNativeGameplayTag(FName("Event.Equip"),TEXT("아이템 착용"));

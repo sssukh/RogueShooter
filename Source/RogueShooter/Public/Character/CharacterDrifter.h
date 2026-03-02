@@ -6,6 +6,8 @@
 #include "Base_Character.h"
 #include "CharacterDrifter.generated.h"
 
+class UCrosshairAttSet;
+
 UCLASS()
 class ROGUESHOOTER_API ACharacterDrifter : public ABase_Character
 {
@@ -25,4 +27,5 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
 };

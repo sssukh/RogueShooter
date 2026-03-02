@@ -33,6 +33,7 @@ public:
 	
 	virtual void SetWidgetController_Implementation(URsBaseWidgetController* InWidgetController) override;
 	
+	// 블루프린트에서 쿨다운관련 이펙트를 설정한다.
 	UFUNCTION(BlueprintImplementableEvent, DisplayName = "SetCooldownEffect")
 	void BP_InitializeCooldownEffect();
 public:

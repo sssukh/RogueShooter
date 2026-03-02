@@ -4,8 +4,8 @@
 #include "ExecCalculation/ExecCalc_Damage.h"
 #include "AbilitySystemComponent.h"
 #include "IMovieSceneModule.h"
-#include "Data/HealthSet.h"
-#include "Data/CombatSet.h"
+#include "Data/Attribute/HealthSet.h"
+#include "Data/Attribute/CombatSet.h"
 
 
 struct FDamageStatics

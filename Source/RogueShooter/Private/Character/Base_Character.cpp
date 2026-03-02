@@ -10,8 +10,8 @@
 #include "Components/InventoryComponent.h"
 #include "Components/ProgressBar.h"
 #include "Components/WidgetComponent.h"
-#include "Data/CombatSet.h"
-#include "Data/HealthSet.h"
+#include "Data/Attribute/CombatSet.h"
+#include "Data/Attribute/HealthSet.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerState.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -31,12 +31,13 @@
 #include "GameplayAbilitiesModule.h"
 #include "AbilitySystemGlobals.h"
 #include "Components/TextBlock.h"
-#include "Data/ExpSet.h"
+#include "Data/Attribute/ExpSet.h"
 #include "UI/UW_PlayerHud.h"
 
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
 #include "EnhancedInputSubsystems.h"
+#include "Data/Attribute/CrosshairAttSet.h"
 #include "System/RsHUD.h"
 #include "System/RsPlayerState.h"
 #include "System/UnitWidgetController.h"
@@ -108,6 +109,21 @@ void ABase_Character::BeginPlay()
 void ABase_Character::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	if (AbilitySystemComponent)
+	{
+		// 1. AttributeSet에서 기본 상태(최소 탄퍼짐)와 회복 속도를 읽어옵니다.
+		float MinSpread = AbilitySystemComponent->GetNumericAttribute(UCrosshairAttSet::GetSpreadMinAttribute());
+		float RecoveryRate = AbilitySystemComponent->GetNumericAttribute(UCrosshairAttSet::GetSpreadRecoveryRateAttribute());
+
+		// 2. 현재 탄퍼짐이 기본 상태보다 넓게 벌어져 있다면?
+		if (CurrentSpread > MinSpread)
+		{
+			// 🌟 [핵심] FInterpTo를 사용해 부드럽게 좁혀줍니다.
+			// (현재값, 목표값, DeltaTime, 회복속도)
+			CurrentSpread = FMath::FInterpTo(CurrentSpread, MinSpread, DeltaTime, RecoveryRate);
+		}
+	}
 }
 
 void ABase_Character::PostInitializeComponents()
@@ -346,8 +362,17 @@ void ABase_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	}
 }
 
+void ABase_Character::AddSpread()
+{
+	if (!AbilitySystemComponent) return;
 
+	// 1. AttributeSet에서 증가량과 최댓값을 읽어옵니다.
+	float SpreadInc = AbilitySystemComponent->GetNumericAttribute(UCrosshairAttSet::GetSpreadIncreasePerShotAttribute());
+	float MaxSpread = AbilitySystemComponent->GetNumericAttribute(UCrosshairAttSet::GetSpreadMaxAttribute());
 
+	// 2. 현재 탄퍼짐에 증가량을 더하되, 최댓값(MaxSpread)을 넘지 않도록 Clamp(제한) 합니다.
+	CurrentSpread = FMath::Min(CurrentSpread + SpreadInc, MaxSpread);
+}
 
 
 void ABase_Character::SetupReference()

@@ -28,7 +28,6 @@ void UUW_PlayerHud::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	
 }
 
 void UUW_PlayerHud::BuildHotbar(const TMap<EActiveAbilities, int32>& ActiveAbilities,

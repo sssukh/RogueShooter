@@ -4,11 +4,11 @@
 #include "System/RsWidgetController.h"
 
 #include "AbilitySystemComponent.h"
-#include "Data/ExpSet.h"
+#include "Data/Attribute/ExpSet.h"
 #include "GameplayAbility/GA_Skill.h"
 #include "RogueShooter/AssetPath.h"
 #include "GameplayEffectTypes.h"
-#include "Data/HealthSet.h"
+#include "Data/Attribute/HealthSet.h"
 #include "Utility/FRsGameplayTags.h"
 #include "Utility/RSLog.h"
 
@@ -300,7 +300,7 @@ void URsWidgetController::OnCooldownTagChanged(const FGameplayTag CooldownTag, i
 		// 필요하다면 가장 긴 Duration을 가진 GE를 찾는 로직 추가 필요.
 		GetCooldownInfo(CooldownTag,TimeRemaining,Duration);
 	}
-
+	
 	// 📢 방송 송출! (나를 구독하고 있는 모든 위젯에게 알림)
 	OnCooldownChange.Broadcast(CooldownTag, bIsCooldown, Duration);
 }

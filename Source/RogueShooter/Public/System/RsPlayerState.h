@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerState.h"
 #include "RsPlayerState.generated.h"
 
+class UCrosshairAttSet;
 class UExpSet;
 class UCombatSet;
 class UHealthSet;
@@ -29,6 +30,8 @@ public:
 		
 	FORCEINLINE UExpSet* GetExpAttributes() {return ExpAttributes;}
 		
+	FORCEINLINE UCrosshairAttSet* GetCrosshairAttributes() {return CrosshairAttributes;}
+	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
@@ -41,4 +44,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "GAS")
 	TObjectPtr<UExpSet> ExpAttributes;
+	
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "GAS")
+	TObjectPtr<UCrosshairAttSet> CrosshairAttributes;
 };

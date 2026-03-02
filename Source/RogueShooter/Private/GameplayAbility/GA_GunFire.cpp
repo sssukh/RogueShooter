@@ -5,6 +5,8 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Abilities/Base_Projectile.h"
+#include "Character/Base_Character.h"
+#include "Data/Attribute/CrosshairAttSet.h"
 #include "GameFramework/Character.h"
 #include "Utility/FRsGameplayTags.h"
 
@@ -231,10 +233,14 @@ void UGA_GunFire::FireHitScan(FName SocketName)
 	// 임시로 상수를 넣고 로직 완성 이후에 발사 시간에 비례해서 커지는 값을 넣자 
 	// float SpreadAngle = GetAbilitySystemComponentFromActorInfo()->GetNumericAttribute(URsAttributeSet::GetSpreadAttribute());
 	float SpreadAngle = 3.0f;
+	if (ABase_Character* Character = Cast<ABase_Character>(GetActorInfo().AvatarActor))
+	{
+		SpreadAngle = Character->CurrentSpread;
+	}
 	FVector ShootDir = FMath::VRandCone(CameraFwd, FMath::DegreesToRadians(SpreadAngle));
 
 	// 4. 끝점: 사거리(Range) 적용
-	float Range = 1000.0f; // Attribute에서 가져오면 더 좋음
+	float Range = 3000.0f; // Attribute에서 가져오면 더 좋음
 	FVector End = Start + (ShootDir * Range);
 
 	// 5. 레이캐스트 실행

@@ -271,4 +271,6 @@ public:
 	// 스킬 이름 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	FText DisplayName;
+	
+	
 };

@@ -8,6 +8,7 @@
 #include "Interface/Interface_ControllerManager.h"
 #include "Gameplay_PlayerController.generated.h"
 
+class URsCharacterInfo;
 class ARsHUD;
 class UUW_InventoryMain;
 class UMyCheatManager;
@@ -282,9 +283,12 @@ public:
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Ability")
 	TObjectPtr<UUW_ChestMaster> ChestUI;
 	
+	
+	// 삭제
 	UPROPERTY()
 	TObjectPtr<UDataTable> DT_ActiveAbilities;
 
+	// 삭제
 	UPROPERTY()
 	TObjectPtr<UDataTable> DT_PassiveAbilities;
 	
@@ -310,4 +314,7 @@ public:
 	
 	UPROPERTY()
 	TObjectPtr<UUW_InventoryMain> InventoryMainWidget;
+	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<URsCharacterInfo> CharacterInfo;
 };

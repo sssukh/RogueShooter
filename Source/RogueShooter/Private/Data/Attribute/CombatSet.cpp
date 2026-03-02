@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Data/CombatSet.h"
+#include "Data/Attribute/CombatSet.h"
 
 #include "Net/UnrealNetwork.h"
 

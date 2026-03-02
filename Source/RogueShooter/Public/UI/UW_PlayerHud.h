@@ -8,6 +8,7 @@
 #include "System/RsWidgetController.h"
 #include "UW_PlayerHud.generated.h"
 
+class UUW_ReticleWidgetBase;
 class UUW_SkillSlotList;
 class UOverlay;
 class URsWidgetController;
@@ -90,4 +91,9 @@ public:
 	UPROPERTY(BlueprintReadWrite,Category = "UW_PlayerHud | Designer", meta = (BindWidget))
 	TObjectPtr<UOverlay> Overlay_HealthBar;
 	
+	UPROPERTY(BlueprintReadWrite,Category = "UW_PlayerHud | Designer", meta = (BindWidget))
+	TObjectPtr<UOverlay> Overlay_Reticle;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "UW_PlayerHud | Config")
+	TSubclassOf<UUW_ReticleWidgetBase> ReticleWidgetClass;
 };

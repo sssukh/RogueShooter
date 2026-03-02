@@ -4,9 +4,10 @@
 #include "System/RsPlayerState.h"
 
 #include "AbilitySystemComponent.h"
-#include "Data/CombatSet.h"
-#include "Data/ExpSet.h"
-#include "Data/HealthSet.h"
+#include "Data/Attribute/CombatSet.h"
+#include "Data/Attribute/ExpSet.h"
+#include "Data/Attribute/HealthSet.h"
+#include "Data/Attribute/CrosshairAttSet.h"
 
 ARsPlayerState::ARsPlayerState()
 {
@@ -19,6 +20,7 @@ ARsPlayerState::ARsPlayerState()
 	HealthAttributes = CreateDefaultSubobject<UHealthSet>(TEXT("HeathAttributes"));
 	CombatAttributes = CreateDefaultSubobject<UCombatSet>(TEXT("CombatAttributes"));
 	ExpAttributes = CreateDefaultSubobject<UExpSet>(TEXT("ExpAttributes"));
+	CrosshairAttributes = CreateDefaultSubobject<UCrosshairAttSet>(TEXT("CrosshairAttributes"));
 }
 
 UAbilitySystemComponent* ARsPlayerState::GetAbilitySystemComponent() const

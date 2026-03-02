@@ -44,6 +44,8 @@ public:
 	FGameplayTag Ability_Skill_Dash;
 	FGameplayTag Ability_Skill_Strike;
 	FGameplayTag Ability_Skill_GunFire;
+	FGameplayTag Ability_Skill_Skill1;
+	FGameplayTag Ability_Skill_Skill1_DoubleTap;
 	
 	FGameplayTag Event_Death;
 	FGameplayTag Event_Equip;

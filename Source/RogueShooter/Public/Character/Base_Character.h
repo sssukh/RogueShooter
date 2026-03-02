@@ -116,12 +116,10 @@ protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "GAS|Config")
 	TSubclassOf<UGameplayEffect> DefaultCurveEffectClass;
 	
-	
-	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Config | Attribute")
 	FCurveTableRowHandle MaxXpCurve;
 	
-
+	
 	
 public:
 	float GetMaxXpForLevel(float pLevel) const;
@@ -130,8 +128,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	
-
+	UFUNCTION(BlueprintCallable)
+	void AddSpread();
 
 	//*****************************************
 	// Interface_CharacterManager
@@ -152,9 +150,6 @@ public:
 	virtual ABase_Character* GetCharacter_Implementation() override;
 	
 
-	//*****************************************
-	// Widget 
-	//*****************************************
 	
 	
 	//*****************************************
@@ -206,15 +201,6 @@ public:
 
 	
 
-	//*****************************************
-	// Passive Stats
-	//*****************************************
-	
-	/**
-	* Adjust stats on pawn via interface to avoid circular dependencies on ability component
-	* ability component의 의존성을 피하기 위해 interface를 통해 pawn의 스탯을 조정한다.
-	*/
-	
 	
 
 
@@ -327,4 +313,7 @@ public:
 	TObjectPtr<UUnitWidgetController> CharacterWidgetController;
 	
 	bool bIsGASInitialized = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config | Crosshair")
+	float CurrentSpread;
 };

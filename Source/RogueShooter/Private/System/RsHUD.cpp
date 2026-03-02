@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "Data/RsCharacterInfo.h"
+#include "System/Gameplay_PlayerController.h"
 #include "System/RsWidgetController.h"
 #include "UI/UW_PlayerHud.h"
 #include "Utility/RSLog.h"
@@ -43,6 +45,8 @@ void ARsHUD::InitOverlay(const FWidgetControllerParams& WCParams)
 		
 		// 4. 컨트롤러에게 Attribute 값변화에 따른 델리게이트 발송 감시 명령
 		WidgetController->BindCallbacksToDependencies();
+		
+		OverlayWidget->ReticleWidgetClass = Cast<AGameplay_PlayerController>(GetOwningPlayerController())->CharacterInfo->ReticleWidgetClass;
 		
 		// 6. 화면 부착
 		OverlayWidget->AddToViewport();
