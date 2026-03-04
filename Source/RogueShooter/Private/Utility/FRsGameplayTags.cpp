@@ -54,4 +54,5 @@ void FRsGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	GC_Combat_Damage_Health = Manager.AddNativeGameplayTag(FName("GameplayCue.Combat.Damage.Health"),TEXT("체력에 데미지"));
 	GC_Combat_Damage_Shield = Manager.AddNativeGameplayTag(FName("GameplayCue.Combat.Damage.Shield"),TEXT("실드에 데미지"));
 	GC_Weapon_Fire = Manager.AddNativeGameplayTag(FName("GameplayCue.Weapon.Fire"),TEXT("발사"));
+	GC_Weapon_Fire_DoubleTap = Manager.AddNativeGameplayTag(FName("GameplayCue.Weapon.Fire.DoubleTap"),TEXT("Drifter DoubleTap GC"));
 }

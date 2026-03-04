@@ -15,6 +15,8 @@ public class RogueShooter : ModuleRules
 			,"MultiplayerSessions","OnlineSubsystem"
 			// GAS
 			,"GameplayAbilities", "GameplayTags", "GameplayTasks"
+			// Niagara
+			, "Niagara"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

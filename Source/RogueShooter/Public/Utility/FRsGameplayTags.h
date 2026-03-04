@@ -57,6 +57,7 @@ public:
 	FGameplayTag GC_Combat_Damage_Shield;
 	FGameplayTag GC_Combat_Damage_Health;
 	FGameplayTag GC_Weapon_Fire;
+	FGameplayTag GC_Weapon_Fire_DoubleTap;
 	
 	FGameplayTag Socket_Muzzle_L;
 	FGameplayTag Socket_Muzzle_R;

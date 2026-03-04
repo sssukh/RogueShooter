@@ -37,6 +37,7 @@
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
 #include "EnhancedInputSubsystems.h"
+#include "Components/RsWeaponComponent.h"
 #include "Data/Attribute/CrosshairAttSet.h"
 #include "System/RsHUD.h"
 #include "System/RsPlayerState.h"
@@ -91,6 +92,9 @@ ABase_Character::ABase_Character()
 	InventoryComponent->bEditableWhenInherited = true;
 	
 	StartLevel = 1;
+	
+	WeaponComponent = CreateDefaultSubobject<URsWeaponComponent>(TEXT("WeaponComponent"));
+	WeaponComponent->bEditableWhenInherited =  true;
 }
 
 // Called when the game starts or when spawned

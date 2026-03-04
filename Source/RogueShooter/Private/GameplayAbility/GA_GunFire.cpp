@@ -6,6 +6,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Abilities/Base_Projectile.h"
 #include "Character/Base_Character.h"
+#include "Components/RsWeaponComponent.h"
 #include "Data/Attribute/CrosshairAttSet.h"
 #include "GameFramework/Character.h"
 #include "Utility/FRsGameplayTags.h"
@@ -59,6 +60,11 @@ void UGA_GunFire::TriggerFireGameplayCue(FVector MuzzleLoc, FVector TargetLoc, c
 {
 	FGameplayCueParameters CueParams;
     
+	if (ABase_Character* Char = Cast<ABase_Character>(GetAvatarActorFromActorInfo()))
+	{
+		CueParams.TargetAttachComponent = Char->GetMesh();
+	}
+	
 	// 1. 시작점 (총구) -> Location에 담음 (약속하기 나름)
 	CueParams.Location = MuzzleLoc;
     
@@ -76,10 +82,13 @@ void UGA_GunFire::TriggerFireGameplayCue(FVector MuzzleLoc, FVector TargetLoc, c
 
 	// 4. 파라미터에 보따리 연결
 	CueParams.EffectContext = ContextHandle;
+	
+	// 꼼수로 muzzle의 인덱스를 담아 보낸다. 
+	CueParams.GameplayEffectLevel = MuzzleIndex;
 
 	// 5. GC 실행
 	GetAbilitySystemComponentFromActorInfo()->ExecuteGameplayCue(
-		FRsGameplayTags::Get().GC_Weapon_Fire, 
+		FRsGameplayTags::Get().GC_Weapon_Fire_DoubleTap, 
 		CueParams
 	);
 }
@@ -236,11 +245,12 @@ void UGA_GunFire::FireHitScan(FName SocketName)
 	if (ABase_Character* Character = Cast<ABase_Character>(GetActorInfo().AvatarActor))
 	{
 		SpreadAngle = Character->CurrentSpread;
+		
 	}
 	FVector ShootDir = FMath::VRandCone(CameraFwd, FMath::DegreesToRadians(SpreadAngle));
 
 	// 4. 끝점: 사거리(Range) 적용
-	float Range = 3000.0f; // Attribute에서 가져오면 더 좋음
+	float Range = 6000.0f; // Attribute에서 가져오면 더 좋음
 	FVector End = Start + (ShootDir * Range);
 
 	// 5. 레이캐스트 실행
@@ -299,6 +309,7 @@ void UGA_GunFire::FireHitScan(FName SocketName)
 	FVector BeamTarget = bHit ? HitResult.ImpactPoint : End;
     
 	HitResult.TraceStart = MuzzleLoc;
+	
 	
 	TriggerFireGameplayCue(MuzzleLoc, BeamTarget, HitResult);
 

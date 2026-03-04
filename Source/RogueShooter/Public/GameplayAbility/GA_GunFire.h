@@ -46,4 +46,8 @@ public:
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "GAS")
 	FVector SpawnTransformOffset;
+	
+	UPROPERTY(BlueprintReadWrite)
+	int32 MuzzleIndex = 0;
+	
 };

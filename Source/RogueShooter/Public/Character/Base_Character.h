@@ -13,6 +13,7 @@
 #include "RsBaseCharacter.h"
 #include "Base_Character.generated.h"
 
+class URsWeaponComponent;
 class UGA_Skill;
 class UUnitWidgetController;
 class UExpSet;
@@ -299,6 +300,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UInventoryComponent> InventoryComponent;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TObjectPtr<URsWeaponComponent> WeaponComponent;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Config")
 	TSubclassOf<AFloatingTextActor> FloatingActorClass;
