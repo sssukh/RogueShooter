@@ -4,10 +4,25 @@
 #include "UI/UW_ReticleWidgetBase.h"
 
 #include "Character/Base_Character.h"
+#include "System/RsWidgetController.h"
+#include "Utility/RSLog.h"
 
 void UUW_ReticleWidgetBase::InitializeReticle(AActor* InWeaponOrCharacter)
 {
 	TargetActor = InWeaponOrCharacter;
+}
+
+void UUW_ReticleWidgetBase::SetWidgetController_Implementation(URsBaseWidgetController* InWidgetController)
+{
+	WidgetController = Cast<URsWidgetController>(InWidgetController);
+	
+	if (!WidgetController)
+	{
+		RS_LOG_WARNING(TEXT("Widget Controller가 설정되지 않았습니다."))
+		return;
+	}
+	
+	WidgetController->OnHitConfirmedSignature.AddDynamic(this,&UUW_ReticleWidgetBase::OnHitEnemy);
 }
 
 void UUW_ReticleWidgetBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -19,7 +34,7 @@ void UUW_ReticleWidgetBase::NativeTick(const FGeometry& MyGeometry, float InDelt
 		// 1. TargetActor에서 현재 탄퍼짐 값(CurrentSpread)을 가져옵니다.
 		// (무기 클래스에 GetCurrentSpread() 같은 함수가 있다고 가정)
 		
-		float Spread = 0;
+		double Spread = 0;
 		
 		if (ABase_Character* Character = Cast<ABase_Character>(TargetActor))
 		{

@@ -40,6 +40,8 @@ public:
 	
 	void UpdateExpBar();
 	
+	void CreateReticle();
+	
 	UFUNCTION()
 	void SetLevel(float InLevel);
 	

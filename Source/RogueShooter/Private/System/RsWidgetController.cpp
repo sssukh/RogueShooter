@@ -67,6 +67,9 @@ void URsWidgetController::BindCallbacksToDependencies()
 			   OnCooldownTagChanged(Tag, NewCount);
 		   });
 	}
+	
+	// 🌟 핵심: 특정 태그(HitEventTag)를 가진 이벤트가 들어오면, 내 함수(OnHitEventReceived)를 실행해라!
+	AbilitySystemComponent->GenericGameplayEventCallbacks.FindOrAdd(HitEventTag).AddUObject(this, &URsWidgetController::OnHitEventReceived);
 }
 
 void URsWidgetController::BroadcastInitialValues()
@@ -188,6 +191,15 @@ void URsWidgetController::BroadcastInitialAbilityInfo()
 			}
 		}
 	}
+}
+
+
+
+void URsWidgetController::OnHitEventReceived(const FGameplayEventData* Payload)
+{
+	
+	if (OnHitConfirmedSignature.IsBound())
+		OnHitConfirmedSignature.Broadcast();
 }
 
 void URsWidgetController::BindExpBarCallbacks()

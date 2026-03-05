@@ -10,6 +10,7 @@
 #include "Data/Attribute/CrosshairAttSet.h"
 #include "GameFramework/Character.h"
 #include "Utility/FRsGameplayTags.h"
+#include "Utility/RSLog.h"
 
 
 UGA_GunFire::UGA_GunFire()
@@ -296,10 +297,27 @@ void UGA_GunFire::FireHitScan(FName SocketName)
 	if (bHit)
 	{
 		// 적을 맞췄다면? -> ApplyGameplayEffect (Damage)
-		if (AActor* HitActor = HitResult.GetActor())
+		if (ACharacter* HitActor = Cast<ACharacter>(HitResult.GetActor()))
 		{
+			RS_LOG_SCREEN(TEXT("%s"),*HitActor->GetName())
+			
 			// GAS 대미지 적용 로직...
 			ApplyDamage(HitActor);
+			
+			UAbilitySystemComponent* MyASC = GetAbilitySystemComponentFromActorInfo();
+    
+			if (MyASC)
+			{
+				// 2. 소포(Payload) 박스를 만듭니다. 여기에 전달할 데이터를 꾹꾹 눌러 담습니다.
+				FGameplayEventData Payload;
+				Payload.Instigator = GetActorInfo().AvatarActor.Get(); // 총을 쏜 사람
+				Payload.Target = HitActor;            // 맞은 사람
+        
+				// 🌟 [핵심] 블루프린트 라이브러리를 거치지 않고 ASC에 직접 이벤트를 꽂아버립니다!
+				FGameplayTag HitTag = FRsGameplayTags::Get().Event_Hit;
+        
+				MyASC->HandleGameplayEvent(HitTag, &Payload);
+			}
 		}
         
 		// 피격 이펙트 (GameplayCue: Impact)

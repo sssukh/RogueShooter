@@ -7,18 +7,17 @@
 #include "NiagaraComponent.h"
 #include "RsWeaponComponent.generated.h"
 
-USTRUCT(BlueprintType)
-struct FMuzzleFlash
-{
-	GENERATED_BODY()
-	
-	UPROPERTY()
-	TObjectPtr<UNiagaraComponent> MuzzleFlashComponent;
-	
-	UPROPERTY()
-	bool MuzzleFlashTrigger = true;
-	
-};
+// USTRUCT(BlueprintType)
+// struct FMuzzleFlashSocketData
+// {
+// 	GENERATED_BODY()
+// 	
+// 	UPROPERTY(BlueprintReadWrite)
+// 	FName MuzzleFlashSocket;
+// 	
+// 	UPROPERTY(BlueprintReadWrite)
+// 	bool MuzzleFlashTrigger = true;
+// };
 
 /*
  *	무기의 이펙트 관련 데이터 및 실행 함수를 가진 컴포넌트
@@ -43,10 +42,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	UNiagaraComponent* GetMuzzleFlashByIndex(int32 MuzzleIndex, bool& MuzzleTrigger);
 public:
-	// 캐릭터 블루프린트에서 미리 달아둘 나이아가라 컴포넌트들
-	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Weapon|FX|Muzzle")
-	TArray<FMuzzleFlash> MuzzleFlashComponents;
-
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Weapon|FX|Muzzle")
 	TObjectPtr<UNiagaraSystem> MuzzleFlashSystem;
 	

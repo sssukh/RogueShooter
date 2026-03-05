@@ -10,6 +10,7 @@
 #include "RsWidgetController.generated.h"
 
 
+struct FGameplayEventData;
 class UExpSet;
 class UCombatSet;
 class UHealthSet;
@@ -21,6 +22,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnCooldownChangeSignature, FGame
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSkillInfoLoadedSignature, const FGameplayTag&, AbilityTag, const FSkillInfo&, RowData);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignatureInHud, float, NewValue);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHitConfirmedSignature);
 
 UCLASS(Blueprintable,BlueprintType)
 class ROGUESHOOTER_API URsWidgetController : public URsBaseWidgetController
@@ -57,6 +60,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="GAS|Messages")
 	FOnAttributeChangedSignatureInHud OnShieldChanged;
 	
+	UPROPERTY(BlueprintAssignable, Category="GAS|Messages")
+	FOnHitConfirmedSignature OnHitConfirmedSignature;
+	
 	// 초기화 함수
 	virtual void SetWidgetControllerParams(const FWidgetControllerParams& WcParams) override;
 	
@@ -75,6 +81,7 @@ public:
 	
 	void BroadcastInitialAbilityInfo();
 	
+	void OnHitEventReceived(const FGameplayEventData* Payload);
 protected:
 	void BindExpBarCallbacks();
 	
@@ -96,4 +103,8 @@ protected:
 	// 스킬 데이터 테이블 참조
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data | Config")
 	TObjectPtr<UDataTable> SkillInfoDataTable;
+	
+	// Hit 수신할 태그 
+	UPROPERTY(EditDefaultsOnly, Category="GAS|Events")
+	FGameplayTag HitEventTag;
 };

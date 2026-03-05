@@ -5,6 +5,7 @@
 
 #include "Components/HorizontalBox.h"
 #include "Components/Overlay.h"
+#include "Components/OverlaySlot.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Library/FunctionLibrary_Helper.h"
@@ -12,6 +13,7 @@
 #include "System/Subsystem/UIAssetCacheSubsystem.h"
 #include "UI/UW_AbilityTile.h"
 #include "UI/UW_HUDHealthBar.h"
+#include "UI/UW_ReticleWidgetBase.h"
 #include "UI/UW_SkillSlotList.h"
 #include "Utility/RSLog.h"
 
@@ -27,7 +29,6 @@ UUW_PlayerHud::UUW_PlayerHud(const FObjectInitializer& ObjectInitializer) : Supe
 void UUW_PlayerHud::NativeConstruct()
 {
 	Super::NativeConstruct();
-
 }
 
 void UUW_PlayerHud::BuildHotbar(const TMap<EActiveAbilities, int32>& ActiveAbilities,
@@ -107,6 +108,21 @@ void UUW_PlayerHud::UpdateTime(FText Time)
 void UUW_PlayerHud::UpdateExpBar()
 {
 	ProgressBar_XP->SetPercent(CurrentExp/MaxExp);
+}
+
+void UUW_PlayerHud::CreateReticle()
+{
+	UUW_ReticleWidgetBase* ReticleWidget = CreateWidget<UUW_ReticleWidgetBase>(GetOwningPlayer(),ReticleWidgetClass);
+	
+	ReticleWidget->InitializeReticle(GetOwningPlayerPawn());
+	
+	UOverlaySlot* OverlaySlot = Overlay_Reticle->AddChildToOverlay(ReticleWidget);
+	
+	OverlaySlot->SetHorizontalAlignment(HAlign_Center);
+	OverlaySlot->SetVerticalAlignment(VAlign_Center);
+	
+	IInterface_WidgetManager::Execute_SetWidgetController(ReticleWidget,WidgetController);
+	
 }
 
 void UUW_PlayerHud::SetLevel(float InLevel)

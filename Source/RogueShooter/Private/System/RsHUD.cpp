@@ -55,6 +55,7 @@ void ARsHUD::InitOverlay(const FWidgetControllerParams& WCParams)
 		// 위젯에게 "너의 데이터 담당자는 얘야"라고 알려줌
 		IInterface_WidgetManager::Execute_SetWidgetController(OverlayWidget,WidgetController);
 		
+		OverlayWidget->CreateReticle();
 		// 5. 스킬 정보 싹 읽어서 방송 
 		// OverlayWidgetController->BroadcastInitialAbilityInfo();
 	}

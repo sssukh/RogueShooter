@@ -36,17 +36,7 @@ class UCharAttributeSet;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoad);
 
-// USTRUCT(BlueprintType)
-// struct FGAbilityID
-// {
-// 	GENERATED_BODY()
-// public:
-// 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
-// 	TSubclassOf<UGameplayAbility> GameplayAbility;
-// 	
-// 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
-// 	EAbilityInputID InputID;
-// };
+
 
 USTRUCT(BlueprintType)
 struct FSkillInputMapping
@@ -54,13 +44,13 @@ struct FSkillInputMapping
 	GENERATED_BODY()
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	class UInputAction* InputAction;
+	TObjectPtr<class UInputAction> InputAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Skill")
 	TSubclassOf<UGA_Skill> Ability;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Skill")
-	EAbilityInputID InputID;
+	EAbilityInputID InputID = EAbilityInputID::None;
 };
 
 UCLASS()
