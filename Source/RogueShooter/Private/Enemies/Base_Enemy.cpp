@@ -29,6 +29,7 @@
 #include "AbilitySystemGlobals.h"
 #include "Data/Attribute/ExpSet.h"
 #include "GameFramework/PlayerState.h"
+#include "System/RsHUD.h"
 #include "UObject/FastReferenceCollector.h"
 
 
@@ -174,10 +175,13 @@ void ABase_Enemy::BeginPlay()
 	{
 		AbilitySystemComponent->InitAbilityActorInfo(this,this);
 		
-		AddCharacterAbilities();
+		ApplyAttributeOnLevel(CharLevel);
 		
+		SetupAbilitiesAndAttributes();
 		
-		IGameplayAbilitiesModule::Get().GetAbilitySystemGlobals()->GetAttributeSetInitter()->InitAttributeSetDefaults(AbilitySystemComponent,TEXT("Enemy"),CharLevel,true);
+			
+		
+		// RS_LOG_SCREEN(TEXT("Health : %f"),AbilitySystemComponent->GetNumericAttribute(HealthSet->GetHealthAttribute()))
 	}
 }
 
@@ -375,11 +379,21 @@ void ABase_Enemy::Die(AActor* DamageCauser)
 	if (!DamageCauser)
 		return;
 	
-	ApplyXpToTargetPlayer(DamageCauser);
+	bIsDead = true;
 	
+	ApplyXpToTargetPlayer(DamageCauser);
 	
 	GetCharacterMovement()->StopMovementImmediately();
 
+	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
+	{
+		// 확실한 내 화면일 때만 HUD에 갱신 요청!
+		if (ARsHUD* MyHUD = Cast<ARsHUD>(PC->GetHUD()))
+		{
+			MyHUD->HideMonsterHealthBar(this);
+		}
+	}
+	
 	ABase_AIController* AIController = Cast<ABase_AIController>(GetController());
 
 	if(AIController)
@@ -391,6 +405,11 @@ void ABase_Enemy::Die(AActor* DamageCauser)
 
 	MC_Enemy_Death();
 
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UHealthSet::GetHealthAttribute()).RemoveAll(this);
+	}
+	
 	DetachFromControllerPendingDestroy();
 }
 
@@ -450,6 +469,42 @@ bool ABase_Enemy::IsAlive_Implementation()
 	return !bIsDead;
 }
 
+void ABase_Enemy::SetupAbilitiesAndAttributes()
+{
+	AddCharacterAbilities();
+	
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(HealthSet->GetHealthAttribute()).AddUObject(this,&ABase_Enemy::OnHealthChanged);
+}
+
+void ABase_Enemy::OnHealthChanged(const FOnAttributeChangeData& Data)
+{
+	// 1. 방어: 데디케이티드 서버라면 UI 작업은 쳐다보지도 말고 즉시 종료!
+	if (GetNetMode() == NM_DedicatedServer) return;
+
+	// 2. 방어: 이 몬스터가 죽었거나 숨겨진 상태(풀링 대기열)라면 무시!
+	if (IsHidden() || bIsDead) return;
+
+	
+	// 3. 로컬 플레이어 찾기 (클라이언트 환경이므로 GetFirstPlayerController가 내 컨트롤러임)
+	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
+	{
+		// 확실한 내 화면일 때만 HUD에 갱신 요청!
+		if (ARsHUD* MyHUD = Cast<ARsHUD>(PC->GetHUD()))
+		{
+			if (Data.NewValue <=0.0f)
+			{
+				MyHUD->HideMonsterHealthBar(this);
+			}
+			else
+			{
+				// 중앙 집중형 HUD에게 "나 체력 변했으니 포스트잇(체력바) 좀 붙여줘!" 라고 요청
+				MyHUD->UpdateMonsterHealthBar(this, Data.NewValue); 
+			}
+			
+		}
+	}
+	
+}
 
 
 void ABase_Enemy::AddCharacterAbilities()

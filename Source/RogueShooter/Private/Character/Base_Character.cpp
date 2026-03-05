@@ -239,7 +239,8 @@ void ABase_Character::PossessedBy(AController* NewController)
 		// 0204 InitAbilityActorInfo 이후에 호출, 그리고 Attribute값들이 추가된 이후에 호출 
 		// 이걸 그냥 ge를 생성해서 따로 적용하자
 		// InitAttributeDefaults_ServerOnly();
-		OnLevelup(StartLevel);
+		ApplyAttributeOnLevel(StartLevel);
+		// OnLevelup(StartLevel);
 	}
 }
 

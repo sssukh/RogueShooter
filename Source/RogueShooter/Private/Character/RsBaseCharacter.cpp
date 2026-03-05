@@ -3,6 +3,9 @@
 
 #include "Character/RsBaseCharacter.h"
 
+#include "AbilitySystemComponent.h"
+#include "GameplayEffectTypes.h"
+
 
 // Sets default values
 ARsBaseCharacter::ARsBaseCharacter()
@@ -38,6 +41,24 @@ float ARsBaseCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const
 
 void ARsBaseCharacter::Die(AActor* DamageCauser)
 {
+}
+
+void ARsBaseCharacter::ApplyAttributeOnLevel(float NewLevel)
+{
+	// 서버에서만 적용 
+	if (!HasAuthority()) return;
+	
+	if (!DefaultCurveEffectClass) return;
+	
+	FGameplayEffectContextHandle Context = GetAbilitySystemComponent()->MakeEffectContext();
+	Context.AddSourceObject(this);
+	
+	FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(DefaultCurveEffectClass,NewLevel,Context);
+	
+	if (SpecHandle.IsValid())
+	{
+		GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+	}
 }
 
 UAbilitySystemComponent* ARsBaseCharacter::GetAbilitySystemComponent() const

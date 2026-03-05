@@ -21,7 +21,7 @@ void UHealthSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData&
 	{
 		float LocalIncomingDamage = GetIncomingDamage();
 		
-		// RS_LOG_SCREEN(TEXT("%s got %f Damage"),*GetOwningActor()->GetName(),LocalIncomingDamage)
+		// RS_LOG_SCREEN(TEXT("%s got %f Damage, CurrentHealth : %f"),*GetOwningActor()->GetName(),LocalIncomingDamage,GetHealth())
 		
 		// meta attribute 초기화
 		SetIncomingDamage(0.0f);

@@ -35,13 +35,16 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void Die(AActor* DamageCauser);
+	
+	virtual void ApplyAttributeOnLevel(float NewLevel);
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 	
-	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "GAS|Config")
+	TSubclassOf<UGameplayEffect> DefaultCurveEffectClass;
 	
 	UPROPERTY()
 	TObjectPtr<UHealthSet> HealthSet;

@@ -104,9 +104,6 @@ protected:
 	void OnLevelup(float NewLevel);
 	
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "GAS|Config")
-	TSubclassOf<UGameplayEffect> DefaultCurveEffectClass;
-	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Config | Attribute")
 	FCurveTableRowHandle MaxXpCurve;
 	

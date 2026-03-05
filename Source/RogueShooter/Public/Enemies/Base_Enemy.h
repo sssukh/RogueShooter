@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayEffectTypes.h"
 #include "Character/RsBaseCharacter.h"
-#include "GameFramework/Character.h"
 #include "Interface/Interface_CharacterManager.h"
 #include "RogueShooter/FlowControlLIbrary.h"
 #include "Base_Enemy.generated.h"
@@ -94,6 +94,11 @@ public:
 	// Interface
 	virtual bool IsAlive_Implementation() override;
 
+	void SetupAbilitiesAndAttributes();
+	
+	void OnHealthChanged(const FOnAttributeChangeData& Data);
+	
+	
 public:
 	// Component
 	
@@ -166,7 +171,7 @@ public:
 	
 	void AddCharacterAbilities();
 	
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;;
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
 	// 부여할 어빌리티 목록
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category =  "GAS | Config")
