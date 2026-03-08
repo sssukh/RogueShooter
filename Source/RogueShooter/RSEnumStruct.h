@@ -271,6 +271,47 @@ public:
 	// 스킬 이름 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	FText DisplayName;
-	
-	
 };
+
+USTRUCT(BlueprintType)
+struct FMonsterSpawnInfo
+{
+	GENERATED_BODY()
+
+	// 스폰할 몬스터 클래스
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave Data")
+	TSubclassOf<ABase_Enemy> MonsterClass;
+
+	// 해당 몬스터의 스폰 마릿수
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave Data")
+	int32 SpawnCount = 10;
+
+	// 해당 몬스터가 스폰되는 간격 (초 단위)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave Data")
+	float SpawnInterval = 1.0f;
+};
+
+USTRUCT(BlueprintType)
+struct FWaveInfo : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	// 이번 웨이브에 등장할 몬스터 그룹 배열 (여러 종류 스폰 가능)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave Data")
+	TArray<FMonsterSpawnInfo> SpawnGroups;
+
+	// 웨이브 시작 전 대기 시간 (상점 이용, 스킬 선택 등을 위한 시간)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave Data")
+	float DelayBeforeStart = 5.0f;
+};
+
+// UENUM(BlueprintType)
+// enum class EWaveState : uint8
+// {
+// 	NotStarted,   // 시작 전 (초기 상태)
+// 	Preparing,    // 웨이브 시작 전 대기 (상점/스킬 선택 등)
+// 	Spawning,     // 몬스터 생성 중
+// 	Combat,       // 생성 완료, 남은 적 섬멸 중
+// 	WaveCleared,  // 웨이브 클리어
+// 	GameOver      // 플레이어 사망 등 게임 오버
+// };

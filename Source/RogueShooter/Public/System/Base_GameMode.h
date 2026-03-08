@@ -7,6 +7,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "Base_GameMode.generated.h"
 
+class UMonsterPoolComponent;
+class UWaveManagerComponent;
 class ABase_Enemy;
 /**
  * 
@@ -68,6 +70,7 @@ public:
 	// seamless travel을 이용해 map으로 이동 
 	virtual void ServerTravel_GamePlay(FName Map);
 
+	void SetEnemyPlayerArray(ABase_Enemy* InEnemy);
 public:
 	
 	UPROPERTY(EditAnywhere)
@@ -98,7 +101,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	TSubclassOf<ABase_Enemy> EnemyClass;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UWaveManagerComponent> WaveManagerComponent;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UMonsterPoolComponent> MonsterPoolComponent;
 private:
 	void UpdateTimer();
 	void IncreaseWaveIndex();

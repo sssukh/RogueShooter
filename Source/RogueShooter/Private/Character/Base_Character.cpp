@@ -69,22 +69,12 @@ ABase_Character::ABase_Character()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Camera->SetupAttachment(SpringArm);
-
-	// static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceFinder(*AssetPath::Animation::BaseCharAnim);
-	// if(AnimInstanceFinder.Succeeded())
-	// {
-	// 	GetMesh()->SetAnimInstanceClass(AnimInstanceFinder.Class);
-	// }
+	
 	
 	GetMesh()->SetRelativeLocation(FVector(0.0f,0.0f,-90.0f));
 	GetMesh()->SetRelativeRotation(FRotator(0.0f,270.0f,0.0f));
 
-	// static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshFinder(*AssetPath::Mesh::SKM_Quinn_Simple);
-	//
-	// if(MeshFinder.Succeeded())
-	// {
-	// 	GetMesh()->SetSkeletalMesh(MeshFinder.Object);
-	// }
+
 	
 	// InventoryComponent 세팅
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
@@ -434,7 +424,7 @@ void ABase_Character::Death_Implementation()
 
 void ABase_Character::MC_Death_Implementation()
 {
-	PlayAnimMontage(DeathAnimMontage);
+	PlayAnimMontage(DeathMontage);
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_COLLISION_ENEMY,ECR_Ignore);
 

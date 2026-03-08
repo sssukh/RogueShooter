@@ -27,6 +27,13 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
+	// 풀에서 꺼낼 때 호출할 AI 시작 함수
+	void ActivateAI();
+    
+	// 풀에 넣을 때 호출할 AI 중지 함수
+	void DeactivateAI();
+	
+	
 	// On Possess setup references and begin BT
 	// 빙의하면서 reference 셋업(Enemy에 reference 전달)을 하고 BT를 시작시킨다.
 	UFUNCTION()

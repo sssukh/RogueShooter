@@ -37,6 +37,11 @@ public:
 	virtual void Die(AActor* DamageCauser);
 	
 	virtual void ApplyAttributeOnLevel(float NewLevel);
+	
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void OnDeathMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+	
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
@@ -51,5 +56,8 @@ public:
 	
 	UPROPERTY()
 	TObjectPtr<UCombatSet> CombatSet;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TObjectPtr<UAnimMontage> DeathMontage;
 	
 };

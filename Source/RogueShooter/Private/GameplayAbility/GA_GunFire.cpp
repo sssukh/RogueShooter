@@ -54,7 +54,18 @@ void UGA_GunFire::ApplyDamage(AActor* TargetActor)
 		// 내(Instigator)가 만든 명세서를 적(Target)에게 적용한다.
 		TargetASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 	}
+	ApplyGameplayEvent(TargetActor);
+}
+
+void UGA_GunFire::ApplyGameplayEvent(AActor* TargetActor)
+{
+	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
 	
+	FGameplayEventData Payload;
+	FGameplayTag HitReactTag =FRsGameplayTags::Get().Event_Movement_HitReaction;
+
+	// TargetASC는 맞은 몬스터의 Ability System Component 입니다.
+	TargetASC->HandleGameplayEvent(HitReactTag, &Payload);
 }
 
 void UGA_GunFire::TriggerFireGameplayCue(FVector MuzzleLoc, FVector TargetLoc, const FHitResult& HitResult)
@@ -192,7 +203,7 @@ void UGA_GunFire::OnTargetDataReceived(const FGameplayAbilityTargetDataHandle& D
 			// 🛡️ [검증 로직 (선택)] 거리가 너무 멀거나 벽을 관통했다면 여기서 데미지를 취소할 수 있습니다.
 
 			// 💥 [실제 데미지 적용] 
-			if (HitResult->GetActor())
+			if (ACharacter* Char = Cast<ACharacter>(HitResult->GetActor()))
 			{
 				// ApplyGameplayEffectToTarget(...) 을 호출하여 체력 차감
 				ApplyDamage(HitResult->GetActor());

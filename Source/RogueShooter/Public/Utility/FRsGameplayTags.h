@@ -47,11 +47,15 @@ public:
 	FGameplayTag Ability_Skill_Skill1;
 	FGameplayTag Ability_Skill_Skill1_DoubleTap;
 	
+	FGameplayTag Ability_Move;
+	FGameplayTag Ability_Attack;
+	
 	FGameplayTag Event_Death;
 	FGameplayTag Event_Equip;
 	FGameplayTag Event_Hit;
 	FGameplayTag Event_LevelUp;
 	FGameplayTag Event_Montage_Fire;
+	FGameplayTag Event_Movement_HitReaction;
 	
 	FGameplayTag GC_Combat_Damage;
 	FGameplayTag GC_Combat_Damage_Shield;

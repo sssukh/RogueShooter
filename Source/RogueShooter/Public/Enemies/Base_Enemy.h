@@ -96,9 +96,16 @@ public:
 
 	void SetupAbilitiesAndAttributes();
 	
+	// 피격시(체력감소 시)
 	void OnHealthChanged(const FOnAttributeChangeData& Data);
 	
 	
+	// Monster Pool
+public:
+	void ActivateFromPool();
+	void DeactivateToPool();
+	// 죽는 애니메이션 재생 후 처리할 풀링 혹은 비주얼 관련 로직 
+	virtual void OnDeathMontageEnded(UAnimMontage* Montage, bool bInterrupted) override;
 public:
 	// Component
 	
@@ -118,9 +125,9 @@ public:
 	TObjectPtr<UAnimMontage> AttackAnimation;
 
 
-	// 초기값 설정 필요
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup")
-	TObjectPtr<UAnimMontage> DeathAnimation;
+	// // 초기값 설정 필요
+	// UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup")
+	// TObjectPtr<UAnimMontage> DeathAnimation;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Base Enemy | Enemy Setup")
 	bool bIsDead = false;

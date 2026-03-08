@@ -61,6 +61,10 @@ void ARsBaseCharacter::ApplyAttributeOnLevel(float NewLevel)
 	}
 }
 
+void ARsBaseCharacter::OnDeathMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+}
+
 UAbilitySystemComponent* ARsBaseCharacter::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;

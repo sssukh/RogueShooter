@@ -5,6 +5,8 @@
 
 #include "MultiplayerSessionsSubsystem.h"
 #include "Character/Base_Character.h"
+#include "Components/MonsterPoolComponent.h"
+#include "Components/WaveManagerComponent.h"
 #include "Enemies/Base_Enemy.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "Interface/Interface_CharacterManager.h"
@@ -21,6 +23,14 @@
 ABase_GameMode::ABase_GameMode()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	
+	WaveManagerComponent = CreateDefaultSubobject<UWaveManagerComponent>(TEXT("WaveManagerComponent"));
+	
+	WaveManagerComponent->bEditableWhenInherited = true;
+	
+	MonsterPoolComponent = CreateDefaultSubobject<UMonsterPoolComponent>(TEXT("MonsterPoolComponent"));
+	
+	MonsterPoolComponent->bEditableWhenInherited =  true;
 }
 
 void ABase_GameMode::BeginPlay()
@@ -31,7 +41,8 @@ void ABase_GameMode::BeginPlay()
 	GetWorldTimerManager().SetTimer(Delay, FTimerDelegate::CreateLambda([&]()
 	{
 		GameSetup();
-		SpawnSetup();
+		// SpawnSetup();
+		WaveManagerComponent->StartWave(1);
 	}), 2.0f, false);
 }
 
@@ -298,4 +309,9 @@ void ABase_GameMode::ServerTravel_GamePlay(FName Map)
 	FString cmd = FString::Printf(TEXT("/Game/RogueShooter/Maps/%s"),*Map.ToString());
 
 	GetWorld()->ServerTravel(cmd);
+}
+
+void ABase_GameMode::SetEnemyPlayerArray(ABase_Enemy* InEnemy)
+{
+	InEnemy->PlayerArray = CachedPlayerCharacterArray;
 }

@@ -22,6 +22,8 @@ public:
 	
 	void ApplyDamage(AActor* TargetActor);
 	
+	void ApplyGameplayEvent(AActor* TargetActor);
+	
 	void TriggerFireGameplayCue(FVector MuzzleLoc, FVector TargetLoc, const FHitResult& HitResult);
 	
 	virtual void ExecuteSkillLogic_Implementation(float ChargeAmount) override;

@@ -42,12 +42,15 @@ void FRsGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	Ability_Skill_Skill1 = Manager.AddNativeGameplayTag(FName("Ability.Skill.Skill1"),TEXT("1번 슬롯 스킬"));
 	Ability_Skill_Skill1_DoubleTap = Manager.AddNativeGameplayTag(FName("Ability.Skill.Skill1.DoubleTap"),TEXT("더블 탭"));
 	
+	Ability_Move = Manager.AddNativeGameplayTag(FName("Ability.Move"),TEXT("움직임"));
+	Ability_Attack = Manager.AddNativeGameplayTag(FName("Ability.Attack"),TEXT("공격"));
 	
 	Event_Death = Manager.AddNativeGameplayTag(FName("Event.Death"),TEXT("죽음"));
 	Event_Equip = Manager.AddNativeGameplayTag(FName("Event.Equip"),TEXT("아이템 착용"));
 	Event_Hit = Manager.AddNativeGameplayTag(FName("Event.Hit"),TEXT("피격"));
 	Event_LevelUp = Manager.AddNativeGameplayTag(FName("Event.LevelUp"),TEXT("레벨업"));
 	Event_Montage_Fire = Manager.AddNativeGameplayTag(FName("Event.Montage.Fire"),TEXT("사격"));
+	Event_Movement_HitReaction = Manager.AddNativeGameplayTag(FName("Event.Movement.HitReaction"),TEXT("피격 반응"));
 	
 	
 	GC_Combat_Damage = Manager.AddNativeGameplayTag(FName("GameplayCue.Combat.Damage"),TEXT("데미지"));

@@ -6,7 +6,6 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
-#include "AudioDevice.h"
 #include "Abilities/GameplayAbilityTypes.h"
 #include "AI/Base_AIController.h"
 #include "AssetTypeActions/AssetDefinition_SoundBase.h"
@@ -27,7 +26,11 @@
 #include "Utility/RSLog.h"
 #include "GameplayAbilitiesModule.h"
 #include "AbilitySystemGlobals.h"
+#include "BrainComponent.h"
+#include "Components/MonsterPoolComponent.h"
+#include "Components/WaveManagerComponent.h"
 #include "Data/Attribute/ExpSet.h"
+#include "GameFramework/GameModeBase.h"
 #include "GameFramework/PlayerState.h"
 #include "System/RsHUD.h"
 #include "UObject/FastReferenceCollector.h"
@@ -120,11 +123,11 @@ ABase_Enemy::ABase_Enemy()
 		AttackAnimation = AttackMontageFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> DeathMontageFinder(*AssetPath::Montage::GruntlingDeath);
-	if(DeathMontageFinder.Succeeded())
-	{
-		DeathAnimation = DeathMontageFinder.Object;
-	}
+	// static ConstructorHelpers::FObjectFinder<UAnimMontage> DeathMontageFinder(*AssetPath::Montage::GruntlingDeath);
+	// if(DeathMontageFinder.Succeeded())
+	// {
+	// 	DeathAnimation = DeathMontageFinder.Object;
+	// }
 
 	DoOnce.Reset();
 
@@ -354,7 +357,7 @@ void ABase_Enemy::MC_Enemy_Death_Implementation()
 
 	AttackCollisionSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	PlayAnimMontage(DeathAnimation);
+	// PlayAnimMontage(DeathAnimation);
 
 	FTimerHandle DelayHandle;
 
@@ -383,7 +386,24 @@ void ABase_Enemy::Die(AActor* DamageCauser)
 	
 	ApplyXpToTargetPlayer(DamageCauser);
 	
-	GetCharacterMovement()->StopMovementImmediately();
+	DeactivateToPool();
+	// SetActorTickEnabled(false);
+	// GetCharacterMovement()->DisableMovement();
+	// GetCharacterMovement()->StopMovementImmediately();
+	
+	// 애니메이션 재생 
+	
+	// if (DeathAnimation)
+	// {
+	// 	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	// 	{
+	// 		AnimInstance->OnMontageEnded.AddDynamic(this,&ABase_Enemy::OnDeathMontageEnded);
+	// 		
+	// 		PlayAnimMontage(DeathAnimation);
+	// 	}
+	// }
+	
+	
 
 	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
 	{
@@ -394,23 +414,25 @@ void ABase_Enemy::Die(AActor* DamageCauser)
 		}
 	}
 	
-	ABase_AIController* AIController = Cast<ABase_AIController>(GetController());
-
-	if(AIController)
-	{
-		AIController->StopMovement();
-
-		AIController->EndAI();
-	}
-
-	MC_Enemy_Death();
-
-	if (AbilitySystemComponent)
-	{
-		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UHealthSet::GetHealthAttribute()).RemoveAll(this);
-	}
 	
-	DetachFromControllerPendingDestroy();
+	
+	// ABase_AIController* AIController = Cast<ABase_AIController>(GetController());
+	//
+	// if(AIController)
+	// {
+	// 	AIController->StopMovement();
+	//
+	// 	AIController->EndAI();
+	// }
+
+	// MC_Enemy_Death();
+
+	// if (AbilitySystemComponent)
+	// {
+	// 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UHealthSet::GetHealthAttribute()).RemoveAll(this);
+	// }
+	
+	// DetachFromControllerPendingDestroy();
 }
 
 void ABase_Enemy::ApplyXpToTargetPlayer(AActor* TargetPlayer)
@@ -505,6 +527,94 @@ void ABase_Enemy::OnHealthChanged(const FOnAttributeChangeData& Data)
 	}
 	
 }
+
+void ABase_Enemy::ActivateFromPool()
+{
+	
+	// 1. 렌더링 및 충돌 복구
+	SetActorHiddenInGame(false);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+    
+	// 2. 틱 및 이동 연산 복구
+	SetActorTickEnabled(true);
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+
+	// 3. AI 비헤비어 트리 재시작
+	
+	if (ABase_AIController* MyAICon = Cast<ABase_AIController>(GetController()))
+	{
+		MyAICon->ActivateAI(); // 예: RunBehaviorTree(MyTree) 를 호출하는 함수
+	}
+	
+	// if (AAIController* AICon = Cast<AAIController>(GetController()))
+	// {
+	// 	if (AICon->GetBrainComponent())
+	// 	{
+	// 		AICon->GetBrainComponent()->RestartLogic();
+	// 	}
+	// 	else
+	// 	{
+	// 		// 🌟 핵심: 뇌가 아예 없다면(풀에 들어가느라 초기화가 안 됐다면), 
+	// 		// AI 컨트롤러에 직접 접근해서 비헤비어 트리를 처음부터 강제로 켜주어야 합니다!
+	// 		// (AMyAIController는 실제 사용 중인 AI컨트롤러 클래스명으로 변경, RunAI는 BT를 실행하는 사용자 정의 함수)
+	// 		if (ABase_AIController* MyAICon = Cast<ABase_AIController>(AICon))
+	// 		{
+	// 			MyAICon->ActivateAI(); // 예: RunBehaviorTree(MyTree) 를 호출하는 함수
+	// 		}
+	// 	}
+	// }
+
+	// TODO: GAS 초기화 (체력 100% 복구 GE 재적용 등)
+	// TODO : 웨이브정보에 몬스터 레벨을 추가
+	ApplyAttributeOnLevel(CharLevel);
+}
+
+void ABase_Enemy::DeactivateToPool()
+{
+	// 1. 렌더링 및 충돌 해제
+	// SetActorHiddenInGame(true);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    
+	// 2. 틱 및 이동 연산 중지
+	SetActorTickEnabled(false);
+	GetCharacterMovement()->DisableMovement();
+	GetCharacterMovement()->StopMovementImmediately();
+	
+	// 3. AI 비헤비어 트리 중지
+	if (ABase_AIController* AICon = Cast<ABase_AIController>(GetController()))
+	{
+		AICon->DeactivateAI(); // 🌟 여기서 타이머와 BT를 확실하게 중지
+	}
+	
+	
+
+	// TODO: GAS가 적용되어 있다면 진행 중인 Ability와 Gameplay Effect(DoT 데미지 등)를 모두 취소하는 로직 추가
+	// AbilitySystemComponent->CancelAllAbilities();
+	// AbilitySystemComponent->RemoveAllGameplayEffects();
+}
+
+void ABase_Enemy::OnDeathMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	{
+		AnimInstance->OnMontageEnded.RemoveDynamic(this, &ABase_Enemy::OnDeathMontageEnded);
+	}
+	
+	// 몬스터 객체 풀로 반환 
+	if (AGameModeBase* GameMode = GetWorld()->GetAuthGameMode())
+	{
+		if (UWaveManagerComponent* WaveManagerComponent = GameMode->FindComponentByClass<UWaveManagerComponent>())
+		{
+			WaveManagerComponent->OnMonsterDied(this);
+		}
+		
+		if (UMonsterPoolComponent* MonsterPoolComponent = GameMode->FindComponentByClass<UMonsterPoolComponent>())
+		{
+			MonsterPoolComponent->ReturnMonster(this);
+		}
+	}
+}
+
 
 
 void ABase_Enemy::AddCharacterAbilities()

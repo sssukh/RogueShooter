@@ -45,26 +45,43 @@ void ABase_AIController::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void ABase_AIController::ActivateAI()
+{
+	if (BehaviorTree)
+	{
+		RunBehaviorTree(BehaviorTree);
+	}
+	else
+	{
+		RS_LOG_ERROR(TEXT("BehaviorTree has not been set in ActivateAI"));
+	}
+
+	BeginAI(); // 타이머 시작 및 타겟 서치
+}
+
+void ABase_AIController::DeactivateAI()
+{
+	EndAI(); // 타이머 정지 및 블랙보드 타겟 비우기
+	StopMovement(); // 현재 진행 중인 이동 명령 즉시 취소
+
+	if (UBehaviorTreeComponent* BTComp = Cast<UBehaviorTreeComponent>(BrainComponent))
+	{
+		BTComp->StopLogic(TEXT("Returned to Pool"));
+	}
+}
+
 void ABase_AIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
 	if(ABase_Enemy* Enemy = Cast<ABase_Enemy>(InPawn))
 	{
-		AsBaseEnemy = Enemy;
-		
-		// RS_LOG_ERROR(TEXT("%s has been set to %s"),*this->GetName(), *Enemy->GetName())
-
-		PlayerArray = AsBaseEnemy->PlayerArray;
+		PlayerArray = Enemy->PlayerArray;
 
 		if(BehaviorTree == nullptr)
 		{
 			RS_LOG_ERROR(TEXT("BehaviorTree has not been set"));
 		}
-		
-		RunBehaviorTree(BehaviorTree);
-
-		BeginAI();
 	}
 }
 
