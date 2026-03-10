@@ -77,6 +77,7 @@ void UGA_Skill::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 			ChargeStartTime = GetWorld()->GetTimeSeconds();
 
 			// 2. (옵션) 차징 시작 이펙트/애니메이션 재생 (여기서 PlayMontage 등 호출 가능)
+			// TODO : 차징 이펙트 추가하기 
             
 			// 3. 떼는 것을 기다림 (WaitInputRelease)
 			UAbilityTask_WaitInputRelease* ReleaseTask = UAbilityTask_WaitInputRelease::WaitInputRelease(this, true);

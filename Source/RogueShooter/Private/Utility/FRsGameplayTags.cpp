@@ -41,6 +41,10 @@ void FRsGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	Ability_Skill_GunFire = Manager.AddNativeGameplayTag(FName("Ability.Skill.GunFire"),TEXT("스킬 총격"));
 	Ability_Skill_Skill1 = Manager.AddNativeGameplayTag(FName("Ability.Skill.Skill1"),TEXT("1번 슬롯 스킬"));
 	Ability_Skill_Skill1_DoubleTap = Manager.AddNativeGameplayTag(FName("Ability.Skill.Skill1.DoubleTap"),TEXT("더블 탭"));
+	Ability_Skill_Skill2_PiercingRay = Manager.AddNativeGameplayTag(FName("Ability.Skill.Skill2.PiercingRay"),TEXT("관통의 빛"));
+	Ability_Skill_Skill3_Slide = Manager.AddNativeGameplayTag(FName("Ability.Skill.Skill3.Slide"),TEXT("슬라이딩"));
+	Ability_Skill_Skill4_BulletStorm = Manager.AddNativeGameplayTag(FName("Ability.Skill.Skill4.BulletStorm"),TEXT("탄막 전개"));
+	
 	
 	Ability_Move = Manager.AddNativeGameplayTag(FName("Ability.Move"),TEXT("움직임"));
 	Ability_Attack = Manager.AddNativeGameplayTag(FName("Ability.Attack"),TEXT("공격"));

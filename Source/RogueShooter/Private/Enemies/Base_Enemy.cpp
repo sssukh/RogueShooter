@@ -387,24 +387,10 @@ void ABase_Enemy::Die(AActor* DamageCauser)
 	ApplyXpToTargetPlayer(DamageCauser);
 	
 	DeactivateToPool();
-	// SetActorTickEnabled(false);
-	// GetCharacterMovement()->DisableMovement();
-	// GetCharacterMovement()->StopMovementImmediately();
-	
-	// 애니메이션 재생 
-	
-	// if (DeathAnimation)
-	// {
-	// 	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
-	// 	{
-	// 		AnimInstance->OnMontageEnded.AddDynamic(this,&ABase_Enemy::OnDeathMontageEnded);
-	// 		
-	// 		PlayAnimMontage(DeathAnimation);
-	// 	}
-	// }
 	
 	
-
+	
+	// 몬스터 체력 바 풀링으로 되돌리기 
 	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
 	{
 		// 확실한 내 화면일 때만 HUD에 갱신 요청!
@@ -413,26 +399,6 @@ void ABase_Enemy::Die(AActor* DamageCauser)
 			MyHUD->HideMonsterHealthBar(this);
 		}
 	}
-	
-	
-	
-	// ABase_AIController* AIController = Cast<ABase_AIController>(GetController());
-	//
-	// if(AIController)
-	// {
-	// 	AIController->StopMovement();
-	//
-	// 	AIController->EndAI();
-	// }
-
-	// MC_Enemy_Death();
-
-	// if (AbilitySystemComponent)
-	// {
-	// 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UHealthSet::GetHealthAttribute()).RemoveAll(this);
-	// }
-	
-	// DetachFromControllerPendingDestroy();
 }
 
 void ABase_Enemy::ApplyXpToTargetPlayer(AActor* TargetPlayer)

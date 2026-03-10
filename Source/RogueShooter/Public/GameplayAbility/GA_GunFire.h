@@ -39,6 +39,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable,Category = "Weapon")
 	void FireHitScan(FName SocketName);
+	
+	UFUNCTION(BlueprintCallable,Category = "Weapon")
+	void GetTargetPoint(FName SocketName, FVector& TargetStart, FVector& TargetPoint, bool IsSpread = false );
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category ="GAS | Config")
 	TSubclassOf<UGameplayEffect> DamageEffectClass;

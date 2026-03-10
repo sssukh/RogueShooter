@@ -46,6 +46,9 @@ public:
 	FGameplayTag Ability_Skill_GunFire;
 	FGameplayTag Ability_Skill_Skill1;
 	FGameplayTag Ability_Skill_Skill1_DoubleTap;
+	FGameplayTag Ability_Skill_Skill2_PiercingRay;
+	FGameplayTag Ability_Skill_Skill3_Slide;
+	FGameplayTag Ability_Skill_Skill4_BulletStorm;
 	
 	FGameplayTag Ability_Move;
 	FGameplayTag Ability_Attack;

@@ -52,7 +52,8 @@ void UGA_GunFire::ApplyDamage(AActor* TargetActor)
 	if (SpecHandle.IsValid() && TargetASC)
 	{
 		// 내(Instigator)가 만든 명세서를 적(Target)에게 적용한다.
-		TargetASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		SourceASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(),TargetASC);
+		// TargetASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 	}
 	ApplyGameplayEvent(TargetActor);
 }
@@ -227,43 +228,46 @@ void UGA_GunFire::FireHitScan(FName SocketName)
 	
 	ACharacter* Avatar = Cast<ACharacter>(GetAvatarActorFromActorInfo());
 	APlayerController* PC = Cast<APlayerController>(Avatar->GetController());
-	if (!Avatar || !PC) return;
-
-	FVector CameraLoc;
-	FRotator CameraRot;
-	
-	// 1. ⭐ 카메라의 위치와 회전을 가져옵니다. (화면 정중앙 기준)
-	PC->GetPlayerViewPoint(CameraLoc, CameraRot);
-
-	// 2. 레이캐스트 방향 설정
-	FVector CameraFwd = CameraRot.Vector();
-	
-	// 1. 시작점: 소켓 위치 (Muzzle_L or Muzzle_R)
+	// if (!Avatar || !PC) return;
+	//
+	// FVector CameraLoc;
+	// FRotator CameraRot;
+	//
+	// // 1. ⭐ 카메라의 위치와 회전을 가져옵니다. (화면 정중앙 기준)
+	// PC->GetPlayerViewPoint(CameraLoc, CameraRot);
+	//
+	// // 2. 레이캐스트 방향 설정
+	// FVector CameraFwd = CameraRot.Vector();
+	//
+	// // 1. 시작점: 소켓 위치 (Muzzle_L or Muzzle_R)
 	FVector MuzzleLoc = Avatar->GetMesh()->GetSocketLocation(SocketName);
-
-	FVector CameraToMuzzle = MuzzleLoc - CameraLoc;
+	//
+	// FVector CameraToMuzzle = MuzzleLoc - CameraLoc;
+	//
+	// float ProjectedDist = FVector::DotProduct(CameraToMuzzle,CameraFwd);
+	//
+	// FVector Start = CameraLoc + (CameraFwd * ProjectedDist);
+	//
+	//
+ //    
+	// // 3. 확산(Spread) 적용 
+	// // 현재 Spread 속성(Attribute)을 가져와서 랜덤하게 방향을 틉니다.
+	// // 임시로 상수를 넣고 로직 완성 이후에 발사 시간에 비례해서 커지는 값을 넣자 
+	// // float SpreadAngle = GetAbilitySystemComponentFromActorInfo()->GetNumericAttribute(URsAttributeSet::GetSpreadAttribute());
+	// float SpreadAngle = 3.0f;
+	// if (ABase_Character* Character = Cast<ABase_Character>(GetActorInfo().AvatarActor))
+	// {
+	// 	SpreadAngle = Character->CurrentSpread;
+	// 	
+	// }
+	// FVector ShootDir = FMath::VRandCone(CameraFwd, FMath::DegreesToRadians(SpreadAngle));
+	//
+	// // 4. 끝점: 사거리(Range) 적용
+	// float Range = 6000.0f; // Attribute에서 가져오면 더 좋음
 	
-	float ProjectedDist = FVector::DotProduct(CameraToMuzzle,CameraFwd);
-	
-	FVector Start = CameraLoc + (CameraFwd * ProjectedDist);
-	
-	
-    
-	// 3. 확산(Spread) 적용 (로그라이크의 핵심!)
-	// 현재 Spread 속성(Attribute)을 가져와서 랜덤하게 방향을 틉니다.
-	// 임시로 상수를 넣고 로직 완성 이후에 발사 시간에 비례해서 커지는 값을 넣자 
-	// float SpreadAngle = GetAbilitySystemComponentFromActorInfo()->GetNumericAttribute(URsAttributeSet::GetSpreadAttribute());
-	float SpreadAngle = 3.0f;
-	if (ABase_Character* Character = Cast<ABase_Character>(GetActorInfo().AvatarActor))
-	{
-		SpreadAngle = Character->CurrentSpread;
-		
-	}
-	FVector ShootDir = FMath::VRandCone(CameraFwd, FMath::DegreesToRadians(SpreadAngle));
-
-	// 4. 끝점: 사거리(Range) 적용
-	float Range = 6000.0f; // Attribute에서 가져오면 더 좋음
-	FVector End = Start + (ShootDir * Range);
+	FVector Start;
+	FVector End;
+	GetTargetPoint(SocketName,Start,End,true);
 
 	// 5. 레이캐스트 실행
 	FHitResult HitResult;
@@ -346,5 +350,61 @@ void UGA_GunFire::FireHitScan(FName SocketName)
 	// 7. 총구 이펙트 (GameplayCue: Muzzle)
 	// SocketName 위치에서 Muzzle Flash 재생
 }
+
+void UGA_GunFire::GetTargetPoint(FName SocketName, FVector& TargetStart, FVector& TargetPoint, bool IsSpread)
+{
+	ACharacter* Avatar = Cast<ACharacter>(GetAvatarActorFromActorInfo());
+	APlayerController* PC = Cast<APlayerController>(Avatar->GetController());
+	
+	if (!Avatar || !PC) return;
+
+	FVector CameraLoc;
+	FRotator CameraRot;
+	
+	// 1. ⭐ 카메라의 위치와 회전을 가져옵니다. (화면 정중앙 기준)
+	PC->GetPlayerViewPoint(CameraLoc, CameraRot);
+
+	// 2. 레이캐스트 방향 설정
+	FVector CameraFwd = CameraRot.Vector();
+	
+	// 1. 시작점: 소켓 위치 (Muzzle_L or Muzzle_R)
+	FVector MuzzleLoc = Avatar->GetMesh()->GetSocketLocation(SocketName);
+
+	FVector CameraToMuzzle = MuzzleLoc - CameraLoc;
+	
+	float ProjectedDist = FVector::DotProduct(CameraToMuzzle,CameraFwd);
+	
+	FVector Start = CameraLoc + (CameraFwd * ProjectedDist);
+    
+	// 3. 확산(Spread) 적용 
+	// 현재 Spread 속성(Attribute)을 가져와서 랜덤하게 방향을 틉니다.
+	// 임시로 상수를 넣고 로직 완성 이후에 발사 시간에 비례해서 커지는 값을 넣자 
+	// float SpreadAngle = GetAbilitySystemComponentFromActorInfo()->GetNumericAttribute(URsAttributeSet::GetSpreadAttribute());
+	FVector ShootDir;
+	if (IsSpread)
+	{
+		float SpreadAngle = 3.0f;
+		if (ABase_Character* Character = Cast<ABase_Character>(GetActorInfo().AvatarActor))
+		{
+			SpreadAngle = Character->CurrentSpread;
+		
+		}
+		ShootDir = FMath::VRandCone(CameraFwd, FMath::DegreesToRadians(SpreadAngle));
+	}
+	else
+	{
+		ShootDir = CameraFwd;
+	}
+
+	// 4. 끝점: 사거리(Range) 적용
+	float Range = 6000.0f; // Attribute에서 가져오면 더 좋음
+	FVector End = Start + (ShootDir * Range);
+
+	TargetStart = Start;
+	TargetPoint = End;
+	
+}
+
+
 
 

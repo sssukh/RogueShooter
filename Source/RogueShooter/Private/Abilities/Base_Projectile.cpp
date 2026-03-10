@@ -49,14 +49,15 @@ ABase_Projectile::ABase_Projectile()
 	
 	ProjectileMovement->bRotationFollowsVelocity =  true;
 
+	
+	SphereComponent->OnComponentBeginOverlap.AddDynamic(this,&ABase_Projectile::OnSphereOverlap);
+	SphereComponent->OnComponentHit.AddDynamic(this,&ABase_Projectile::OnHit);
 }
 
 // Called when the game starts or when spawned
 void ABase_Projectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	SphereComponent->OnComponentBeginOverlap.AddDynamic(this,&ABase_Projectile::OnSphereOverlap);
 }
 
 // Called every frame
@@ -65,20 +66,18 @@ void ABase_Projectile::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void ABase_Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	FVector NormalImpulse, const FHitResult& Hit)
+{
+	
+}
+
 void ABase_Projectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                       UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!IsValid(OtherActor) || OtherActor == GetOwner()) return; // 나 자신은 무시
 
-	// 1. 적의 ASC 찾기
-	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor);
-
-	// 2. 명세서(Spec)가 유효하고 적에게 ASC가 있다면 적용
-	if (DamageEffectSpecHandle.IsValid() && TargetASC)
-	{
-		// 내(Instigator)가 만든 명세서를 적(Target)에게 적용한다.
-		TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
-	}
+	ApplyDamage(OtherActor);
 
 	// 3. 투사체 파괴 (관통형이면 여기서 파괴 안 하고 횟수 차감 등 로직 추가)
 	Destroy();
@@ -96,5 +95,18 @@ void ABase_Projectile::NotifyHit(class UPrimitiveComponent* MyComp, AActor* Othe
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),Hit_VFX,HitLocation);
 
 	Destroy();
+}
+
+void ABase_Projectile::ApplyDamage(AActor* TargetActor)
+{
+	// 1. 적의 ASC 찾기
+	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+
+	// 2. 명세서(Spec)가 유효하고 적에게 ASC가 있다면 적용
+	if (DamageEffectSpecHandle.IsValid() && TargetASC)
+	{
+		// 내(Instigator)가 만든 명세서를 적(Target)에게 적용한다.
+		TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
+	}
 }
 
