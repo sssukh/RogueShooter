@@ -10,11 +10,16 @@
 UENUM(BlueprintType)
 enum class ESkillInputStyle : uint8
 {
-	Instant     UMETA(DisplayName = "Instant (One Shot)"), // 단발
-	Continuous  UMETA(DisplayName = "Continuous (Hold)"),  // 연사
-	Charging    UMETA(DisplayName = "Charging (Release)"), // 차징 (모아서 쏘기)
-	Burst       UMETA(DisplayName = "Burst Fire")          // 점사 (3점사 등)
+	// 단발
+	Instant     UMETA(DisplayName = "Instant (One Shot)"), 
+	// 연사
+	Continuous  UMETA(DisplayName = "Continuous (Hold)"),  
+	// 차징 (모아서 쏘기)
+	Charging    UMETA(DisplayName = "Charging (Release)"), 
+	// 점사 (3점사 등)/직접 EndAbility 호출해야함.
+	Burst       UMETA(DisplayName = "Burst Fire")          
 };
+
 
 /**
  * BaseSkill 클래스 
@@ -79,9 +84,12 @@ protected:
 
 	// 점사 관련 설정
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Config", meta = (EditCondition = "InputStyle == ESkillInputStyle::Burst"))
-	int32 BurstCount = 3; // 한 번 누르면 몇 발 나가는지
+	int32 MaxBurstCount = 3; // 한 번 누르면 몇 발 나가는지
 	
-private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Config", meta = (EditCondition = "InputStyle == ESkillInputStyle::Burst"))
+	float BurstInterval = 0.1f; // 한 번 누르면 몇 발 나가는지
+	
+protected:
 	// 버튼을 뗐을 때 감지 (Task 콜백)
 	UFUNCTION()
 	void OnReleaseInput(float TimeHeld);
@@ -92,11 +100,21 @@ private:
 	// 반복 실행될 함수
 	void LoopLogic();
 	
-	int32 CurrentBurstShots = 0; // 현재 점사 발사 수
+	
 	float ChargeStartTime = 0.0f; // 차징 시작 시간
 
 	// 점사 로직용 함수
 	void BurstLogic();
+	
+	
+	// 태스크의 발사 신호를 받을 C++ 콜백 함수
+	UFUNCTION()
+	void HandlePerformAction(int32 ActionNumber);
+
+	// 태스크의 완료 신호를 받을 C++ 콜백 함수
+	UFUNCTION()
+	void HandleRepeatFinished(int32 ActionNumber);
+	
 public:
 	// 데이터 애셋에 접근할 키 값 
 	// 스킬 아이콘 및 설명을 가져옴 

@@ -4,8 +4,10 @@
 #include "GameplayAbility/GA_Skill.h"
 
 #include "AbilitySystemComponent.h"
+#include "VectorVM.h"
 #include "Utility/FRsGameplayTags.h"
 #include "Abilities/Tasks/AbilityTask_WaitInputRelease.h"
+#include "Abilities/Tasks/AbilityTask_Repeat.h"
 
 UGA_Skill::UGA_Skill()
 {
@@ -59,17 +61,7 @@ void UGA_Skill::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 		}
 		break;
 
-	// case ESkillInputStyle::Continuous:
-	// 	{
-	// 		ExecuteSkillLogic(1.0f);
-	// 		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Loop, this, &UGA_Skill::LoopLogic, FireRate, true);
- //            
-	// 		// 입력 해제 대기
-	// 		UAbilityTask_WaitInputRelease* ReleaseTask = UAbilityTask_WaitInputRelease::WaitInputRelease(this, true);
-	// 		ReleaseTask->OnRelease.AddDynamic(this, &UGA_Skill::OnReleaseInput);
-	// 		ReleaseTask->ReadyForActivation();
-	// 	}
-	// 	break;
+	
 
 	case ESkillInputStyle::Charging:
 		{
@@ -86,14 +78,10 @@ void UGA_Skill::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 		}
 		break;
 
+		// 루시안 궁 
 	case ESkillInputStyle::Burst:
 		{
-			// 1. 카운터 초기화
-			CurrentBurstShots = 0;
-
-			// 2. 첫 발 발사 및 타이머 시작
-			BurstLogic(); 
-			// 점사는 입력을 떼도 계속 나가야 하므로 WaitInputRelease가 필요 없습니다.
+			BurstLogic();
 		}
 		break;
 	}
@@ -187,12 +175,7 @@ void UGA_Skill::OnReleaseInput(float TimeHeld)
 
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 	}
-	// B. 연사 모드일 때
-	else if (InputStyle == ESkillInputStyle::Continuous)
-	{
-		// 타이머 끄고 종료
-		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
-	}
+	
 }
 
 void UGA_Skill::LoopLogic()
@@ -211,21 +194,40 @@ void UGA_Skill::LoopLogic()
 
 void UGA_Skill::BurstLogic()
 {
-	// 1. 발사
+	// 발사할 때 마다 CurrentBurstShots 더하고 CheckEndBurstLogic 호출하기 
 	ExecuteSkillLogic(1.0f);
-	CurrentBurstShots++;
+	
+	// 1. 엔진 내장 반복 태스크 생성
+	UAbilityTask_Repeat* RepeatTask = UAbilityTask_Repeat::RepeatAction(this, BurstInterval, MaxBurstCount);
 
-	// 2. 횟수 체크
-	if (CurrentBurstShots < BurstCount)
+	if (RepeatTask)
 	{
-		// 다음 발사 예약
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Loop, this, &UGA_Skill::BurstLogic, FireRate, false);
+		// 2. 태스크의 실행 핀을 C++ 콜백 함수에 연결 (AddDynamic)
+		RepeatTask->OnPerformAction.AddDynamic(this, &UGA_Skill::HandlePerformAction);
+		RepeatTask->OnFinished.AddDynamic(this, &UGA_Skill::HandleRepeatFinished);
+
+		// 3. 태스크 실행 시작
+		RepeatTask->ReadyForActivation();
 	}
 	else
 	{
-		// 다 쐈으면 종료
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 	}
 }
+
+void UGA_Skill::HandlePerformAction(int32 ActionNumber)
+{
+	ExecuteSkillLogic(1.0f);
+}
+
+void UGA_Skill::HandleRepeatFinished(int32 ActionNumber)
+{
+	// C++에서 깔끔하게 어빌리티를 종료합니다.
+	bool bReplicateEndAbility = true;
+	bool bWasCancelled = false;
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
+
+
 
 
