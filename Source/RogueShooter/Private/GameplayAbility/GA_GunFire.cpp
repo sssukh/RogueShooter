@@ -101,7 +101,7 @@ void UGA_GunFire::TriggerFireGameplayCue(FVector MuzzleLoc, FVector TargetLoc, c
 
 	// 5. GC 실행
 	GetAbilitySystemComponentFromActorInfo()->ExecuteGameplayCue(
-		FRsGameplayTags::Get().GC_Weapon_Fire_DoubleTap, 
+		FRsGameplayTags::Get().GC_Weapon_Fire_Drifter_DoubleTap, 
 		CueParams
 	);
 }

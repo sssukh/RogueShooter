@@ -57,7 +57,8 @@ void UGA_Skill::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 	case ESkillInputStyle::Continuous:
 		{
 			ExecuteSkillLogic(1.0f); // 그냥 발사 (파워 100%)
-			EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
+			if (bAutoEndAbility)
+				EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 		}
 		break;
 
@@ -194,9 +195,9 @@ void UGA_Skill::LoopLogic()
 
 void UGA_Skill::BurstLogic()
 {
-	// 발사할 때 마다 CurrentBurstShots 더하고 CheckEndBurstLogic 호출하기 
-	ExecuteSkillLogic(1.0f);
-	
+	// 카운트 초기화 
+	CurrentBurstCount = 0;
+
 	// 1. 엔진 내장 반복 태스크 생성
 	UAbilityTask_Repeat* RepeatTask = UAbilityTask_Repeat::RepeatAction(this, BurstInterval, MaxBurstCount);
 
@@ -218,6 +219,7 @@ void UGA_Skill::BurstLogic()
 void UGA_Skill::HandlePerformAction(int32 ActionNumber)
 {
 	ExecuteSkillLogic(1.0f);
+	++CurrentBurstCount;
 }
 
 void UGA_Skill::HandleRepeatFinished(int32 ActionNumber)

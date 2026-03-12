@@ -71,6 +71,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Config")
 	ESkillInputStyle InputStyle = ESkillInputStyle::Instant;
 
+	
+	// false일 시 직접 EndAbility 반드시 호출 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Config", meta = (EditCondition = "InputStyle == ESkillInputStyle::Instant"))
+	bool bAutoEndAbility = true;
+	
 	// 연사 속도 (초 단위, Continuous 모드일 때만 사용)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Config", meta = (EditCondition = "InputStyle == ESkillInputStyle::Continuous"))
 	float FireRate = 0.1f;
@@ -85,6 +90,9 @@ protected:
 	// 점사 관련 설정
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Config", meta = (EditCondition = "InputStyle == ESkillInputStyle::Burst"))
 	int32 MaxBurstCount = 3; // 한 번 누르면 몇 발 나가는지
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Config", meta = (EditCondition = "InputStyle == ESkillInputStyle::Burst"))
+	int32 CurrentBurstCount = 0; // 지금 몇 발 나갔는지
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Config", meta = (EditCondition = "InputStyle == ESkillInputStyle::Burst"))
 	float BurstInterval = 0.1f; // 한 번 누르면 몇 발 나가는지
@@ -105,7 +113,6 @@ protected:
 
 	// 점사 로직용 함수
 	void BurstLogic();
-	
 	
 	// 태스크의 발사 신호를 받을 C++ 콜백 함수
 	UFUNCTION()

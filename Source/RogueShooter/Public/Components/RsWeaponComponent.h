@@ -34,7 +34,8 @@ class ROGUESHOOTER_API URsWeaponComponent : public UActorComponent
 public:
 	URsWeaponComponent();
 
-	
+	UFUNCTION(BlueprintCallable)
+	FName GetMuzzleNameByIndex(int32 Index);
 protected:
 	virtual void BeginPlay() override;
 	

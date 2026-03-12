@@ -17,6 +17,13 @@ URsWeaponComponent::URsWeaponComponent()
 	// ...
 }
 
+FName URsWeaponComponent::GetMuzzleNameByIndex(int32 Index)
+{
+	if (Index>=MuzzleSocketNames.Num())
+		return FName(TEXT("None"));
+	
+	return MuzzleSocketNames[Index];
+}
 
 
 void URsWeaponComponent::BeginPlay()

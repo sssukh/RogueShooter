@@ -540,7 +540,9 @@ void ABase_Enemy::DeactivateToPool()
 	// 1. 렌더링 및 충돌 해제
 	// SetActorHiddenInGame(true);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-    
+    GetMesh()->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
+	
+	
 	// 2. 틱 및 이동 연산 중지
 	SetActorTickEnabled(false);
 	GetCharacterMovement()->DisableMovement();

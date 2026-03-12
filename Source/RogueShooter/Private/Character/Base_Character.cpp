@@ -118,6 +118,7 @@ void ABase_Character::Tick(float DeltaTime)
 			CurrentSpread = FMath::FInterpTo(CurrentSpread, MinSpread, DeltaTime, RecoveryRate);
 		}
 	}
+	
 }
 
 void ABase_Character::PostInitializeComponents()
@@ -289,6 +290,9 @@ void ABase_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		if (MoveAction)
 		{
 			EnhancedInputComponent->BindAction(MoveAction,ETriggerEvent::Triggered,this,&ABase_Character::Move);
+			
+			EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &ABase_Character::Move);
+			EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Canceled, this, &ABase_Character::Move);
 		}
 		
 		for (const FSkillInputMapping& Mapping : DefaultSkills)
@@ -584,6 +588,7 @@ void ABase_Character::Move(const FInputActionValue& Value)
 	// 입력값 가져오기 (X: 앞뒤, Y: 좌우)
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
+	CachedMoveInput = MovementVector;
 	if (Controller != nullptr)
 	{
 		// A. 컨트롤러의 회전값 가져오기
