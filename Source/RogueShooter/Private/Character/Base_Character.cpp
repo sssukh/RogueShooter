@@ -43,6 +43,7 @@
 #include "System/RsPlayerState.h"
 #include "System/UnitWidgetController.h"
 #include "GameplayAbility/GA_Skill.h"
+#include "Utility/FRsGameplayTags.h"
 
 // Sets default values
 ABase_Character::ABase_Character()
@@ -589,6 +590,14 @@ void ABase_Character::Move(const FInputActionValue& Value)
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
 	CachedMoveInput = MovementVector;
+	
+	if (AbilitySystemComponent && AbilitySystemComponent->HasMatchingGameplayTag(FRsGameplayTags::Get().Status_Movement_Dashing))
+	{
+		// 대시 태그가 있다면 일반 이동(AddMovementInput)을 무시하고 빠져나갑니다!
+		RS_LOG_SCREEN(TEXT("Dashing"))
+		return; 
+	}
+	
 	if (Controller != nullptr)
 	{
 		// A. 컨트롤러의 회전값 가져오기

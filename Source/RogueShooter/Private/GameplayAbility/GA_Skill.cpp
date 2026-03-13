@@ -199,7 +199,7 @@ void UGA_Skill::BurstLogic()
 	CurrentBurstCount = 0;
 
 	// 1. 엔진 내장 반복 태스크 생성
-	UAbilityTask_Repeat* RepeatTask = UAbilityTask_Repeat::RepeatAction(this, BurstInterval, MaxBurstCount);
+	UAbilityTask_Repeat* RepeatTask = UAbilityTask_Repeat::RepeatAction(this, BurstTime/MaxBurstCount, MaxBurstCount);
 
 	if (RepeatTask)
 	{

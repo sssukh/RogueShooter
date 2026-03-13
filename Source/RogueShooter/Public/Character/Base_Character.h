@@ -309,7 +309,6 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config | Crosshair")
 	float CurrentSpread;
-	
 private:
 	// 실시간으로 저장(캐싱)해둘 이동 입력 벡터 
 	FVector2D CachedMoveInput;

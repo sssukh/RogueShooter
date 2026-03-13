@@ -4,6 +4,9 @@
 #include "GameplayTagContainer.h"
 #include "NativeGameplayTags.h"
 
+#define ADD_NATIVE_TAG(TagName, DevComment) \
+TagName = AddNativeTag( Manager,#TagName , DevComment )
+
 class UGameplayTagsManager;
 
 /**
@@ -38,6 +41,7 @@ public:
 	FGameplayTag Status_Cooldown_SKill3;
 	FGameplayTag Status_Cooldown_SKill4;
 	FGameplayTag Status_Cooldown_SKill5;
+	FGameplayTag Status_Movement_Dashing;
 	
 	
 	FGameplayTag Ability_Skill;
@@ -73,6 +77,9 @@ public:
 	
 protected:
 	void AddAllTags(UGameplayTagsManager& Manager);
+	
+	FGameplayTag AddNativeTag(UGameplayTagsManager& Manager, const FString& InRawName, const FString& DevComment);
+	
 private:
 	static FRsGameplayTags GameplayTags;
 };

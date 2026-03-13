@@ -34,6 +34,7 @@ void FRsGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	Status_Cooldown_SKill3 = Manager.AddNativeGameplayTag(FName("Status.Cooldown.Skill3"),TEXT("Skill3 쿨다운"));
 	Status_Cooldown_SKill4 = Manager.AddNativeGameplayTag(FName("Status.Cooldown.Skill4"),TEXT("Skill4 쿨다운"));
 	Status_Cooldown_SKill5 = Manager.AddNativeGameplayTag(FName("Status.Cooldown.Skill5"),TEXT("Skill5 쿨다운"));
+	ADD_NATIVE_TAG(Status_Movement_Dashing,TEXT("이동기 사용중"));
 	
 	Ability_Skill = Manager.AddNativeGameplayTag(FName("Ability.Skill"),TEXT("스킬 태그"));
 	Ability_Skill_Dash = Manager.AddNativeGameplayTag(FName("Ability.Skill.Dash"),TEXT("스킬 대쉬 태그"));
@@ -64,3 +65,14 @@ void FRsGameplayTags::AddAllTags(UGameplayTagsManager& Manager)
 	GC_Weapon_Fire_Drifter_DoubleTap = Manager.AddNativeGameplayTag(FName("GameplayCue.Weapon.Fire.Drifter.DoubleTap"),TEXT("Drifter DoubleTap GC"));
 	GC_Weapon_Fire_Drifter_Projectile = Manager.AddNativeGameplayTag(FName("GameplayCue.Weapon.Fire.Drifter.Projectile"),TEXT("Drifter Fire Projectile GC"));
 }
+
+FGameplayTag FRsGameplayTags::AddNativeTag(UGameplayTagsManager& Manager, const FString& InRawName, const FString& DevComment)
+{
+	// 1. 언더바(_)를 점(.)으로 치환
+	FString ProcessedName = InRawName.Replace(TEXT("_"), TEXT("."));
+    
+	// 2. 엔진의 GameplayTagManager를 통해 등록
+	return Manager.AddNativeGameplayTag(FName(*ProcessedName), DevComment);
+}
+
+

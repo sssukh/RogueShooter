@@ -95,7 +95,7 @@ protected:
 	int32 CurrentBurstCount = 0; // 지금 몇 발 나갔는지
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Config", meta = (EditCondition = "InputStyle == ESkillInputStyle::Burst"))
-	float BurstInterval = 0.1f; // 한 번 누르면 몇 발 나가는지
+	float BurstTime = 3.0f; // 몇초동안 나가는지 
 	
 protected:
 	// 버튼을 뗐을 때 감지 (Task 콜백)
