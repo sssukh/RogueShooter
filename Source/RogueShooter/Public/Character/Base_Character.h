@@ -212,6 +212,17 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Movement|Input")
 	FVector2D GetCachedMoveInput() const { return CachedMoveInput; }
 	
+	UFUNCTION(Server, Reliable,BlueprintCallable)
+	void Server_RequestDashDirection(const FVector& InDashDir);
+
+	UFUNCTION(BlueprintCallable, Category="Dash")
+	FVector MakeDashDirectionFromCachedInput() const;
+	// 실시간으로 저장(캐싱)해둘 이동 입력 벡터 
+	UPROPERTY(BlueprintReadOnly, Category="Dash")
+	FVector2D CachedMoveInput;
+	
+	UPROPERTY(Replicated, BlueprintReadWrite, Category="Dash")
+	FVector ReplicatedDashDirection = FVector::ForwardVector;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<UCameraComponent> Camera;
@@ -309,7 +320,7 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config | Crosshair")
 	float CurrentSpread;
-private:
-	// 실시간으로 저장(캐싱)해둘 이동 입력 벡터 
-	FVector2D CachedMoveInput;
+	
+	
+
 };

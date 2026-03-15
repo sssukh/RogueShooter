@@ -569,6 +569,37 @@ void ABase_Character::OnRep_CharSK()
 	// }
 }
 
+
+void ABase_Character::Server_RequestDashDirection_Implementation(const FVector& InDashDir)
+{
+	ReplicatedDashDirection = InDashDir;
+}
+
+FVector ABase_Character::MakeDashDirectionFromCachedInput() const
+{
+	const FRotator ControlRot = Controller ? Controller->GetControlRotation() : GetActorRotation();
+	const FRotator YawRot(0.f, ControlRot.Yaw, 0.f);
+
+	const FVector Forward =  FRotationMatrix(YawRot).GetUnitAxis(EAxis::X);
+	const FVector Right   = FRotationMatrix(YawRot).GetUnitAxis(EAxis::Y);
+
+	FVector DashDir = Forward * CachedMoveInput.X + Right * CachedMoveInput.Y;
+	DashDir.Z = 0.f;
+
+	if (DashDir.IsNearlyZero())
+	{
+		DashDir = GetActorForwardVector();
+		DashDir.Z = 0.f;
+	}
+	
+	
+	
+
+	DashDir.Normalize();
+	
+	return DashDir;
+}
+
 void ABase_Character::Look(const FInputActionValue& Value)
 {
 	// Axis2D 데이터 가져오기 (X, Y)

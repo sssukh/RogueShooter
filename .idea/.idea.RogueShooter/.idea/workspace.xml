@@ -12,14 +12,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8deb027d-5a9e-424c-a7bd-f766f82ad3c0" name="변경" comment="">
-      <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayAbility/Skill/Drifter/BGA_DrifterBulletStorm.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayAbility/Skill/Drifter/BGA_DrifterBulletStorm.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayAbility/Skill/Drifter/BGA_DrifterSlide.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/RogueShooter/Blueprints/GameplayAbility/Skill/Drifter/BGA_DrifterSlide.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/Character/Base_Character.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/Character/Base_Character.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/GameplayAbility/GA_Skill.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/GameplayAbility/GA_Skill.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Private/Utility/FRsGameplayTags.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Private/Utility/FRsGameplayTags.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/Character/Base_Character.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/Character/Base_Character.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/GameplayAbility/GA_Skill.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/GameplayAbility/GA_Skill.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/RogueShooter/Public/Utility/FRsGameplayTags.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/RogueShooter/Public/Utility/FRsGameplayTags.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,10 +33,10 @@
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Private/AbilitySystemComponent.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Private/AttributeSet.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Private/GameplayAbilityTypes.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Private/GameplayCueNotify_Burst.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Private/GameplayCueNotify_Burst.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Private/GameplayEffect.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/Abilities/Tasks/AbilityTask_WaitInputRelease.h" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/GameplayCueNotify_Burst.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/GameplayCueNotify_Burst.h" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Developer/DerivedDataCache/Private/DerivedDataCacheStats.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Developer/Profiler/Private/ProfilerSession.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Developer/SkeletalMeshUtilitiesCommon/Public/SkeletalMeshNotifier.h" root0="FORCE_HIGHLIGHTING" />
@@ -124,6 +119,7 @@
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/Engine/Classes/GameFramework/PlayerState.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/Engine/Private/Actor.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/Engine/Private/Character.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/Engine/Private/Components/NavMovementComponent.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/Engine/Private/Controller.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/Engine/Private/Pawn.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/Engine/Private/PlayerController.cpp" root0="FORCE_HIGHLIGHTING" />
@@ -434,6 +430,7 @@
       <workItem from="1773198530976" duration="8506000" />
       <workItem from="1773301026987" duration="10870000" />
       <workItem from="1773369526186" duration="5790000" />
+      <workItem from="1773537397232" duration="8897000" />
     </task>
     <servers />
   </component>
