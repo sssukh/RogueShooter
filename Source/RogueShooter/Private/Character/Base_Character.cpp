@@ -251,9 +251,18 @@ void ABase_Character::OnLevelup( float NewLevel)
 	}
 }
 
-
-
-
+FSkillInputMapping ABase_Character::GetSkillInputMappingFromInputID(EAbilityInputID InInputID)
+{
+	for (const FSkillInputMapping& SkillInputInfo : DefaultSkills)
+	{
+		if (SkillInputInfo.InputID==InInputID)
+		{
+			return SkillInputInfo;
+		}
+	}
+	
+	return FSkillInputMapping();
+}
 
 
 float ABase_Character::GetMaxXpForLevel(float pLevel) const
@@ -675,6 +684,56 @@ void ABase_Character::SendAbilityLocalInput(const EAbilityInputID InputID, bool 
 	{
 		if (bIsPressed)
 		{
+			
+			TSubclassOf<UGA_Skill> TargetSkillClass = nullptr;
+			
+			TargetSkillClass = GetSkillInputMappingFromInputID(InputID).Ability;
+			
+			if (!TargetSkillClass)  return;
+			
+			UGA_Skill* SkillCDO = TargetSkillClass->GetDefaultObject<UGA_Skill>();
+			ESkillPayloadType PayloadType = SkillCDO->GetRequiredPayloadType();
+			FGameplayTag EventTag = SkillCDO->GetActivationEventTag();
+			
+			// 3. 요구사항에 맞춰 택배(Payload)를 조립합니다.
+			FGameplayEventData Payload;
+			Payload.Instigator = this;
+			Payload.Target = this;
+
+			if (PayloadType != ESkillPayloadType::None)
+			{
+				FGameplayAbilityTargetData_LocationInfo* LocationData = new FGameplayAbilityTargetData_LocationInfo();
+            
+				// Switch문으로 요구하는 데이터만 계산해서 넣어줍니다.
+				switch (PayloadType)
+				{
+				case ESkillPayloadType::Direction:
+					LocationData->TargetLocation.LiteralTransform = FTransform(MakeDashDirectionFromCachedInput());
+					break;
+				case ESkillPayloadType::MouseLocation:
+					// LocationData->TargetLocation.LiteralTransform = FTransform(GetMouseCursorLocation());
+					break;
+				case ESkillPayloadType::TargetActor:
+					// (타겟 액터가 필요하다면 다른 TargetData 타입을 생성해서 핸들에 넣습니다)
+					break;
+				}
+
+				LocationData->TargetLocation.LocationType = EGameplayAbilityTargetingLocationType::LiteralTransform;
+				FGameplayAbilityTargetDataHandle TargetDataHandle;
+				TargetDataHandle.Add(LocationData);
+				Payload.TargetData = TargetDataHandle;
+            
+				// 4-A. 데이터가 완성되었으니 이벤트로 스킬을 먼저 켭니다.
+				if (EventTag.IsValid())
+				{
+					AbilitySystemComponent->HandleGameplayEvent(EventTag, &Payload);
+				}
+			}
+			
+			// B. ASC에게 InputID가 눌렸음을 알려줍니다. 
+			// (TargetData가 필요 없는 기본 스킬들은 이 줄에 의해 켜지며, 
+			// 이미 위에서 켜진 스킬들은 상태만 Pressed로 기록되어 WaitInputRelease가 작동하게 됩니다!)
+				
 			// ASC에게 "이 ID 눌렸어"라고 알림 -> 자동으로 연결된 GA 발동 시도
 			GetAbilitySystemComponent()->AbilityLocalInputPressed((int32)InputID);
 		}

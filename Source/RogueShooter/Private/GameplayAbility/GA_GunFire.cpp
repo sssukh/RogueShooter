@@ -106,7 +106,8 @@ void UGA_GunFire::TriggerFireGameplayCue(FVector MuzzleLoc, FVector TargetLoc, c
 	);
 }
 
-void UGA_GunFire::ExecuteSkillLogic_Implementation(float ChargeAmount)
+void UGA_GunFire::ExecuteSkillLogic_Implementation(float ChargeAmount,
+	FGameplayAbilityTargetDataHandle TriggerEventData)
 {
 	// 1. 대미지 GE 클래스 가져오기 (블루프린트에서 설정)
 	if (!DamageEffectClass || !ProjectileClass)

@@ -20,6 +20,14 @@ enum class ESkillInputStyle : uint8
 	Burst       UMETA(DisplayName = "Burst Fire")          
 };
 
+UENUM(BlueprintType)
+enum class ESkillPayloadType : uint8
+{
+	None            UMETA(DisplayName = "필요 없음 (일반 스킬)"),
+	Direction       UMETA(DisplayName = "방향 벡터 (대시 등)"),
+	MouseLocation   UMETA(DisplayName = "마우스 커서 위치 (메테오 등)"),
+	TargetActor     UMETA(DisplayName = "현재 락온된 타겟 (유도탄 등)")
+};
 
 /**
  * BaseSkill 클래스 
@@ -62,15 +70,34 @@ protected:
 
 	// ChargeAmount: 0.0 ~ 1.0 사이의 값 (차징일 때만 변하고, 나머지는 항상 1.0)
 	UFUNCTION(BlueprintNativeEvent, Category = "Skill Logic")
-	void ExecuteSkillLogic(float ChargeAmount);
-	virtual void ExecuteSkillLogic_Implementation(float ChargeAmount);
+	void ExecuteSkillLogic(float ChargeAmount,FGameplayAbilityTargetDataHandle TriggerEventData);
+	virtual void ExecuteSkillLogic_Implementation(float ChargeAmount, FGameplayAbilityTargetDataHandle TriggerEventData);
 	
+public:
+	// 외부(캐릭터)에서 이 값을 읽어갈 수 있도록 Getter 추가
+	ESkillPayloadType GetRequiredPayloadType() const { return RequiredPayloadType; }
+	FGameplayTag GetActivationEventTag() const { return ActivationEventTag; }
+protected:
+	// 스킬 발동 시 전달받은 타겟 데이터(방향, 위치 등)를 보관하는 변수
+	UPROPERTY(BlueprintReadOnly, Category = "Skill|Data")
+	FGameplayAbilityTargetDataHandle CachedTargetData;
+
+	// 자식 블루프린트에서 타겟 데이터를 쉽게 벡터로 뽑아 쓰기 위한 헬퍼 함수
+	UFUNCTION(BlueprintCallable, Category = "Skill|Data")
+	FVector GetTargetDataLocation() const;
 	
 protected:
 	// 스킬 타입 (단발 vs 연사)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Config")
 	ESkillInputStyle InputStyle = ESkillInputStyle::Instant;
 
+	// 이 스킬이 발동될 때 어떤 데이터가 필요한가요?
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill|Input")
+	ESkillPayloadType RequiredPayloadType = ESkillPayloadType::None;
+	
+	// 이 스킬을 이벤트로 발동시킬 때 사용할 태그 (예: Ability.Trigger.Dash)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill|Input")
+	FGameplayTag ActivationEventTag;
 	
 	// false일 시 직접 EndAbility 반드시 호출 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill Config", meta = (EditCondition = "InputStyle == ESkillInputStyle::Instant"))

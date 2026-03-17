@@ -39,24 +39,25 @@ void UGA_Skill::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 		// 	
 		// }
 	}
-	// // 2. 몽타주 자동 재생 (설정되어 있다면)
-	// if (SkillMontage)
-	// {
-	// 	// AbilityTask_PlayMontageAndWait를 C++에서 생성해서 실행하거나
-	// 	// 단순 재생 후 BP에게 타이밍을 맡길 수도 있습니다.
-	// }
-	//
-	// // 3.  블루프린트 로직 실행 
-	// BP_OnActivateSkill();
 	
-	// bAutoCommit이 꺼져있다면 EndAbility 앞에 ApplyCooldown 실행 
+	// =======================================================
+	// 🌟 [핵심 로직 추가] 이벤트로 전달된 데이터가 있다면 캐싱합니다.
+	// =======================================================
+	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
+	{
+		CachedTargetData = TriggerEventData->TargetData;
+	}
+	else
+	{
+		CachedTargetData.Clear(); // 입력으로 실행됐을 경우 찌꺼기 방지
+	}
 	
 	switch (InputStyle)
 	{
 	case ESkillInputStyle::Instant:
 	case ESkillInputStyle::Continuous:
 		{
-			ExecuteSkillLogic(1.0f); // 그냥 발사 (파워 100%)
+			ExecuteSkillLogic(1.0f, CachedTargetData); // 그냥 발사 (파워 100%)
 			if (bAutoEndAbility)
 				EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 		}
@@ -147,10 +148,34 @@ FVector UGA_Skill::GetMouseCursorLocation()
 	return FVector();
 }
 
-void UGA_Skill::ExecuteSkillLogic_Implementation(float ChargeAmount)
+void UGA_Skill::ExecuteSkillLogic_Implementation(float ChargeAmount, FGameplayAbilityTargetDataHandle TriggerEventData)
 {
 }
 
+
+
+FVector UGA_Skill::GetTargetDataLocation() const
+{
+	// 1. 캐싱된 핸들에 유효한 데이터가 있는지 확인합니다.
+	if (CachedTargetData.IsValid(0))
+	{
+		// 2. 0번째 인덱스의 타겟 데이터를 가져옵니다.
+		const FGameplayAbilityTargetData* Data = CachedTargetData.Get(0);
+        
+		if (Data)
+		{
+			// 3. 안에 들어있는 Transform 정보가 있다면, 그것의 Location(벡터)을 반환합니다.
+			// (만약 우리가 LiteralTransform으로 방향을 넣었다면, 그 방향 벡터가 튀어나옵니다!)
+			if (Data->HasEndPoint())
+			{
+				return Data->GetEndPointTransform().GetLocation();
+			}
+		}
+	}
+
+	// 데이터가 없거나 유효하지 않으면 기본값(0,0,0)을 반환합니다.
+	return FVector::ZeroVector;
+}
 
 
 void UGA_Skill::OnReleaseInput(float TimeHeld)
@@ -172,7 +197,7 @@ void UGA_Skill::OnReleaseInput(float TimeHeld)
 		float ChargeAlpha = FMath::Clamp((ChargeDuration - MinChargeTime) / (MaxChargeTime - MinChargeTime), 0.0f, 1.0f);
 
 		// 자식에게 전달! (이제 자식은 이 Alpha값으로 대미지나 투사체 크기를 조절)
-		ExecuteSkillLogic(ChargeAlpha);
+		ExecuteSkillLogic(ChargeAlpha,CachedTargetData);
 
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 	}
@@ -184,7 +209,7 @@ void UGA_Skill::LoopLogic()
 	// 매 발사마다 코스트 지불 시도
 	if (CommitAbilityCost(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo))
 	{
-		ExecuteSkillLogic(1.0f);
+		ExecuteSkillLogic(1.0f,CachedTargetData);
 	}
 	else
 	{
@@ -218,7 +243,7 @@ void UGA_Skill::BurstLogic()
 
 void UGA_Skill::HandlePerformAction(int32 ActionNumber)
 {
-	ExecuteSkillLogic(1.0f);
+	ExecuteSkillLogic(1.0f,CachedTargetData);
 	++CurrentBurstCount;
 }
 

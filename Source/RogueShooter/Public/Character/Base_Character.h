@@ -103,6 +103,7 @@ protected:
 	UFUNCTION()
 	void OnLevelup(float NewLevel);
 	
+	FSkillInputMapping GetSkillInputMappingFromInputID(EAbilityInputID InInputID);
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Config | Attribute")
 	FCurveTableRowHandle MaxXpCurve;

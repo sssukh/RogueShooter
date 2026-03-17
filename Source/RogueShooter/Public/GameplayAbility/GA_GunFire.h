@@ -26,7 +26,7 @@ public:
 	
 	void TriggerFireGameplayCue(FVector MuzzleLoc, FVector TargetLoc, const FHitResult& HitResult);
 	
-	virtual void ExecuteSkillLogic_Implementation(float ChargeAmount) override;
+	virtual void ExecuteSkillLogic_Implementation(float ChargeAmount, FGameplayAbilityTargetDataHandle TriggerEventData) override;
 	
 
 
